@@ -1,12 +1,12 @@
-utree is a C++ header-only library implementing a generic abstract syntax tree
-data structure. It is designed to be portable and deployable on embedded systems.
-utree is primarily intended to work with `the Boost.Spirit parser/generator
-framework <http://www.boost-spirit.com/home>`_.
+Prana is a C++ header-only library implementing a generic abstract syntax tree
+data structure called utree. It is designed to be portable and deployable on
+embedded systems. Prana is primarily intended to work with `the Boost.Spirit
+parser/generator framework <http://www.boost-spirit.com/home>`_.
 
 License
 =======
 
-utree uses the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
+Prana uses the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
 A copy should be available in the credit directory of this repository.
  
 Contact

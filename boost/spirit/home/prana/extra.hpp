@@ -1,11 +1,3 @@
-
-
-// $$$ move this in its own file $$$
-namespace scheme { namespace utree_functions
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // Extra functions
-    ///////////////////////////////////////////////////////////////////////////
     inline utree rest(utree& x)
     {
         utree::iterator i = x.begin(); ++i;
@@ -17,4 +9,5 @@ namespace scheme { namespace utree_functions
         utree::const_iterator i = x.begin(); ++i;
         return utree(utree::const_range(i, x.end()), shallow);
     }
-}}
+
+

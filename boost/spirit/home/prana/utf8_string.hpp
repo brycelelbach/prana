@@ -1,0 +1,14 @@
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Our UTF-8 string
+  ///////////////////////////////////////////////////////////////////////////
+  typedef basic_string<
+  boost::iterator_range<char const*>,
+  utree_type::string_type>
+  utf8_string_range;
+
+  typedef basic_string<
+  std::string,
+  utree_type::string_type>
+  utf8_string;
+

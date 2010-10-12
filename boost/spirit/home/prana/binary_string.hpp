@@ -1,0 +1,13 @@
+///////////////////////////////////////////////////////////////////////////
+// Binary string
+///////////////////////////////////////////////////////////////////////////
+typedef basic_string<
+boost::iterator_range<char const*>,
+  utree_type::binary_type>
+  binary_range;
+
+  typedef basic_string<
+  std::string,
+  utree_type::binary_type>
+  binary_string;
+

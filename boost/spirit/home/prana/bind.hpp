@@ -12,10 +12,10 @@ struct binder {
   binder (F f, X& x): x(x), f(f) { }
 
   template<typename Y>
-  typename F::result_type operator()(Y& y) const { return f(x, y); }
+  typename F::result_type operator() (Y& y) const { return f(x, y); }
 
   template<typename Y>
-  typename F::result_type operator()(Y const& y) const { return f(x, y); }
+  typename F::result_type operator() (Y const& y) const { return f(x, y); }
 };
 
 template<typename F, typename X>

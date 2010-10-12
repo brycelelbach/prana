@@ -1,31 +1,3 @@
-/*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-
-    Distributed under the Boost Software License, Version 1.0. (See accompanying
-    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
-#if !defined(BOOST_SPIRIT_UTREE_OPERATORS)
-#define BOOST_SPIRIT_UTREE_OPERATORS
-
-#include <utree/utree.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/type_traits/is_integral.hpp>
-
-#if defined(BOOST_MSVC)
-# pragma warning(push)
-# pragma warning(disable: 4804)
-# pragma warning(disable: 4805)
-#endif
-
-#include <exception>
-#include <utree/utree.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/type_traits/is_integral.hpp>
-
-namespace scheme
-{
     struct utree_exception : std::exception {};
 
     struct illegal_arithmetic_operation : utree_exception
