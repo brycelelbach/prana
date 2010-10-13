@@ -16,7 +16,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-#include <boost/spirit/home/prana/pointers.hpp>
+#include <boost/spirit/home/prana/adt/any_ptr.hpp>
 #include <boost/spirit/home/prana/exceptions.hpp>
 
 namespace boost {

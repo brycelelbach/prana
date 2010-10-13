@@ -23,20 +23,7 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-// forward declaration
-class utree;
-
-// forward declaration
-template<typename UTreeX, typename UTreeY>
-struct visitor;
-
-struct void_ptr {
-  void* p;
-  std::type_info const* i;
-};
-
-class any_ptr {
- public:
+struct any_ptr {
   template<typename Ptr>
   typename boost::disable_if<
     boost::is_polymorphic<typename boost::remove_pointer<Ptr>::type>, Ptr
@@ -48,19 +35,19 @@ class any_ptr {
   }
 
   template<typename T>
-  any_ptr (T* p): p(p), i(&BOOST_SP_TYPEID(T*)) { }
+  void construct (T* p) {
+    p = p;
+    i = &BOOST_SP_TYPEID(T*);
+  }
 
+  void construct (void* p, std::type_info const* i) {
+    p = p;
+    i = i;
+  }
+  
   friend bool operator== (any_ptr const& a, any_ptr const& b) {
     return (a.p == b.p) && (*a.i == *b.i);
   }
-
- private:
-  any_ptr (void* p, std::type_info const* i): p(p), i(i) { }
-
-  template<typename UTreeX, typename UTreeY>
-  friend struct vistor;
-
-  friend class utree;
 
   void* p;
   std::type_info const* i;

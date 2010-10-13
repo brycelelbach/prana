@@ -10,16 +10,18 @@
 #if !defined(BOOST_SPIRIT_PRANA_UTREE_HPP)
 #define BOOST_SPIRIT_PRANA_UTREE_HPP
 
+#include <typeinfo>
 #include <string>
 
 #include <boost/ref.hpp>
 #include <boost/assert.hpp>
 #include <boost/range/iterator_range.hpp>
 
+#include <boost/spirit/home/prana/adt/dllist.hpp>
+#include <boost/spirit/home/prana/adt/basic_string.hpp>
+#include <boost/spirit/home/prana/adt/fast_string.hpp>
+#include <boost/spirit/home/prana/adt/any_ptr.hpp>
 #include <boost/spirit/home/prana/tree_type.hpp>
-#include <boost/spirit/home/prana/adt/list_fwd.hpp>
-#include <boost/spirit/home/prana/strings.hpp>
-#include <boost/spirit/home/prana/pointers.hpp>
 
 namespace boost {
 namespace spirit {
@@ -41,9 +43,9 @@ class stored_function;
 class utree {
  public:
   typedef utree value_type;
-  typedef list::iterator<utree> iterator;
-  typedef list::iterator<utree const> const_iterator;
-  typedef list::iterator<boost::reference_wrapper<utree> > ref_iterator;
+  typedef dllist<utree>::iterator iterator;
+  typedef dllist<utree>::const_iterator const_iterator;
+  typedef dllist<utree>::ref_iterator ref_iterator;
   typedef utree& reference;
   typedef utree const& const_reference;
   typedef std::ptrdiff_t difference_type;
@@ -175,17 +177,17 @@ class utree {
   void copy (const_reference other);
 
   union {
-    fast_string s;
-    list l;
+    fast_string<dllist<utree> > s;
+    dllist<utree> l;
     struct {
-      list::node* first;
-      list::node* last;
+      dllist<utree>::node* first;
+      dllist<utree>::node* last;
     } r;
     struct {
       char const* first;
       char const* last;
     } sr;
-    void_ptr v;
+    any_ptr v;
     bool b;
     int i;
     double d;
@@ -198,7 +200,6 @@ class utree {
 } // spirit 
 } // boost
 
-#include <boost/spirit/home/prana/adt/list.hpp>
 #include <boost/spirit/home/prana/scope.hpp>
 #include <boost/spirit/home/prana/index.hpp>
 #include <boost/spirit/home/prana/cast.hpp>
@@ -474,7 +475,7 @@ inline utree::iterator utree::erase (iterator pos) {
   if (get_type() == tree_type::reference_type)
     return p->erase(pos);
   BOOST_ASSERT(get_type() == tree_type::list_type);
-  list::node* np = l.erase(pos.node);
+  dllist<utree>::node* np = l.erase(pos.node);
   return iterator(np, np ? np->prev : l.last);
 }
 
@@ -571,7 +572,7 @@ inline std::size_t utree::size (void) const {
     return ((utree const*)p)->size();
   else if (get_type() == tree_type::range_type) {
     size_type size = 0;
-    list::node* n = r.first;
+    dllist<utree>::node* n = r.first;
     while (n) {
       n = n->next;
       ++size;

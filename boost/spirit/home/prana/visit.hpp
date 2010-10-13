@@ -18,9 +18,10 @@
 
 #include <boost/type_traits/is_const.hpp>
 
+#include <boost/spirit/home/prana/adt/basic_string.hpp>
+#include <boost/spirit/home/prana/adt/fast_string.hpp>
+#include <boost/spirit/home/prana/adt/any_ptr.hpp>
 #include <boost/spirit/home/prana/tree_type.hpp>
-#include <boost/spirit/home/prana/strings.hpp>
-#include <boost/spirit/home/prana/pointers.hpp>
 #include <boost/spirit/home/prana/bind.hpp>
 
 namespace boost {

@@ -7,21 +7,64 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_LIST_HPP)
-#define BOOST_SPIRIT_PRANA_LIST_HPP
+#if !defined(BOOST_SPIRIT_PRANA_DLLIST_HPP)
+#define BOOST_SPIRIT_PRANA_DLLIST_HPP
 
 #include <boost/assert.hpp>
 #include <boost/ref.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <boost/spirit/home/prana/utree.hpp>
-
 namespace boost {
 namespace spirit {
 namespace prana {
 
-struct list::node: private boost::noncopyable {
+/*=============================================================================
+Our POD double linked list. Straightforward implementation. This has to be a POD
+so it can be used in utree's discriminated union.
+=============================================================================*/
+
+template<typename Data>
+struct dllist {
+ public:
+  struct node;
+
+  template<typename Value> class node_iterator;
+
+  typedef std::size_t size_type;
+
+  typedef node_iterator<Data>                            iterator;
+  typedef node_iterator<const Data>                      const_iterator;
+  typedef node_iterator<boost::reference_wrapper<Data> > ref_iterator;
+
+  void free (void);
+  void copy (dllist const& other);
+  void default_construct (void);
+
+  template<typename T>
+  void insert_before (T const& val, node* node);
+
+  template<typename T>
+  void insert_after (T const& val, node* node);
+
+  template<typename T>
+  void push_front (T const& val);
+
+  template<typename T>
+  void push_back (T const& val);
+
+  void pop_front (void);
+  void pop_back (void);
+
+  node* erase (node* pos);
+
+  node* first;
+  node* last;
+  size_type size;
+};
+
+template<typename Data>
+struct dllist<Data>::node: private boost::noncopyable {
   template<typename T>
   node (T const& val, node* next, node* prev):
     val(val), next(next), prev(prev) { }
@@ -31,23 +74,21 @@ struct list::node: private boost::noncopyable {
     next->prev = prev;
   }
 
-  utree val;
+  Data val;
   node* next;
   node* prev;
 };
 
+template<typename Data>
 template<typename Value>
-class list::iterator: public boost::iterator_facade<
-  iterator<Value>, Value, boost::bidirectional_traversal_tag
+class dllist<Data>::node_iterator: public boost::iterator_facade<
+  node_iterator<Value>, Value, boost::bidirectional_traversal_tag
 > {
  public:
-  iterator (void): node(0) { }
+  node_iterator (void): node(0) { }
 
-  iterator (list::node* node, list::node* prev): node(node), prev(prev) { }
-
- private:
-  friend class boost::iterator_core_access;
-  friend class utree;
+  node_iterator (dllist<Data>::node* node, dllist<Data>::node* prev):
+    node(node), prev(prev) { }
 
   void increment (void) {
     if (node != 0) { // not at end
@@ -63,31 +104,32 @@ class list::iterator: public boost::iterator_facade<
     }
   }
 
-  bool equal (iterator const& other) const { return node == other.node; }
+  bool equal (node_iterator const& other) const {
+    return node == other.node;
+  }
 
-  typename iterator::reference dereference (void) const { return node->val; }
+  typename node_iterator::reference dereference (void) const {
+    return node->val;
+  }
 
-  list::node* node;
-  list::node* prev;
+  dllist<Data>::node* node;
+  dllist<Data>::node* prev;
 };
 
+template<typename Data>
 template<typename Value>
-class list::iterator<boost::reference_wrapper<Value> >:
+class dllist<Data>::node_iterator<boost::reference_wrapper<Value> >:
   public boost::iterator_facade<
-    iterator<boost::reference_wrapper<Value> >,
+    node_iterator<boost::reference_wrapper<Value> >,
     boost::reference_wrapper<Value>,
-    boost::bidirectional_traversal_tag>
-{
+    boost::bidirectional_traversal_tag
+> {
  public:
-  iterator (void):
+  node_iterator (void):
     node(0), prev(0), curr(nil_node) { }
 
-  iterator (list::node* node, list::node* prev):
+  node_iterator (dllist<Data>::node* node, dllist<Data>::node* prev):
     node(node), prev(prev), curr(node ? (node->val) : nil_node) { }
-
- private:
-  friend class boost::iterator_core_access;
-  friend class utree;
 
   void increment (void) {
     if (node != 0) { // not at end
@@ -105,21 +147,28 @@ class list::iterator<boost::reference_wrapper<Value> >:
     }
   }
 
-  bool equal (iterator const& other) const { return node == other.node; }
+  bool equal (node_iterator const& other) const {
+    return node == other.node;
+  }
 
-  typename iterator::reference dereference (void) const { return curr; }
+  typename node_iterator::reference dereference (void) const {
+    return curr;
+  }
 
-  list::node* node;
-  list::node* prev;
+  dllist<Data>::node* node;
+  dllist<Data>::node* prev;
 
   static Value nil_node;
   mutable boost::reference_wrapper<Value> curr;
 };
 
+template<typename Data>
 template<typename Value>
-Value list::iterator<boost::reference_wrapper<Value> >::nil_node = Value();
+Value dllist<Data>::node_iterator<boost::reference_wrapper<Value> >::nil_node
+  = Value();
 
-inline void list::free (void) {
+template<typename Data>
+inline void dllist<Data>::free (void) {
   node* p = first;
   
   while (p != last) {
@@ -131,7 +180,8 @@ inline void list::free (void) {
   first = last = 0; size = 0;
 }
 
-inline void list::copy (list const& other) {
+template<typename Data>
+inline void dllist<Data>::copy (dllist const& other) {
   first = last = 0; size = 0;
   node* p = other.first;
 
@@ -141,13 +191,15 @@ inline void list::copy (list const& other) {
   }
 }
 
-inline void list::default_construct (void) {
+template<typename Data>
+inline void dllist<Data>::default_construct (void) {
   first = last = 0;
   size = 0;
 }
 
+template<typename Data>
 template<typename T>
-inline void list::insert_before (T const& val, node* np) {
+inline void dllist<Data>::insert_before (T const& val, node* np) {
   BOOST_ASSERT(np != 0);
 
   node* new_node = new node(val, np, np->prev);
@@ -161,8 +213,9 @@ inline void list::insert_before (T const& val, node* np) {
   ++size;
 }
 
-template <typename T>
-inline void list::insert_after (T const& val, node* np) {
+template<typename Data>
+template<typename T>
+inline void dllist<Data>::insert_after (T const& val, node* np) {
   BOOST_ASSERT(np != 0);
 
   node* new_node = new node(val, np->next, np);
@@ -176,8 +229,9 @@ inline void list::insert_after (T const& val, node* np) {
   ++size;
 }
 
+template<typename Data>
 template<typename T>
-inline void list::push_front (T const& val) {
+inline void dllist<Data>::push_front (T const& val) {
   node* new_node;
 
   if (first == 0) {
@@ -189,15 +243,17 @@ inline void list::push_front (T const& val) {
   else insert_before(val, first);
 }
 
+template<typename Data>
 template<typename T>
-inline void list::push_back(T const& val) {
+inline void dllist<Data>::push_back(T const& val) {
   if (last == 0)
     push_front(val);
   else
     insert_after(val, last);
 }
 
-inline void list::pop_front (void) {
+template<typename Data>
+inline void dllist<Data>::pop_front (void) {
   BOOST_ASSERT(size != 0);
 
   if (first == last) { // there's only one item
@@ -215,7 +271,8 @@ inline void list::pop_front (void) {
   }
 }
 
-inline void list::pop_back (void) {
+template<typename Data>
+inline void dllist<Data>::pop_back (void) {
   BOOST_ASSERT(size != 0);
 
   if (first == last) { // there's only one item
@@ -233,7 +290,8 @@ inline void list::pop_back (void) {
   }
 }
 
-inline list::node* list::erase (node* pos) {
+template<typename Data>
+inline typename dllist<Data>::node* dllist<Data>::erase (node* pos) {
   BOOST_ASSERT(pos != 0);
 
   if (pos == first) {
@@ -257,4 +315,4 @@ inline list::node* list::erase (node* pos) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_LIST_HPP
+#endif // BOOST_SPIRIT_PRANA_DLLIST_HPP

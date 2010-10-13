@@ -16,12 +16,12 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-utree& index (list::node* node, std::size_t i) {
+utree& index (dllist<utree>::node* node, std::size_t i) {
   for (; i > 0; --i) node = node->next;
   return node->val;
 }
 
-utree const& index (list::node const* node, std::size_t i) {
+utree const& index (dllist<utree>::node const* node, std::size_t i) {
   for (; i > 0; --i) node = node->next;
   return node->val;
 }

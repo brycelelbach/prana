@@ -18,8 +18,11 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-// A typed string with parametric Base storage. The storage can be any
-// range or (stl container) of chars.
+/*=============================================================================
+A typed string with parametric Base storage. The storage can be any range or
+(STL container) of chars.
+=============================================================================*/
+
 template<typename Base, tree_type::info type_>
 struct basic_string: Base {
  public:
@@ -45,6 +48,24 @@ struct basic_string: Base {
     return *this;
   }
 };
+
+typedef basic_string<iterator_range<char const*>, tree_type::binary_type>
+  binary_range;
+
+typedef basic_string<std::string, tree_type::binary_type>
+  binary_string;
+
+typedef basic_string<iterator_range<char const*>, tree_type::string_type>
+  utf8_string_range;
+
+typedef basic_string<std::string, tree_type::string_type>
+  utf8_string;
+
+typedef basic_string<iterator_range<char const*>, tree_type::symbol_type>
+  utf8_symbol_range;
+
+typedef basic_string<std::string, tree_type::symbol_type>
+  utf8_symbol;
 
 } // prana
 } // spirit
