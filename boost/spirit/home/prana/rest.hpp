@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INDEX_HPP)
-#define BOOST_SPIRIT_PRANA_INDEX_HPP
+#if !defined(BOOST_SPIRIT_PRANA_REST_HPP)
+#define BOOST_SPIRIT_PRANA_REST_HPP
 
 #include <boost/spirit/home/prana/utree.hpp>
 
@@ -16,18 +16,19 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-utree& index (list::node* node, std::size_t i) {
-  for (; i > 0; --i) node = node->next;
-  return node->val;
+utree rest (utree& x) {
+  utree::iterator i = x.begin(); ++i;
+  return utree(utree::range(i, x.end()), shallow);
 }
 
-utree const& index (list::node const* node, std::size_t i) {
-  for (; i > 0; --i) node = node->next;
-  return node->val;
+utree rest (utree const& x) {
+  utree::const_iterator i = x.begin(); ++i;
+  return utree(utree::const_range(i, x.end()), shallow);
 }
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INDEX_HPP
+#endif // BOOST_SPIRIT_PRANA_REST_HPP
+
