@@ -376,7 +376,7 @@ inline utree::iterator utree::insert (iterator pos, T const& val) {
     return begin();
   }
 
-  l.insert_before(val, pos.node);
+  l.insert(val, pos);
   return iterator(pos.node->prev, pos.node->prev->prev);
 }
 
@@ -434,8 +434,7 @@ inline utree::iterator utree::erase (iterator pos) {
   if (get_type() == tree_type::reference_type)
     return p->erase(pos);
   BOOST_ASSERT(get_type() == tree_type::list_type);
-  dllist<utree>::node* np = l.erase(pos.node);
-  return iterator(np, np ? np->prev : l.last);
+  return l.erase(pos);
 }
 
 inline utree::iterator utree::erase (iterator first, iterator last) {

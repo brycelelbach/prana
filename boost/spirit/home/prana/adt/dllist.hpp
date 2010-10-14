@@ -10,7 +10,6 @@
 #if !defined(BOOST_SPIRIT_PRANA_DLLIST_HPP)
 #define BOOST_SPIRIT_PRANA_DLLIST_HPP
 
-#include <boost/assert.hpp>
 #include <boost/ref.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -41,11 +40,8 @@ struct dllist {
   void copy (dllist const& other);
   void default_construct (void);
 
-  template<typename T>
-  void insert_before (T const& val, node* node);
-
-  template<typename T>
-  void insert_after (T const& val, node* node);
+  template<typename T, typename Iterator>
+  void insert (T const& val, Iterator pos);
 
   template<typename T>
   void push_front (T const& val);
@@ -62,7 +58,8 @@ struct dllist {
   iterator end (void);
   const_iterator end (void) const;
 
-  node* erase (node* pos);
+  template<typename Iterator>
+  iterator erase (Iterator pos);
 
   node* first;
   node* last;
@@ -201,39 +198,20 @@ inline void dllist<Data>::copy (dllist const& other) {
 
 template<typename Data>
 inline void dllist<Data>::default_construct (void) {
-  first = last = 0;
-  size = 0;
+  first = last = 0; size = 0;
 }
 
 template<typename Data>
-template<typename T>
-inline void dllist<Data>::insert_before (T const& val, node* np) {
-  BOOST_ASSERT(np != 0);
+template<typename T, typename Iterator>
+inline void dllist<Data>::insert (T const& val, Iterator pos) {
+  node* new_node = new node(val, pos.node, pos.node->prev);
 
-  node* new_node = new node(val, np, np->prev);
-
-  if (np->prev)
-    np->prev->next = new_node;
+  if (pos.node->prev)
+    pos.node->prev->next = new_node;
   else
     first = new_node;
 
-  np->prev = new_node;
-  ++size;
-}
-
-template<typename Data>
-template<typename T>
-inline void dllist<Data>::insert_after (T const& val, node* np) {
-  BOOST_ASSERT(np != 0);
-
-  node* new_node = new node(val, np->next, np);
-
-  if (np->next)
-    np->next->prev = new_node;
-  else
-    last = new_node;
-
-  np->next = new_node;
+  pos.node->prev = new_node;
   ++size;
 }
 
@@ -248,21 +226,34 @@ inline void dllist<Data>::push_front (T const& val) {
     ++size;
   }
 
-  else insert_before(val, first);
+  else {
+    new_node = new node(val, first, first->prev);
+
+    first->prev = new_node;
+    first = new_node;
+
+    ++size;
+  }
 }
 
 template<typename Data>
 template<typename T>
-inline void dllist<Data>::push_back(T const& val) {
-  if (last == 0)
-    push_front(val);
-  else
-    insert_after(val, last);
+inline void dllist<Data>::push_back (T const& val) {
+  if (last == 0) push_front(val);
+
+  else {
+    node* new_node = new node(val, last->next, last);
+
+    last->next = new_node;
+    last = new_node;
+    
+    ++size;
+  }
 }
 
 template<typename Data>
 inline void dllist<Data>::pop_front (void) {
-  BOOST_ASSERT(size != 0);
+  if (size == 0) return;
 
   if (first == last) { // there's only one item
     delete first;
@@ -281,7 +272,7 @@ inline void dllist<Data>::pop_front (void) {
 
 template<typename Data>
 inline void dllist<Data>::pop_back (void) {
-  BOOST_ASSERT(size != 0);
+  if (size == 0) return;
 
   if (first == last) { // there's only one item
     delete first;
@@ -310,33 +301,34 @@ inline typename dllist<Data>::const_iterator dllist<Data>::begin (void) const {
 
 template<typename Data>
 inline typename dllist<Data>::iterator dllist<Data>::end (void) {
-  return iterator(0, first);
+  return iterator(0, last);
 }
 
 template<typename Data>
 inline typename dllist<Data>::const_iterator dllist<Data>::end (void) const {
-  return const_iterator(0, first);
+  return const_iterator(0, last);
 }
 
 template<typename Data>
-inline typename dllist<Data>::node* dllist<Data>::erase (node* pos) {
-  BOOST_ASSERT(pos != 0);
+template<typename Iterator>
+inline typename dllist<Data>::iterator dllist<Data>::erase (Iterator pos) {
+  if (pos.node == 0) return Iterator(0, last);
 
-  if (pos == first) {
+  if (pos.node == first) {
     pop_front();
-    return first;
+    return Iterator(first, 0);
   }
 
-  else if (pos == last) {
+  else if (pos.node == last) {
     pop_back();
-    return 0;
+    return Iterator(0, last);
   }
 
-  node* next(pos->next);
-  pos->unlink();
-  delete pos;
+  node* next(pos.node->next);
+  pos.node->unlink();
+  delete pos.node;
   --size;
-  return next;
+  return Iterator(next, next->prev);
 }
 
 } // prana
