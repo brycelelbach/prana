@@ -7,12 +7,13 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_BASIC_STRING_HPP)
-#define BOOST_SPIRIT_PRANA_BASIC_STRING_HPP
+#if !defined(BOOST_SPIRIT_PRANA_TYPED_STRING_HPP)
+#define BOOST_SPIRIT_PRANA_TYPED_STRING_HPP
 
 #include <cstddef>
 
 #include <boost/spirit/home/prana/tree_type.hpp>
+#include <boost/spirit/home/prana/adt/irange.hpp>
 
 namespace boost {
 namespace spirit {
@@ -24,51 +25,55 @@ A typed string with parametric Base storage. The storage can be any range or
 =============================================================================*/
 
 template<typename Base, tree_type::info type_>
-struct basic_string: Base {
+struct typed_string: Base {
  public:
   static tree_type::info const type = type_;
 
-  basic_string (void): Base() { }
+  typed_string (void) { }
 
-  basic_string (Base const& base): Base(base) { }
-
-  template<typename Iterator>
-  basic_string (Iterator bits, std::size_t len): Base(bits, bits + len) { }
+  typed_string (Base const& base): Base(base) { }
 
   template<typename Iterator>
-  basic_string (Iterator first, Iterator last): Base(first, last) { }
+  typed_string (Iterator bits, std::size_t len) {
+    construct(bits, bits + len);
+  }
 
-  basic_string& operator= (basic_string const& other) {
+  template<typename Iterator>
+  typed_string (Iterator first, Iterator last) {
+    construct(first, last);
+  }
+
+  typed_string& operator= (typed_string const& other) {
     Base::operator=(other);
     return *this;
   }
 
-  basic_string& operator= (Base const& other) {
+  typed_string& operator= (Base const& other) {
     Base::operator=(other);
     return *this;
   }
 };
 
-typedef basic_string<iterator_range<char const*>, tree_type::binary_type>
+typedef typed_string<irange<char const*>, tree_type::binary_type>
   binary_range;
 
-typedef basic_string<std::string, tree_type::binary_type>
+typedef typed_string<std::string, tree_type::binary_type>
   binary_string;
 
-typedef basic_string<iterator_range<char const*>, tree_type::string_type>
+typedef typed_string<irange<char const*>, tree_type::string_type>
   utf8_string_range;
 
-typedef basic_string<std::string, tree_type::string_type>
+typedef typed_string<std::string, tree_type::string_type>
   utf8_string;
 
-typedef basic_string<iterator_range<char const*>, tree_type::symbol_type>
+typedef typed_string<irange<char const*>, tree_type::symbol_type>
   utf8_symbol_range;
 
-typedef basic_string<std::string, tree_type::symbol_type>
+typedef typed_string<std::string, tree_type::symbol_type>
   utf8_symbol;
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_BASIC_STRING_HPP
+#endif // BOOST_SPIRIT_PRANA_TYPED_STRING_HPP

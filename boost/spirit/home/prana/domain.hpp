@@ -7,36 +7,22 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_TREE_TYPE_HPP)
-#define BOOST_SPIRIT_PRANA_TREE_TYPE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_DOMAIN_HPP)
+#define BOOST_SPIRIT_PRANA_DOMAIN_HPP
+
+#include <boost/spirit/home/support/unused.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-// the nil type
-struct nil { };
+struct domain { };
 
-struct tree_type {
-  enum info {
-    nil_type,
-    bool_type,
-    int_type,
-    double_type,
-    string_type,
-    string_range_type,
-    symbol_type,
-    binary_type,
-    list_type,
-    range_type,
-    reference_type,
-    any_type,
-    record_type
-  };
-};
+using spirit::unused;
+using spirit::unused_type;
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_TREE_TYPE_HPP
+#endif // BOOST_SPIRIT_PRANA_DOMAIN_HPP

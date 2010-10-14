@@ -19,20 +19,29 @@ namespace spirit {
 namespace prana {
 
 struct tree_print {
-  typedef void result_type;
+  typedef std::ostream& result_type;
 
   std::ostream& out;
 
   tree_print (std::ostream& out): out(out) { }
 
-  void operator() (nil) const { out << "<nil> "; }
+  result_type operator() (nil) const {
+    out << "<nil> ";
+    return out;
+  }
 
   template<typename T>
-  void operator() (T val) const { out << val << ' '; }
+  result_type operator() (T val) const {
+    out << val << ' ';
+    return out;
+  }
 
-  void operator() (bool b) const { out << (b ? "true" : "false") << ' '; }
+  result_type operator() (bool b) const {
+    out << (b ? "true" : "false") << ' ';
+    return out;
+  }
 
-  void operator() (binary_range const& b) const {
+  result_type operator() (binary_range const& b) const {
     typedef binary_range::const_iterator iterator;
     
     out << "#";
@@ -42,9 +51,11 @@ struct tree_print {
       // FIXME: Can has static_cast?
       out << std::hex << int((unsigned char)*i);
     out << std::dec << "# ";
+
+    return out;
   }
 
-  void operator() (utf8_string_range const& str) const {
+  result_type operator() (utf8_string_range const& str) const {
     typedef utf8_string_range::const_iterator iterator;
 
     iterator i = str.begin();
@@ -52,29 +63,42 @@ struct tree_print {
     out << '"';
     for (; i != str.end(); ++i) out << *i;
     out << "\" ";
+    
+    return out;
   }
 
-  void operator() (utf8_symbol_range const& str) const {
+  result_type operator() (utf8_symbol_range const& str) const {
     typedef utf8_symbol_range::const_iterator iterator;
     iterator i = str.begin();
     for (; i != str.end(); ++i) out << *i;
+    return out;
   }
 
+  result_type operator() (irange<char const*> const& str) const {
+    char const* i = str.begin();
+    for (; i != str.end(); ++i) out << *i;
+    return out;
+  }
+ 
   template<typename Iterator>
-  void operator() (iterator_range<Iterator> const& range) const {
-    typedef typename iterator_range<Iterator>::const_iterator iterator;
+  result_type operator() (irange<Iterator> const& range) const {
+    typedef typename irange<Iterator>::const_iterator iterator;
 
-    (*this)('(');
+    out << "(";
     for (iterator i = range.begin(); i != range.end(); ++i) visit(*i, *this);
-    (*this)(')');
+    out << ")";
+    
+    return out;
   }
 
-  void operator() (any_ptr const& p) const {
-    return (*this)("<pointer>");
+  result_type operator() (any_ptr const& p) const {
+    out << "<pointer>";
+    return out;
   }
 
-  void operator() (function_base const& pf) const {
-    return (*this)("<function>");
+  result_type operator() (record<utree> const& pf) const {
+    out << "<record>";
+    return out;
   }
 };
 

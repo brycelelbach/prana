@@ -10,35 +10,30 @@
 #if !defined(BOOST_SPIRIT_PRANA_UTREE_HPP)
 #define BOOST_SPIRIT_PRANA_UTREE_HPP
 
-#include <typeinfo>
+#include <cstring>
+
 #include <string>
 
 #include <boost/ref.hpp>
 #include <boost/assert.hpp>
-#include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/adt/dllist.hpp>
-#include <boost/spirit/home/prana/adt/basic_string.hpp>
+#include <boost/spirit/home/prana/adt/typed_string.hpp>
 #include <boost/spirit/home/prana/adt/fast_string.hpp>
 #include <boost/spirit/home/prana/adt/any_ptr.hpp>
+#include <boost/spirit/home/prana/adt/irange.hpp>
+
+#include <boost/spirit/home/prana/constructs/record.hpp>
+
+#include <boost/spirit/home/prana/functional/index.hpp>
+#include <boost/spirit/home/prana/functional/visit.hpp>
+
 #include <boost/spirit/home/prana/tree_type.hpp>
+#include <boost/spirit/home/prana/shallow.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
-
-struct shallow_tag { };
-shallow_tag const shallow = { };
-
-// forward declaration
-class scope;
-
-// forward declaration
-class function_base;
-
-// forward declaration
-template<typename F>
-class stored_function;
 
 class utree {
  public:
@@ -51,8 +46,8 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t size_type;
 
-  typedef boost::iterator_range<iterator> range;
-  typedef boost::iterator_range<const_iterator> const_range;
+  typedef irange<iterator> range;
+  typedef irange<const_iterator> const_range;
 
   utree (void);
   utree (bool b);
@@ -65,21 +60,17 @@ class utree {
   utree (std::string const& str);
   utree (boost::reference_wrapper<utree> ref);
   utree (any_ptr const& p);
-
-  template<typename Iter>
-  utree (boost::iterator_range<Iter> r);
-
   utree (range r, shallow_tag);
   utree (const_range r, shallow_tag);
   utree (utf8_string_range const& str, shallow_tag);
+  utree (record<utree>* pf);
+  utree (const_reference other);
 
-  template<typename F>
-  utree (stored_function<F> const& pf);
+  template<template<typename> class Range, typename Iter>
+  utree (Range<Iter> r);
 
   template<typename Base, tree_type::info type_>
-  utree (basic_string<Base, type_> const& str);
-
-  utree (const_reference other);
+  utree (typed_string<Base, type_> const& str);
 
   ~utree (void);
 
@@ -91,15 +82,13 @@ class utree {
   reference operator= (char const* s);
   reference operator= (std::string const& s);
   reference operator= (boost::reference_wrapper<utree> ref);
+  reference operator= (record<utree>* pf_);
 
-  template<typename F>
-  reference operator= (stored_function<F> const& pf);
-
-  template<typename Iter>
-  reference operator= (boost::iterator_range<Iter> r);
+  template<template<typename> class Range, typename Iter>
+  reference operator= (Range<Iter> r);
 
   template<typename Base, tree_type::info type_>
-  reference operator= (basic_string<Base, type_> const& bin);
+  reference operator= (typed_string<Base, type_> const& bin);
 
   template<typename T>
   void push_back (T const& val);
@@ -150,21 +139,16 @@ class utree {
 
   tree_type::info which (void) const;
 
-  template<typename T>
-  T get (void) const;
-
   reference deref (void);
   const_reference deref (void) const;
 
   short tag (void) const;
   void tag (short tag);
 
-  utree eval (scope const& env) const;
+  utree eval (environment<utree> const& env) const;
 
  private:
-  template<typename UTreeX, typename UTreeY>
   friend struct visitor;
-
   friend struct indexer;
 
   tree_type::info get_type (void) const;
@@ -179,37 +163,17 @@ class utree {
   union {
     fast_string<dllist<utree> > s;
     dllist<utree> l;
-    struct {
-      dllist<utree>::node* first;
-      dllist<utree>::node* last;
-    } r;
-    struct {
-      char const* first;
-      char const* last;
-    } sr;
+    irange<dllist<utree>::node*> r;
+    irange<char const*> sr;
     any_ptr v;
     bool b;
     int i;
     double d;
     utree* p;
-    function_base* pf;
+    record<utree>* pf;
   };
 };
 
-} // prana
-} // spirit 
-} // boost
-
-#include <boost/spirit/home/prana/scope.hpp>
-#include <boost/spirit/home/prana/index.hpp>
-#include <boost/spirit/home/prana/cast.hpp>
-#include <boost/spirit/home/prana/visit.hpp>
-#include <boost/spirit/home/prana/function/function_base.hpp>
-#include <boost/spirit/home/prana/function/stored_function.hpp>
-
-namespace boost {
-namespace spirit {
-namespace prana {
 
 inline utree::utree (void) {
   set_type(tree_type::nil_type);
@@ -253,7 +217,7 @@ inline utree::utree (std::string const& str) {
 }
 
 template<typename Base, tree_type::info type_>
-inline utree::utree (basic_string<Base, type_> const& bin) {
+inline utree::utree (typed_string<Base, type_> const& bin) {
   s.construct(bin.begin(), bin.end());
   set_type(type_);
 }
@@ -263,21 +227,17 @@ inline utree::utree (boost::reference_wrapper<utree> ref): p(ref.get_pointer()) 
 }
 
 inline utree::utree (any_ptr const& p) {
-  v.p = p.p;
-  v.i = p.i;
+  v = p;
   set_type(tree_type::any_type);
 }
 
-template<typename F>
-inline utree::utree (stored_function<F> const& pf):
-  pf(new stored_function<F>(pf))
-{
-  set_type(tree_type::function_type);
+inline utree::utree (record<utree>* pf): pf(pf) {
+  set_type(tree_type::record_type);
 }
 
 // deep copy
-template<typename Iter>
-inline utree::utree (boost::iterator_range<Iter> r) {
+template<template<typename> class Range, typename Iter>
+inline utree::utree (Range<Iter> r) {
   set_type(tree_type::nil_type);
   assign(r.begin(), r.end());
 }
@@ -361,7 +321,7 @@ inline utree& utree::operator= (std::string const& s_) {
 }
 
 template<typename Base, tree_type::info type_>
-inline utree& utree::operator= (basic_string<Base, type_> const& bin) {
+inline utree& utree::operator= (typed_string<Base, type_> const& bin) {
   free();
   s.construct(bin.begin(), bin.end());
   set_type(type_);
@@ -375,16 +335,15 @@ inline utree& utree::operator= (boost::reference_wrapper<utree> ref) {
   return *this;
 }
 
-template<typename F>
-inline utree& utree::operator= (stored_function<F> const& pf) {
+inline utree& utree::operator= (record<utree>* pf_) {
   free();
-  pf = new stored_function<F>(pf);
-  set_type(tree_type::function_type);
+  pf = pf_;
+  set_type(tree_type::record_type);
   return *this;
 }
-
-template<typename Iter>
-inline utree& utree::operator= (boost::iterator_range<Iter> r) {
+ 
+template<template<typename> class Range, typename Iter>
+inline utree& utree::operator= (Range<Iter> r) {
   free();
   assign(r.begin(), r.end());
   return *this;
@@ -701,7 +660,7 @@ inline void utree::free (void) {
     case tree_type::list_type:
       l.free();
       break;
-    case tree_type::function_type:
+    case tree_type::record_type:
       if (pf) delete pf;
       pf = 0;
       break;
@@ -736,7 +695,7 @@ inline void utree::copy (const_reference other) {
     case tree_type::string_range_type:
       sr = other.sr;
       break;
-    case tree_type::function_type:
+    case tree_type::record_type:
       pf = other.pf->clone();
       break;
     case tree_type::string_type:
@@ -749,11 +708,6 @@ inline void utree::copy (const_reference other) {
       s.tag(other.s.tag());
       break;
   }
-}
-
-template<typename T>
-inline T utree::get (void) const {
-  return visit(*this, cast<T>());
 }
 
 inline utree& utree::deref (void) {
@@ -774,8 +728,8 @@ inline void utree::tag (short tag) {
   s.tag(tag);
 }
 
-inline utree utree::eval (scope const& env) const {
-  BOOST_ASSERT(get_type() == tree_type::function_type);
+inline utree utree::eval (environment<utree> const& env) const {
+  BOOST_ASSERT(get_type() == tree_type::record_type);
   return (*pf)(env);
 }
 

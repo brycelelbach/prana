@@ -22,42 +22,6 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-#if 0
-// Relational operators
-bool operator== (utree const& a, utree const& b);
-bool operator< (utree const& a, utree const& b);
-bool operator!= (utree const& a, utree const& b);
-bool operator> (utree const& a, utree const& b);
-bool operator<= (utree const& a, utree const& b);
-bool operator>= (utree const& a, utree const& b);
-
-// Input and output
-std::ostream& operator<< (std::ostream& out, utree const& x);
-std::istream& operator>> (std::istream& in, utree& x);
-std::ostream& operator<< (std::ostream& out, nil const& x);
-
-// Logical operators
-utree operator&& (utree const& a, utree const& b);
-utree operator|| (utree const& a, utree const& b);
-utree operator! (utree const& a);
-
-// Arithmetic operators
-utree operator+ (utree const& a, utree const& b);
-utree operator- (utree const& a, utree const& b);
-utree operator* (utree const& a, utree const& b);
-utree operator/ (utree const& a, utree const& b);
-utree operator% (utree const& a, utree const& b);
-utree operator- (utree const& a);
-
-// Bitwise operators
-utree operator& (utree const& a, utree const& b);
-utree operator| (utree const& a, utree const& b);
-utree operator^ (utree const& a, utree const& b);
-utree operator<< (utree const& a, utree const& b);
-utree operator>> (utree const& a, utree const& b);
-utree operator~ (utree const& a);
-#endif 
-
 #define BOOST_SPIRIT_CREATE_FUNCTION(name, expr, base)                  \
   struct BOOST_PP_CAT(function_impl_, name) {                           \
     template<typename A, typename B>                                    \

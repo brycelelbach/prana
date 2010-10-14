@@ -23,6 +23,11 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
+/*=============================================================================
+A POD implementation of a Boost.Any like structure which unfortunately still
+uses typeinfo (FIXME).
+=============================================================================*/
+
 struct any_ptr {
   template<typename Ptr>
   typename boost::disable_if<
@@ -43,10 +48,6 @@ struct any_ptr {
   void construct (void* p, std::type_info const* i) {
     p = p;
     i = i;
-  }
-  
-  friend bool operator== (any_ptr const& a, any_ptr const& b) {
-    return (a.p == b.p) && (*a.i == *b.i);
   }
 
   void* p;

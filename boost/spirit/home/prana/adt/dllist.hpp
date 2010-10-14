@@ -65,6 +65,8 @@ struct dllist {
 
 template<typename Data>
 struct dllist<Data>::node: private boost::noncopyable {
+  typedef Data value_type;
+
   template<typename T>
   node (T const& val, node* next, node* prev):
     val(val), next(next), prev(prev) { }

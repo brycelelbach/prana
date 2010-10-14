@@ -7,24 +7,25 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_FUNCTION_BASE_HPP)
-#define BOOST_SPIRIT_PRANA_FUNCTION_BASE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_RECORD_HPP)
+#define BOOST_SPIRIT_PRANA_RECORD_HPP
 
-#include <boost/spirit/home/prana/utree.hpp>
+#include <boost/spirit/home/prana/constructs/environment.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-struct function_base {
+template<typename Tree>
+struct record {
  public:
-  virtual ~function_base (void) { };
-  virtual utree operator() (scope const& env) const = 0;
-  virtual function_base* clone (void) const = 0;
+  virtual ~record (void) { };
+  virtual Tree operator() (environment<Tree> const& env) const = 0;
+  virtual record* clone (void) const = 0;
 };
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_FUNCTION_BASE_HPP
+#endif // BOOST_SPIRIT_PRANA_RECORD_HPP

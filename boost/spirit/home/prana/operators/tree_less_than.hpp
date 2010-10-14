@@ -50,8 +50,8 @@ struct tree_less_than {
 
   template<typename Base, tree_type::info type_>
   bool operator() (
-    basic_string<Base, type_> const& a,
-    basic_string<Base, type_> const& b
+    typed_string<Base, type_> const& a,
+    typed_string<Base, type_> const& b
   ) const {
     return static_cast<Base const&>(a) < static_cast<Base const&>(b);
   }
@@ -64,7 +64,7 @@ struct tree_less_than {
     BOOST_ASSERT(false); return false; 
   }
 
-  bool operator() (function_base const& a, function_base const& b) const {
+  bool operator() (record<utree> const& a, record<utree> const& b) const {
     BOOST_ASSERT(false); return false; 
   }
 };

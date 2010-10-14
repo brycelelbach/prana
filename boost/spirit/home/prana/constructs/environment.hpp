@@ -7,27 +7,30 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCOPE_HPP)
-#define BOOST_SPIRIT_PRANA_SCOPE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ENVIRONMENT_HPP)
+#define BOOST_SPIRIT_PRANA_ENVIRONMENT_HPP
 
-#include <boost/spirit/home/prana/utree.hpp>
+#include <boost/spirit/home/prana/adt/irange.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-class scope: public boost::iterator_range<utree*> {
+template<typename Tree>
+class environment: public irange<Tree*> {
  public:
-  scope (utree* first = 0, utree* last = 0, scope const* parent = 0):
-    boost::iterator_range<utree*>(first, last),
+  environment (Tree* first = 0, Tree* last = 0, environment const* parent = 0):
     parent(parent),
-    depth(parent ? (parent->depth + 1) : 0) { }
+    depth(parent ? (parent->depth + 1) : 0)
+  {
+    construct(first, last);
+  }
 
-  scope const* outer (void) const { return parent; }
+  environment const* outer (void) const { return parent; }
   int level (void) const { return depth; }
 
  private:
-  scope const* parent;
+  environment const* parent;
   int depth;
 };
 
@@ -35,4 +38,4 @@ class scope: public boost::iterator_range<utree*> {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCOPE_HPP
+#endif // BOOST_SPIRIT_PRANA_ENVIRONMENT_HPP
