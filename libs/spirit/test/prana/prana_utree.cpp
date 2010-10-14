@@ -10,6 +10,7 @@
 #define BOOST_TEST_MODULE prana_utree
 
 #include <boost/spirit/home/prana/utree.hpp>
+#include <boost/spirit/home/prana/constructs/function.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace boost::spirit::prana;
@@ -67,4 +68,42 @@ BOOST_AUTO_TEST_CASE(str_ctor) {
   utree t5("the long string is quite long, and might break fast_string<>");
   utree t6(ss);
   utree t7(std::string("T am temporary!"));
+}
+
+BOOST_AUTO_TEST_CASE(ref_ctor) {
+  utree t0;
+  utree t1(boost::ref(t0));
+}
+
+BOOST_AUTO_TEST_CASE(range_ctor) {
+  utree::range r;
+  utree::const_range cr;
+  utf8_string_range ur;
+ 
+  utree t0(r, shallow);
+  utree t1(cr, shallow);
+  utree t2(ur, shallow);
+  utree t3(utree::range());
+  utree t3(utree::const_range());
+  utree t3(utf8_string_range());
+}
+
+BOOST_AUTO_TEST_CASE(any_ctor) {
+  any_ptr a;
+  utree t0(a);
+}
+  
+struct functor {
+  utree operator() (environment<utree> const& env) const {
+    return env.begin();
+  }
+};
+
+BOOST_AUTO_TEST_CASE(record_ctor) {
+  utree t0(new function<functor, utree>());
+}
+
+BOOST_AUTO_TEST_CASE(copy_ctor) {
+  utree t0;
+  utree t1(t0);
 }

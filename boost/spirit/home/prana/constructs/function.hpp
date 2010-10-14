@@ -30,7 +30,7 @@ struct function: public record<Tree> {
   }
   
   virtual record<Tree>* clone (void) const {
-    return new function<F>(*this);
+    return new function<F, Tree>(*this);
   }
 };
 
