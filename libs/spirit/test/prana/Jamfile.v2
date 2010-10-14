@@ -13,5 +13,7 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-unit-test utree_instantiation : utree_instantiation.cpp ;
-unit-test utree_basic_ctors : utree_basic_ctors.cpp ;
+unit-test utree_instantiation  : utree_instantiation.cpp ;
+unit-test utree_basic_ctors    : utree_basic_ctors.cpp ;
+
+unit-test dllist_instantiation : dllist_instantiation.cpp ;
