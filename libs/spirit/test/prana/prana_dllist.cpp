@@ -7,14 +7,25 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE utree_instantiation
+#define BOOST_TEST_MODULE prana_dllist
 
-#include <boost/spirit/home/prana/utree.hpp>
+#include <boost/spirit/home/prana/adt/dllist.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace boost::spirit::prana;
 
-BOOST_AUTO_TEST_CASE(instantiate) {
-  utree t;
+BOOST_AUTO_TEST_CASE(default_and_free) {
+  dllist<int> l;
+  l.default_construct();
+  l.free();
+}
+
+BOOST_AUTO_TEST_CASE(insertion) {
+  dllist<int> l;
+  l.default_construct();
+  l.push_back(15);
+  l.push_back(2134);
+  l.push_back(-423);
+  l.free();
 }
 

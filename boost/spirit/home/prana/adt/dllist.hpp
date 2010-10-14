@@ -56,6 +56,12 @@ struct dllist {
   void pop_front (void);
   void pop_back (void);
 
+  iterator begin (void);
+  const_iterator begin (void) const;
+
+  iterator end (void);
+  const_iterator end (void) const;
+
   node* erase (node* pos);
 
   node* first;
@@ -290,6 +296,26 @@ inline void dllist<Data>::pop_back (void) {
     delete np;
     --size;
   }
+}
+
+template<typename Data>
+inline typename dllist<Data>::iterator dllist<Data>::begin (void) {
+  return iterator(first, 0);
+}
+
+template<typename Data>
+inline typename dllist<Data>::const_iterator dllist<Data>::begin (void) const {
+  return const_iterator(first, 0);
+}
+
+template<typename Data>
+inline typename dllist<Data>::iterator dllist<Data>::end (void) {
+  return iterator(0, first);
+}
+
+template<typename Data>
+inline typename dllist<Data>::const_iterator dllist<Data>::end (void) const {
+  return const_iterator(0, first);
 }
 
 template<typename Data>
