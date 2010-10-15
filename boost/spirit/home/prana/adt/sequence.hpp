@@ -230,7 +230,7 @@ inline void sequence<Data>::free (void) {
 template<typename Data>
 template<typename Container>
 inline Container sequence<Data>::get (void) const {
-  return Container(first, last);
+  return Container(begin(), end());
 }
 
 template<typename Data>

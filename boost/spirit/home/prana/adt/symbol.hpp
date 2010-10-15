@@ -12,7 +12,6 @@
 
 #include <climits>
 
-#include <boost/ref.hpp>
 #include <boost/swap.hpp>
 #include <boost/integer.hpp>
 #include <boost/detail/iterator.hpp>
@@ -35,7 +34,6 @@ class symbol: public boost::detail::iterator_traits<Char const*> {
   typedef boost::uint_t<sizeof(void*)>::exact       size_type;
   typedef Char const*                               iterator;
   typedef Char const*                               const_iterator;
-  typedef boost::reference_wrapper<Char const*>     ref_iterator;
 
   BOOST_STATIC_CONSTANT(size_type, stack_size =
     boost::alignment_of<void*[2]>::value / sizeof(Char));

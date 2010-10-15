@@ -18,7 +18,6 @@ struct TreeContainer {
   typedef unspecified-unsigned-integer size_type;
   typedef unspecified-forward-iterator iterator;
   typedef unspecified-forward-iterator const_iterator;
-  typedef unspecified-forward-iterator ref_iterator;
 
   void default_construct (void);
 

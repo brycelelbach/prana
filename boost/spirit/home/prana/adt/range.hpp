@@ -29,7 +29,6 @@ struct range: public boost::detail::iterator_traits<Iterator> {
   typedef std::size_t                               size_type;
   typedef Iterator                                  iterator;
   typedef Iterator                                  const_iterator;
-  typedef boost::reference_wrapper<Iterator>        ref_iterator;
 
   void default_construct (void);
 

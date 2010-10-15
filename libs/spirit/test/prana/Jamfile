@@ -13,6 +13,5 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-unit-test prana_utree         : prana_utree.cpp ;
+unit-test prana_sequence        : prana_sequence.cpp ;
 
-unit-test prana_dllist        : prana_dllist.cpp ;
