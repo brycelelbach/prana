@@ -41,8 +41,9 @@ struct indexer {
 };
 
 template<typename Node>
-typename indexer::result<Node, std::size_t>::type
-index (Node node, std::size_t i) {
+typename indexer::result<Node, std::size_t>::type index (
+  Node node, std::size_t i
+) {
   indexer x;
   return x(node, i);
 }

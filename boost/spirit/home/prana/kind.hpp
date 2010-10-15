@@ -7,25 +7,27 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_RECORD_HPP)
-#define BOOST_SPIRIT_PRANA_RECORD_HPP
+#if !defined(BOOST_SPIRIT_PRANA_KIND_HPP)
+#define BOOST_SPIRIT_PRANA_KIND_HPP
 
-#include <boost/spirit/home/prana/constructs/environment.hpp>
+#include <boost/utility/binary.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-template<typename Tree>
-struct record {
- public:
-  virtual ~record (void) { };
-  virtual Tree operator() (environment<Tree> const& env) const = 0;
-  virtual record* clone (void) const = 0;
+enum kind {
+  nil_kind       =              000,
+  reference_kind = BOOST_BINARY(001), 
+  symbol_kind    = BOOST_BINARY(010),
+  numeric_kind   = BOOST_BINARY(011), 
+  sequence_kind  = BOOST_BINARY(100),  
+  set_kind       = BOOST_BINARY(101),  
+  record_kind    = BOOST_BINARY(110)
 };
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_RECORD_HPP
+#endif // BOOST_SPIRIT_PRANA_KIND_HPP

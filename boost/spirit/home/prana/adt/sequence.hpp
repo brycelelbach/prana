@@ -7,9 +7,10 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DLLIST_HPP)
-#define BOOST_SPIRIT_PRANA_DLLIST_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEQUENCE_HPP)
+#define BOOST_SPIRIT_PRANA_SEQUENCE_HPP
 
+#include <boost/swap.hpp>
 #include <boost/ref.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -18,27 +19,35 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-/*=============================================================================
-Our POD double linked list. Straightforward implementation. This has to be a POD
-so it can be used in utree's discriminated union.
-=============================================================================*/
-
 template<typename Data>
-struct dllist {
+struct sequence {
  public:
   struct node;
 
   template<typename Value> class node_iterator;
+ 
+  typedef Data                                            value_type;
+  typedef Data&                                           reference;
+  typedef Data const&                                     const_reference;
+  typedef Data*                                           pointer;
+  typedef Data const*                                     const_pointer;
+  typedef std::size_t                                     size_type;
+  typedef node_iterator<Data>                             iterator;
+  typedef node_iterator<const Data>                       const_iterator;
+  typedef node_iterator<boost::reference_wrapper<Data> >  ref_iterator;
 
-  typedef std::size_t size_type;
-
-  typedef node_iterator<Data>                            iterator;
-  typedef node_iterator<const Data>                      const_iterator;
-  typedef node_iterator<boost::reference_wrapper<Data> > ref_iterator;
-
-  void free (void);
-  void copy (dllist const& other);
   void default_construct (void);
+  
+  void copy (sequence const& other);
+  
+  static sequence make (void);
+  
+  void free (void);
+
+  void swap (sequence&);
+  
+  template<typename Container>
+  Container get (void) const;
 
   template<typename T, typename Iterator>
   void insert (T const& val, Iterator pos);
@@ -61,13 +70,17 @@ struct dllist {
   template<typename Iterator>
   iterator erase (Iterator pos);
 
+ private:
+  friend class node;
+
+  template<typename Value> friend class node_iterator;
+
   node* first;
   node* last;
-  size_type size;
 };
 
 template<typename Data>
-struct dllist<Data>::node: private boost::noncopyable {
+struct sequence<Data>::node: private boost::noncopyable {
   typedef Data value_type;
 
   template<typename T>
@@ -86,13 +99,13 @@ struct dllist<Data>::node: private boost::noncopyable {
 
 template<typename Data>
 template<typename Value>
-class dllist<Data>::node_iterator: public boost::iterator_facade<
+class sequence<Data>::node_iterator: public boost::iterator_facade<
   node_iterator<Value>, Value, boost::bidirectional_traversal_tag
 > {
  public:
   node_iterator (void): node(0) { }
 
-  node_iterator (dllist<Data>::node* node, dllist<Data>::node* prev):
+  node_iterator (sequence<Data>::node* node, sequence<Data>::node* prev):
     node(node), prev(prev) { }
 
   void increment (void) {
@@ -117,13 +130,13 @@ class dllist<Data>::node_iterator: public boost::iterator_facade<
     return node->val;
   }
 
-  dllist<Data>::node* node;
-  dllist<Data>::node* prev;
+  sequence<Data>::node* node;
+  sequence<Data>::node* prev;
 };
 
 template<typename Data>
 template<typename Value>
-class dllist<Data>::node_iterator<boost::reference_wrapper<Value> >:
+class sequence<Data>::node_iterator<boost::reference_wrapper<Value> >:
   public boost::iterator_facade<
     node_iterator<boost::reference_wrapper<Value> >,
     boost::reference_wrapper<Value>,
@@ -133,7 +146,7 @@ class dllist<Data>::node_iterator<boost::reference_wrapper<Value> >:
   node_iterator (void):
     node(0), prev(0), curr(nil_node) { }
 
-  node_iterator (dllist<Data>::node* node, dllist<Data>::node* prev):
+  node_iterator (sequence<Data>::node* node, sequence<Data>::node* prev):
     node(node), prev(prev), curr(node ? (node->val) : nil_node) { }
 
   void increment (void) {
@@ -160,8 +173,8 @@ class dllist<Data>::node_iterator<boost::reference_wrapper<Value> >:
     return curr;
   }
 
-  dllist<Data>::node* node;
-  dllist<Data>::node* prev;
+  sequence<Data>::node* node;
+  sequence<Data>::node* prev;
 
   static Value nil_node;
   mutable boost::reference_wrapper<Value> curr;
@@ -169,25 +182,18 @@ class dllist<Data>::node_iterator<boost::reference_wrapper<Value> >:
 
 template<typename Data>
 template<typename Value>
-Value dllist<Data>::node_iterator<boost::reference_wrapper<Value> >::nil_node
+Value sequence<Data>::node_iterator<boost::reference_wrapper<Value> >::nil_node
   = Value();
 
-template<typename Data>
-inline void dllist<Data>::free (void) {
-  node* p = first;
-  
-  while (p != last) {
-    node* next = p->next;
-    delete p;
-    p = next;
-  }
 
-  first = last = 0; size = 0;
+template<typename Data>
+inline void sequence<Data>::default_construct (void) {
+  first = last = 0;
 }
 
 template<typename Data>
-inline void dllist<Data>::copy (dllist const& other) {
-  first = last = 0; size = 0;
+inline void sequence<Data>::copy (sequence const& other) {
+  free();
   node* p = other.first;
 
   while (p != 0) {
@@ -197,13 +203,39 @@ inline void dllist<Data>::copy (dllist const& other) {
 }
 
 template<typename Data>
-inline void dllist<Data>::default_construct (void) {
-  first = last = 0; size = 0;
+inline sequence<Data> sequence<Data>::make (void) {
+  sequence s;
+  s.default_construct();
+  return s;
+}
+
+template<typename Data>
+inline void sequence<Data>::swap (sequence& other) {
+  boost::swap(*this, other);
+}
+
+template<typename Data>
+inline void sequence<Data>::free (void) {
+  node* p = first;
+  
+  while (p != last) {
+    node* next = p->next;
+    delete p;
+    p = next;
+  }
+
+  first = last = 0;
+}
+
+template<typename Data>
+template<typename Container>
+inline Container sequence<Data>::get (void) const {
+  return Container(first, last);
 }
 
 template<typename Data>
 template<typename T, typename Iterator>
-inline void dllist<Data>::insert (T const& val, Iterator pos) {
+inline void sequence<Data>::insert (T const& val, Iterator pos) {
   node* new_node = new node(val, pos.node, pos.node->prev);
 
   if (pos.node->prev)
@@ -212,52 +244,43 @@ inline void dllist<Data>::insert (T const& val, Iterator pos) {
     first = new_node;
 
   pos.node->prev = new_node;
-  ++size;
 }
 
 template<typename Data>
 template<typename T>
-inline void dllist<Data>::push_front (T const& val) {
+inline void sequence<Data>::push_front (T const& val) {
   node* new_node;
 
   if (first == 0) {
     new_node = new node(val, 0, 0);
     first = last = new_node;
-    ++size;
   }
 
   else {
     new_node = new node(val, first, first->prev);
-
     first->prev = new_node;
     first = new_node;
-
-    ++size;
   }
 }
 
 template<typename Data>
 template<typename T>
-inline void dllist<Data>::push_back (T const& val) {
+inline void sequence<Data>::push_back (T const& val) {
   if (last == 0) push_front(val);
 
   else {
     node* new_node = new node(val, last->next, last);
-
     last->next = new_node;
     last = new_node;
-    
-    ++size;
   }
 }
 
 template<typename Data>
-inline void dllist<Data>::pop_front (void) {
-  if (size == 0) return;
+inline void sequence<Data>::pop_front (void) {
+  if (!first) return;
 
-  if (first == last) { // there's only one item
+  else if (first == last) { // there's only one item
     delete first;
-    size = 0;
     first = last = 0;
   }
 
@@ -266,17 +289,15 @@ inline void dllist<Data>::pop_front (void) {
     first = first->next;
     first->prev = 0;
     delete np;
-    --size;
   }
 }
 
 template<typename Data>
-inline void dllist<Data>::pop_back (void) {
-  if (size == 0) return;
+inline void sequence<Data>::pop_back (void) {
+  if (!first) return;
 
-  if (first == last) { // there's only one item
+  else if (first == last) { // there's only one item
     delete first;
-    size = 0;
     first = last = 0;
   }
 
@@ -285,36 +306,35 @@ inline void dllist<Data>::pop_back (void) {
     last = last->prev;
     last->next = 0;
     delete np;
-    --size;
   }
 }
 
 template<typename Data>
-inline typename dllist<Data>::iterator dllist<Data>::begin (void) {
+inline typename sequence<Data>::iterator sequence<Data>::begin (void) {
   return iterator(first, 0);
 }
 
 template<typename Data>
-inline typename dllist<Data>::const_iterator dllist<Data>::begin (void) const {
+inline typename sequence<Data>::const_iterator sequence<Data>::begin (void) const {
   return const_iterator(first, 0);
 }
 
 template<typename Data>
-inline typename dllist<Data>::iterator dllist<Data>::end (void) {
+inline typename sequence<Data>::iterator sequence<Data>::end (void) {
   return iterator(0, last);
 }
 
 template<typename Data>
-inline typename dllist<Data>::const_iterator dllist<Data>::end (void) const {
+inline typename sequence<Data>::const_iterator sequence<Data>::end (void) const {
   return const_iterator(0, last);
 }
 
 template<typename Data>
 template<typename Iterator>
-inline typename dllist<Data>::iterator dllist<Data>::erase (Iterator pos) {
+inline typename sequence<Data>::iterator sequence<Data>::erase (Iterator pos) {
   if (pos.node == 0) return Iterator(0, last);
 
-  if (pos.node == first) {
+  else if (pos.node == first) {
     pop_front();
     return Iterator(first, 0);
   }
@@ -327,7 +347,6 @@ inline typename dllist<Data>::iterator dllist<Data>::erase (Iterator pos) {
   node* next(pos.node->next);
   pos.node->unlink();
   delete pos.node;
-  --size;
   return Iterator(next, next->prev);
 }
 
@@ -335,4 +354,4 @@ inline typename dllist<Data>::iterator dllist<Data>::erase (Iterator pos) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_DLLIST_HPP
+#endif // BOOST_SPIRIT_PRANA_SEQUENCE_HPP

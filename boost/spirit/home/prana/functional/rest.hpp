@@ -42,8 +42,7 @@ struct rester {
 };
 
 template<typename Tree>
-typename rester::result<Tree&>::type
-rest (Tree& x) {
+typename rester::result<Tree&>::type rest (Tree& x) {
   rester r;
   return r(x);
 }

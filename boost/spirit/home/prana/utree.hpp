@@ -37,17 +37,19 @@ namespace prana {
 
 class utree {
  public:
-  typedef utree value_type;
-  typedef dllist<utree>::iterator iterator;
-  typedef dllist<utree>::const_iterator const_iterator;
-  typedef dllist<utree>::ref_iterator ref_iterator;
-  typedef utree& reference;
-  typedef utree const& const_reference;
-  typedef std::ptrdiff_t difference_type;
-  typedef std::size_t size_type;
+  typedef list<utree>            list;
 
-  typedef irange<iterator> range;
-  typedef irange<const_iterator> const_range;
+  typedef utree                  value_type;
+  typedef list::iterator         iterator;
+  typedef list::const_iterator   const_iterator;
+  typedef list::ref_iterator     ref_iterator;
+  typedef utree&                 reference;
+  typedef utree const&           const_reference;
+  typedef std::ptrdiff_t         difference_type;
+  typedef std::size_t            size_type;
+
+  typedef range<iterator>        range;
+  typedef range<const_iterator>  const_range;
 
   utree (void);
   utree (bool b);
@@ -135,7 +137,6 @@ class utree {
   ref_iterator ref_end (void);
 
   bool empty (void) const;
-  size_type size (void) const;
 
   tree_type::info which (void) const;
 
