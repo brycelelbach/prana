@@ -1,11 +1,11 @@
+################################################################################
+#   Copyright (c) 2001-2010 Joel de Guzman
+#   Copyright (c) 2001-2010 Hartmut Kaiser
+#   Copyright (c) 2010      Bryce Lelbach
 #
-#    Copyright (c) 2001-2010 Joel de Guzman
-#    Copyright (c) 2001-2010 Hartmut Kaiser
-#    Copyright (c) 2010      Bryce Lelbach
-#
-#    Distributed under the Boost Software License, Version 1.0. (See accompanying
-#    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#
+#   Distributed under the Boost Software License, Version 1.0. (See accompanying
+#   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+################################################################################
 
 project spirit_prana_test :
   requirements
@@ -13,5 +13,11 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-unit-test prana_sequence        : prana_sequence.cpp ;
+run prana_range.cpp    : : : <address-model>32 : prana_range_32bit    ;
+run prana_range.cpp    : : : <address-model>64 : prana_range_64bit    ;
 
+run prana_symbol.cpp   : : : <address-model>32 : prana_symbol_32bit   ;
+run prana_symbol.cpp   : : : <address-model>64 : prana_symbol_64bit   ;
+
+run prana_sequence.cpp : : : <address-model>32 : prana_sequence_32bit ;
+run prana_sequence.cpp : : : <address-model>64 : prana_sequence_64bit ;

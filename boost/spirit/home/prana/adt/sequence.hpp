@@ -10,6 +10,8 @@
 #if !defined(BOOST_SPIRIT_PRANA_SEQUENCE_HPP)
 #define BOOST_SPIRIT_PRANA_SEQUENCE_HPP
 
+#include <algorithm>
+
 #include <boost/swap.hpp>
 #include <boost/ref.hpp>
 #include <boost/noncopyable.hpp>
@@ -24,7 +26,7 @@ struct sequence {
  public:
   struct node;
 
-  template<typename Value> class node_iterator;
+  template<typename Value> struct node_iterator;
  
   typedef Data                                            value_type;
   typedef Data&                                           reference;
@@ -46,17 +48,13 @@ struct sequence {
 
   void swap (sequence&);
   
-  template<typename Container>
-  Container get (void) const;
+  template<typename Container> Container get (void) const;
 
   template<typename T, typename Iterator>
   void insert (T const& val, Iterator pos);
 
-  template<typename T>
-  void push_front (T const& val);
-
-  template<typename T>
-  void push_back (T const& val);
+  template<typename T> void push_front (T const& val);
+  template<typename T> void push_back (T const& val);
 
   void pop_front (void);
   void pop_back (void);
@@ -70,10 +68,8 @@ struct sequence {
   template<typename Iterator>
   iterator erase (Iterator pos);
 
- private:
-  friend class node;
-
-  template<typename Value> friend class node_iterator;
+  template<typename Container> bool operator== (Container const&) const;
+  template<typename Container> bool operator!= (Container const&) const;
 
   node* first;
   node* last;
@@ -99,7 +95,7 @@ struct sequence<Data>::node: private boost::noncopyable {
 
 template<typename Data>
 template<typename Value>
-class sequence<Data>::node_iterator: public boost::iterator_facade<
+struct sequence<Data>::node_iterator: public boost::iterator_facade<
   node_iterator<Value>, Value, boost::bidirectional_traversal_tag
 > {
  public:
@@ -136,7 +132,7 @@ class sequence<Data>::node_iterator: public boost::iterator_facade<
 
 template<typename Data>
 template<typename Value>
-class sequence<Data>::node_iterator<boost::reference_wrapper<Value> >:
+struct sequence<Data>::node_iterator<boost::reference_wrapper<Value> >:
   public boost::iterator_facade<
     node_iterator<boost::reference_wrapper<Value> >,
     boost::reference_wrapper<Value>,
@@ -216,13 +212,18 @@ inline void sequence<Data>::swap (sequence& other) {
 
 template<typename Data>
 inline void sequence<Data>::free (void) {
+  if (first == last) { // we only have one element
+    if (first) delete first;
+    return;
+  }
+
   node* p = first;
   
-  while (p != last) {
+  while (p) {
     node* next = p->next;
     delete p;
     p = next;
-  }
+  } 
 
   first = last = 0;
 }
@@ -236,6 +237,11 @@ inline Container sequence<Data>::get (void) const {
 template<typename Data>
 template<typename T, typename Iterator>
 inline void sequence<Data>::insert (T const& val, Iterator pos) {
+  if (!pos.node) {
+    push_back(val);
+    return;
+  }
+
   node* new_node = new node(val, pos.node, pos.node->prev);
 
   if (pos.node->prev)
@@ -310,22 +316,26 @@ inline void sequence<Data>::pop_back (void) {
 }
 
 template<typename Data>
-inline typename sequence<Data>::iterator sequence<Data>::begin (void) {
+inline typename sequence<Data>::iterator
+sequence<Data>::begin (void) {
   return iterator(first, 0);
 }
 
 template<typename Data>
-inline typename sequence<Data>::const_iterator sequence<Data>::begin (void) const {
+inline typename sequence<Data>::const_iterator
+sequence<Data>::begin (void) const {
   return const_iterator(first, 0);
 }
 
 template<typename Data>
-inline typename sequence<Data>::iterator sequence<Data>::end (void) {
+inline typename sequence<Data>::iterator
+sequence<Data>::end (void) {
   return iterator(0, last);
 }
 
 template<typename Data>
-inline typename sequence<Data>::const_iterator sequence<Data>::end (void) const {
+inline typename sequence<Data>::const_iterator
+sequence<Data>::end (void) const {
   return const_iterator(0, last);
 }
 
@@ -348,6 +358,18 @@ inline typename sequence<Data>::iterator sequence<Data>::erase (Iterator pos) {
   pos.node->unlink();
   delete pos.node;
   return Iterator(next, next->prev);
+}
+
+template<typename Data>
+template<typename Container>
+inline bool sequence<Data>::operator== (Container const& c) const {
+  return std::equal(begin(), end(), c.begin());
+}
+
+template<typename Data>
+template<typename Container>
+inline bool sequence<Data>::operator!= (Container const& c) const {
+  return !std::equal(begin(), end(), c.begin());
 }
 
 } // prana

@@ -24,8 +24,6 @@ struct TreeContainer {
   void copy (TreeContainer const&);
 
   static TreeContainer make (void);
-  
-  void swap (TreeContainer&);
 
   void free (void);
   
@@ -37,7 +35,9 @@ struct TreeContainer {
   iterator end (void);
   const_iterator end (void) const;
 
- unspecified-access-specifier:
+  template<typename Container> bool operator== (Container const&) const;
+  template<typename Container> bool operator!= (Container const&) const;
+
   unspecified-type* first;
   unspecified-type* last;
 };

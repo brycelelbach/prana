@@ -12,8 +12,11 @@
 #include <vector>
 #include <list>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <boost/spirit/home/prana/adt/sequence.hpp>
-#include <boost/test/unit_test.hpp>
+
+#include "prana_test_harness.hpp"
 
 using namespace boost::spirit::prana;
 
@@ -23,7 +26,7 @@ BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
   l.free();
   l = sequence<int>::make();
   l.free();
-  l.free(); // make sure double free doesn't do anything funky
+  l.free();
 }
 
 BOOST_AUTO_TEST_CASE(insertion) {
@@ -38,9 +41,9 @@ BOOST_AUTO_TEST_CASE(insertion) {
 BOOST_AUTO_TEST_CASE(forward_iteration) {
   sequence<double> l;
   l.default_construct();
-  l.push_front(7005.995);
-  l.push_front(153.51);
-  l.push_front(0.445);
+  l.insert(7005.995, l.begin());
+  l.insert(153.51, l.begin());
+  l.insert(0.445, l.begin());
   sequence<double>::iterator it = l.begin(), end = l.end();
   BOOST_CHECK(*it == 0.445);
   BOOST_CHECK(*(++it) == 153.51);
@@ -52,9 +55,9 @@ BOOST_AUTO_TEST_CASE(forward_iteration) {
 BOOST_AUTO_TEST_CASE(reverse_iteration) {
   sequence<std::string> l;
   l.default_construct();
-  l.push_back("foo");
-  l.push_back("bar");
-  l.push_back("buzz");
+  l.insert("foo", l.end());
+  l.insert("bar", l.end());
+  l.insert("buzz", l.end());
   sequence<std::string>::iterator it = l.begin(), end = l.end();
   BOOST_CHECK(*(--end) == "buzz");
   BOOST_CHECK(*(--end) == "bar");
@@ -123,32 +126,6 @@ BOOST_AUTO_TEST_CASE(copy) {
   l0.free(); 
 }
  
-BOOST_AUTO_TEST_CASE(swap) {
-  sequence<char> l0;
-  l0.default_construct();
-  l0.push_back('d');
-  l0.push_back('g');
-  l0.push_back('h');
-  sequence<char> l1;
-  l1.default_construct();
-  l1.push_back('w');
-  l1.push_back('x');
-  l1.push_back('y');
-  l1.swap(l0);
-  sequence<char>::iterator it = l0.begin(), end = l0.end();
-  BOOST_CHECK(*(it) == 'w');
-  BOOST_CHECK(*(++it) == 'x');
-  BOOST_CHECK(*(++it) == 'y');
-  BOOST_CHECK(++it == end);
-  it = l1.begin(); end = l1.end();
-  BOOST_CHECK(*(it) == 'd');
-  BOOST_CHECK(*(++it) == 'g');
-  BOOST_CHECK(*(++it) == 'h');
-  BOOST_CHECK(++it == end);
-  l0.free(); 
-  l1.free();
-}
-
 BOOST_AUTO_TEST_CASE(get_to_list) {
   sequence<std::string> l0;
   l0.default_construct();
@@ -177,5 +154,21 @@ BOOST_AUTO_TEST_CASE(get_to_vector) {
   BOOST_CHECK(*(++it) == 64.3);
   BOOST_CHECK(*(++it) == 12.0);
   BOOST_CHECK(++it == end);
+}
+
+BOOST_AUTO_TEST_CASE(get_to_irange) {
+  sequence<int> l;
+  l.default_construct();
+  l.push_back(6325);
+  l.push_back(-503);
+  l.push_back(10422);
+  typedef boost::iterator_range<sequence<int>::const_iterator> irange;
+  irange r = l.get<irange>();
+  sequence<int>::const_iterator it = r.begin(), end = r.end();
+  BOOST_CHECK(*(it) == 6325);
+  BOOST_CHECK(*(++it) == -503);
+  BOOST_CHECK(*(++it) == 10422);
+  BOOST_CHECK(++it == end);
+  l.free();
 }
 
