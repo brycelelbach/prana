@@ -35,24 +35,6 @@ BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
   w.free();
 }
 
-BOOST_AUTO_TEST_CASE(sizes) {
-  BOOST_TEST_MESSAGE
-    (  "byte size is "
-    << CHAR_BIT << " bits");
-  BOOST_TEST_MESSAGE
-    (  "stack store size is "
-    << (sizeof(symbol<char>::stack_store) * CHAR_BIT) << " bits");
-  BOOST_TEST_MESSAGE
-    (  "heap stored size is "
-    << (sizeof(symbol<char>::heap_store) * CHAR_BIT) << " bits");
-  BOOST_TEST_MESSAGE
-    (  "stack size is "
-    << (symbol_traits<char>::stack_size * CHAR_BIT) << " bits");
-  BOOST_TEST_MESSAGE
-    (  "meta size is " 
-    << (symbol_traits<char>::meta_size * CHAR_BIT) << " bits");
-}
-
 BOOST_AUTO_TEST_CASE(copy_char_string_stack) {
   symbol<char> s;
   s.default_construct();
@@ -93,4 +75,24 @@ BOOST_AUTO_TEST_CASE(copy_wchar_string_heap) {
   BOOST_CHECK(h == L"The long string is quite long.");
 }
 
+BOOST_AUTO_TEST_CASE(copy_empty_char_string) {
+  symbol<char> s;
+  s.default_construct();
+  s.copy("");
+  BOOST_TEST_MESSAGE(s.str());
+  BOOST_CHECK(s.str() == "");
+  std::string h = s.get<std::string>();
+  s.free();
+  BOOST_CHECK(h == "");
+}
+
+BOOST_AUTO_TEST_CASE(copy_empty_wchar_string) {
+  symbol<wchar_t> s;
+  s.default_construct();
+  s.copy(L"");
+  BOOST_CHECK(s.str() == L"");
+  std::wstring h = s.get<std::wstring>();
+  s.free();
+  BOOST_CHECK(h == L"");
+}
 

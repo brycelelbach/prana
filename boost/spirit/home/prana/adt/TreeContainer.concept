@@ -37,8 +37,5 @@ struct TreeContainer {
 
   template<typename Container> bool operator== (Container const&) const;
   template<typename Container> bool operator!= (Container const&) const;
-
-  unspecified-type* first;
-  unspecified-type* last;
 };
 

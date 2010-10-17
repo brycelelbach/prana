@@ -32,9 +32,8 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t    size_type;
   
-  typedef typename sequence<utree>::iterator       iterator;
-  typedef typename sequence<utree>::const_iterator const_iterator;
-  typedef typename sequence<utree>::ref_iterator   ref_iterator;
+  typedef node_iterator<utree> iterator;
+  typedef node_iterator<utree> const_iterator;
 
   typedef sequence<utree> sequence_type;
   typedef symbol<Char>    symbol_type;

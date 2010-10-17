@@ -9,6 +9,8 @@
 
 #define BOOST_TEST_MODULE prana_range
 
+#include <cstring>
+
 #include <vector>
 #include <list>
 
@@ -44,6 +46,16 @@ BOOST_AUTO_TEST_CASE(copy_list) {
   r.free();
 }
  
+BOOST_AUTO_TEST_CASE(copy_c_str) {
+  char const* hello = "hello";
+  range<char const*> r;
+  r.default_construct();
+  r.copy(hello, hello + std::strlen(hello));
+  std::string s(r.begin(), r.end());
+  r.free();
+  BOOST_CHECK(s == "hello");
+}
+
 BOOST_AUTO_TEST_CASE(copy_range) {
   std::list<char> l;
   range<std::list<char>::const_iterator> r0, r1;

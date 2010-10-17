@@ -10,83 +10,34 @@
 #if !defined(BOOST_SPIRIT_PRANA_SYMBOL_HPP)
 #define BOOST_SPIRIT_PRANA_SYMBOL_HPP
 
-#include <cstring>
+#include <string>
+
 #include <climits>
+#include <cstring>
+#include <cwchar>
 
-#include <algorithm>
+#include <boost/cstdint.hpp>
 
-#include <boost/config.hpp>
-#include <boost/integer.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/detail/iterator.hpp>
-#include <boost/type_traits/alignment_of.hpp>
-
-#include <boost/spirit/home/prana/kind.hpp>
+#include <boost/spirit/home/prana/meta/unroll_copy.hpp>
+#include <boost/spirit/home/prana/adt/range.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 template<typename Char>
-struct symbol_traits;
-
-template<>
-struct symbol_traits<char> {
-  typedef boost::uint_t<sizeof(void*) * CHAR_BIT>::exact size_type;
-  static size_type const stack_size;
-  static size_type const meta_size;
-  
-  static inline size_type length (char const* s) {
-    return std::strlen(s);
-  }
-};
-
-symbol_traits<char>::size_type const symbol_traits<char>::stack_size =
-  sizeof(void*[2]) / sizeof(char);
-
-symbol_traits<char>::size_type const symbol_traits<char>::meta_size =
-  sizeof(void*) / sizeof(char);
-
-template<>
-struct symbol_traits<wchar_t> {
-  typedef boost::uint_t<sizeof(void*) * CHAR_BIT>::exact size_type;
-  static size_type const stack_size;
-  static size_type const meta_size;
-
-  static inline size_type length (wchar_t const* s) {
-    return std::wcslen(s);
-  }
-};
-
-symbol_traits<wchar_t>::size_type const symbol_traits<wchar_t>::stack_size =
-  sizeof(void*[2]) / sizeof(wchar_t);
-
-symbol_traits<wchar_t>::size_type const symbol_traits<wchar_t>::meta_size =
-  sizeof(void*) / sizeof(wchar_t);
-
-template<typename Char>
 struct symbol {
  public:
-  typedef symbol_traits<Char> traits;
- 
-  typedef Char                       value_type;
-  typedef Char&                      reference;
-  typedef Char const&                const_reference;
-  typedef Char*                      pointer;
-  typedef Char const*                const_pointer;
-  typedef typename traits::size_type size_type; 
-  typedef Char const*                iterator;
-  typedef Char const*                const_iterator;
+  typedef Char        value_type;
+  typedef Char&       reference;
+  typedef Char const& const_reference;
+  typedef Char*       pointer;
+  typedef Char const* const_pointer;
+  typedef std::size_t size_type; 
+  typedef Char const* iterator;
+  typedef Char const* const_iterator;
 
-  struct stack_store {
-    Char      str[traits::stack_size];
-    char      meta[traits::meta_size];
-  };
-    
-  struct heap_store {
-    Char*     str;
-    size_type size;
-  };
+  static size_type const stack_size;
 
   void default_construct (void);
  
@@ -109,47 +60,44 @@ struct symbol {
   template<typename Container> bool operator== (Container const&) const;
   template<typename Container> bool operator!= (Container const&) const;
   
-  // alias for begin
   std::basic_string<Char> str (void) const;
   
-  template<size_type N>
-  char meta (void) const;  
-  
-  template<size_type N>
-  void meta (char);
-
-  size_type size (void) const;
-  
   union {
-    stack_store stack;
-    heap_store  heap;
-  };
+    struct {
+      uint8_t storage;
+      Char str[(sizeof(void*[2]) / sizeof(Char)) - 1];
+    } stack;
+    struct {
+      uint8_t storage;
+      range<Char const*>* str;
+    } heap;
+  } data;
 };
 
-#define STORAGE     stack.meta[0]
-#define HEAP        (1 << (CHAR_BIT - 1))
-#define HEAP_SIZE   heap.size
-#define STACK_SIZE  stack.meta[0]
+template<typename Char>
+typename symbol<Char>::size_type const symbol<Char>::stack_size =
+  (sizeof(void*[2]) / sizeof(Char)) - 1;
 
 template<typename Char>
 inline void symbol<Char>::default_construct (void) {
-  heap.str = 0;
-  heap.size = 0;
-
-  // FIXME: there's gotta be some way to unroll this with TMP
-  for (size_type i = 0; i != traits::meta_size; ++i) stack.meta[i] = 0;
+  data.stack.storage = 1;
+  Char* ptr = data.stack.str;
+  unroll_copy_c<stack_size, '\0'>::apply(ptr);
 }
 
 template<typename Char>
 inline void symbol<Char>::copy (symbol const& other) {
-  copy(other.str(), other.str() + other.size());
+  copy(other.begin(), other.end());
 }
 
 template<typename Char>
 inline void symbol<Char>::copy (Char const* c) {
-  // FIXME: this can be done inline, which will be faster, and
-  // eliminate the need for length in traits
-  copy(c, c + traits::length(c));
+  copy(c, c + std::strlen(c));
+}
+
+template<>
+inline void symbol<wchar_t>::copy (wchar_t const* c) {
+  copy(c, c + std::wcslen(c));
 }
 
 template<typename Char>
@@ -158,28 +106,34 @@ inline void symbol<Char>::copy (Iterator f, Iterator l) {
   free();
 
   size_type size = l - f;
-  Char* str = 0;
 
-  if (size <= traits::stack_size) {
-    str = stack.str;
-    STACK_SIZE = size;
+  if (!size) {
+    data.stack.storage = CHAR_MAX;
+    return;
+  }
+
+  else if (size <= stack_size) {
+    data.stack.storage = size;
+  
+    for (size_type i = 0; i != size; ++i) data.stack.str[i] = *f++;
   }
 
   else { // store it in the heap
-    str = new Char[size];
-    heap.str = str;
-    heap.size = size;
-    STORAGE = HEAP;
+    data.stack.storage = 0;
+  
+    Char* p = new Char[size];
+    for (size_type i = 0; i != size; ++i) p[i] = *f++;
+  
+    data.heap.str = new range<Char const*>;
+    data.heap.str->default_construct();
+    data.heap.str->copy(p, size); 
   }
-
-  // FIXME: there's gotta be some way to unroll this with TMP
-  for (size_type i = 0; i != size; ++i) *str++ = *f++;
 }
 
 template<typename Char>
 template<typename Container>
 inline void symbol<Char>::copy (Container const& c) {
-  copy(c, begin(), c.end());
+  copy(c.begin(), c.end());
 }
 
 template<typename Char>
@@ -200,59 +154,41 @@ inline symbol<Char> symbol<Char>::make (Iterator f, Iterator l) {
 template<typename Char>
 template<typename Container>
 inline symbol<Char> symbol<Char>::make (Container const& c) {
-  copy(c, begin(), c.end());
+  copy(c.begin(), c.end());
 }
 
 template<typename Char>
 inline void symbol<Char>::free (void) { 
-  if (heap.str && (STORAGE & HEAP)) {
-    delete[] heap.str;
-    heap.str = 0;
-    STORAGE = 0;
+  if (!data.stack.storage) {
+    delete[] data.heap.str->begin();
+    data.heap.str->free();
+    delete data.heap.str;
+    default_construct();
   } 
 }
 
 template<typename Char>
 template<typename Container>
 inline Container symbol<Char>::get (void) const {
+  if (data.stack.storage == CHAR_MAX) return Container();
   return Container(begin(), end());
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::begin (void) const {
-  if (STORAGE & HEAP) return heap.str;
-  return stack.str;
+  if (!data.stack.storage) return data.heap.str->begin();
+  return data.stack.str;
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::end (void) const {
-  if (STORAGE & HEAP) return heap.str + size();
-  return stack.str + size();
+  if (!data.stack.storage) return data.heap.str->end();
+  return data.stack.str + data.stack.storage;
 }
 
 template<typename Char>
 inline std::basic_string<Char> symbol<Char>::str (void) const {
-  return std::basic_string<Char>(begin(), end());
-}
-
-template<typename Char>
-template<typename symbol<Char>::size_type N>
-inline char symbol<Char>::meta (void) const {
-  BOOST_STATIC_ASSERT((N > 1) && (N <= symbol_traits<Char>::meta_size));
-  return stack.meta[N];
-}
-
-template<typename Char>
-template<typename symbol<Char>::size_type N>
-inline void symbol<Char>::meta (char t) {
-  BOOST_STATIC_ASSERT((N > 1) && (N <= symbol_traits<Char>::meta_size));
-  stack.meta[N] = t;
-}
-
-template<typename Char>
-inline typename symbol<Char>::size_type symbol<Char>::size (void) const {
-  if (STORAGE & HEAP) return HEAP_SIZE;
-  return STACK_SIZE;
+  return get<std::basic_string<Char> >();
 }
 
 template<typename Char>
