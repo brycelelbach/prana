@@ -67,21 +67,20 @@ symbol_traits<wchar_t>::size_type const symbol_traits<wchar_t>::meta_size =
 template<typename Char>
 struct symbol {
  public:
-  typedef typename boost::detail::iterator_traits<Char const*> iterator_traits;
-  typedef symbol_traits<Char>                                  sym_traits;
+  typedef symbol_traits<Char> traits;
  
-  typedef typename iterator_traits::value_type            value_type; 
-  typedef typename iterator_traits::reference             reference; 
-  typedef typename iterator_traits::reference const       const_reference;
-  typedef typename iterator_traits::pointer               pointer;
-  typedef typename sym_traits::size_type                 size_type; 
-  typedef typename iterator_traits::pointer const         const_pointer;
-  typedef Char const*                                     iterator;
-  typedef Char const*                                     const_iterator;
+  typedef Char                       value_type;
+  typedef Char&                      reference;
+  typedef Char const&                const_reference;
+  typedef Char*                      pointer;
+  typedef Char const*                const_pointer;
+  typedef typename traits::size_type size_type; 
+  typedef Char const*                iterator;
+  typedef Char const*                const_iterator;
 
   struct stack_store {
-    Char      str[sym_traits::stack_size];
-    char      meta[sym_traits::meta_size];
+    Char      str[traits::stack_size];
+    char      meta[traits::meta_size];
   };
     
   struct heap_store {
@@ -138,7 +137,7 @@ inline void symbol<Char>::default_construct (void) {
   heap.size = 0;
 
   // FIXME: there's gotta be some way to unroll this with TMP
-  for (size_type i = 0; i != sym_traits::meta_size; ++i) stack.meta[i] = 0;
+  for (size_type i = 0; i != traits::meta_size; ++i) stack.meta[i] = 0;
 }
 
 template<typename Char>
@@ -149,8 +148,8 @@ inline void symbol<Char>::copy (symbol const& other) {
 template<typename Char>
 inline void symbol<Char>::copy (Char const* c) {
   // FIXME: this can be done inline, which will be faster, and
-  // eliminate the need for length in sym_traits
-  copy(c, c + sym_traits::length(c));
+  // eliminate the need for length in traits
+  copy(c, c + traits::length(c));
 }
 
 template<typename Char>
@@ -161,7 +160,7 @@ inline void symbol<Char>::copy (Iterator f, Iterator l) {
   size_type size = l - f;
   Char* str = 0;
 
-  if (size <= sym_traits::stack_size) {
+  if (size <= traits::stack_size) {
     str = stack.str;
     STACK_SIZE = size;
   }

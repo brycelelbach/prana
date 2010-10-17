@@ -14,25 +14,21 @@
 
 #include <algorithm>
 
-#include <boost/detail/iterator.hpp>
-
-namespace boost {
+namespace boost { 
 namespace spirit {
 namespace prana {
 
 template<typename Iterator>
 struct range {
  public:
-  typedef typename boost::detail::iterator_traits<Iterator> iterator_traits;
-
-  typedef typename iterator_traits::value_type      value_type; 
-  typedef typename iterator_traits::reference       reference; 
-  typedef typename iterator_traits::reference const const_reference;
-  typedef typename iterator_traits::pointer         pointer; 
-  typedef typename iterator_traits::pointer const   const_pointer;
-  typedef std::size_t                               size_type;
-  typedef Iterator                                  iterator;
-  typedef Iterator                                  const_iterator;
+  typedef Iterator        value_type;
+  typedef Iterator&       reference;
+  typedef Iterator const& const_reference;
+  typedef Iterator*       pointer;
+  typedef Iterator const* const_pointer;
+  typedef std::size_t     size_type;
+  typedef Iterator        iterator;
+  typedef Iterator        const_iterator;
 
   void default_construct (void);
 
