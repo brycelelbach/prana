@@ -21,7 +21,7 @@ namespace spirit {
 namespace prana {
 
 template<typename Data>
-struct node: private boost::noncopyable {
+struct sequence_node: private boost::noncopyable {
   typedef Data        value_type;
   typedef Data&       reference;
   typedef Data const& const_reference;
@@ -30,68 +30,70 @@ struct node: private boost::noncopyable {
   typedef std::size_t size_type;
 
   template<typename T>
-  node (T const&, node*, node*);
+  sequence_node (T const&, sequence_node*, sequence_node*);
 
   void unlink (void);
 
   Data val;
-  node* next;
-  node* prev;
+  sequence_node* next;
+  sequence_node* prev;
 };
 
 template<typename Data>
-struct node_iterator: public boost::iterator_facade<
-  node_iterator<Data>, Data, boost::bidirectional_traversal_tag
+struct sequence_iterator: public boost::iterator_facade<
+  sequence_iterator<Data>, Data, boost::bidirectional_traversal_tag
 > {
  public:
   typedef typename mpl::if_<
     boost::is_const<Data>,
-    node<typename boost::remove_const<Data>::type> const,
-    node<Data>
+    sequence_node<typename boost::remove_const<Data>::type> const,
+    sequence_node<Data>
   >::type node_type;
 
-  node_iterator (void);
+  sequence_iterator (void);
 
-  node_iterator (node_type*, node_type*);
+  sequence_iterator (node_type*, node_type*);
 
   void increment (void);
   void decrement (void);
 
   template<typename Iterator> bool equal (Iterator const&) const;
 
-  typename node_iterator::reference dereference (void) const;
+  typename sequence_iterator::reference dereference (void) const;
 
   node_type* curr;
-  node_type* prev; // only needed for sequence
+  node_type* prev;
 };
 
 template<typename Data>
 template<typename T>
-node<Data>::node (T const& val, node* next_, node* prev_):
-  val(val), next(next_), prev(prev_) {
-    // we leave a line here so we can breakpoint the ctor in gdb if needed
-  }
+sequence_node<Data>::sequence_node (
+  T const& val, sequence_node* next_, sequence_node* prev_
+): val(val), next(next_), prev(prev_) {
+  // we leave a line here so we can breakpoint the ctor in gdb if needed
+}
 
 template<typename Data>
-void node<Data>::unlink (void) {
+void sequence_node<Data>::unlink (void) {
   // WARN: do not call unlink unless the node comes from a utree sequence
   prev->next = next;
   next->prev = prev;
 }
   
 template<typename Data>
-node_iterator<Data>::node_iterator (void): curr(0), prev(0) {
-  // we leave a line here so we can breakpoint the ctor in gdb if needed
-}
+sequence_iterator<Data>::sequence_iterator (void):
+  curr(0), prev(0) {
+    // we leave a line here so we can breakpoint the ctor in gdb if needed
+  }
 
 template<typename Data>
-node_iterator<Data>::node_iterator (node_type* curr_, node_type* prev_):
+sequence_iterator<Data>::sequence_iterator (node_type* curr_, node_type* prev_):
   curr(curr_), prev(prev_) {
     // we leave a line here so we can breakpoint the ctor in gdb if needed
   }
 
 template<typename Data>
-void node_iterator<Data>::increment (void) {
+void sequence_iterator<Data>::increment (void) {
   if (curr != 0) { // not at end
     prev = curr;
     curr = curr->next;
@@ -99,7 +101,7 @@ void node_iterator<Data>::increment (void) {
 }
 
 template<typename Data>
-void node_iterator<Data>::decrement (void) {
+void sequence_iterator<Data>::decrement (void) {
   if (prev != 0) { // not at begin
     curr = prev;
     prev = prev->prev;
@@ -108,13 +110,13 @@ void node_iterator<Data>::decrement (void) {
 
 template<typename Data>
 template<typename Iterator>
-bool node_iterator<Data>::equal (Iterator const& other) const {
+bool sequence_iterator<Data>::equal (Iterator const& other) const {
   return curr == other.curr;
 }
 
 template<typename Data>
-typename node_iterator<Data>::reference
-node_iterator<Data>::dereference (void) const {
+typename sequence_iterator<Data>::reference
+sequence_iterator<Data>::dereference (void) const {
   return curr->val;
 }
 

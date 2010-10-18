@@ -10,6 +10,8 @@
 #if !defined(BOOST_SPIRIT_PRANA_UTREE_HPP)
 #define BOOST_SPIRIT_PRANA_UTREE_HPP
 
+#include <boost/ref.hpp>
+
 #include <boost/spirit/home/prana/adt/sequence.hpp>
 #include <boost/spirit/home/prana/adt/symbol.hpp>
 #include <boost/spirit/home/prana/adt/range.hpp>
@@ -32,12 +34,15 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t    size_type;
   
-  typedef node_iterator<utree> iterator;
-  typedef node_iterator<utree> const_iterator;
-
-  typedef sequence<utree> sequence_type;
-  typedef symbol<Char>    symbol_type;
-  typedef range<iterator> range_type;
+  typedef sequence<utree>                           sequence_type;
+  typedef typename sequence_type::iterator          sequence_iterator;  
+  typedef typename sequence_type::range_type        sequence_range;  
+  typedef typename sequence_type::const_iterator    sequence_const_iterator;  
+  typedef typename sequence_type::const_range_type  sequence_const_range;  
+ 
+  typedef symbol<Char>                          symbol_type;
+  typedef typename symbol_type::iterator        symbol_iterator;  
+  typedef typename symbol_type::const_iterator  symbol_const_iterator;  
 
   utree (void);
   utree (utree const&);
@@ -46,9 +51,9 @@ class utree {
 
  private:
   union data_type { 
-    sequence_type seq;
-    symbol_type   sym;
-    range_type    rge;
+    sequence_type   seq;
+    sequence_range  seq_rge;
+    symbol_type     sym;
   } data;  
 };
 

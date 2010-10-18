@@ -14,7 +14,8 @@
 
 #include <boost/swap.hpp>
 
-#include <boost/spirit/home/prana/adt/node.hpp>
+#include <boost/spirit/home/prana/adt/range.hpp>
+#include <boost/spirit/home/prana/adt/sequence_iterator.hpp>
 
 namespace boost {
 namespace spirit {
@@ -23,15 +24,17 @@ namespace prana {
 template<typename Data>
 struct sequence {
  public:
-  typedef Data                      value_type;
-  typedef Data&                     reference;
-  typedef Data const&               const_reference;
-  typedef Data*                     pointer;
-  typedef Data const*               const_pointer;
-  typedef std::size_t               size_type;
-  typedef node_iterator<Data>       iterator;
-  typedef node_iterator<const Data> const_iterator;
-  typedef node<Data>                node_type; 
+  typedef Data                          value_type;
+  typedef Data&                         reference;
+  typedef Data const&                   const_reference;
+  typedef Data*                         pointer;
+  typedef Data const*                   const_pointer;
+  typedef std::size_t                   size_type;
+  typedef sequence_iterator<Data>       iterator;
+  typedef sequence_iterator<Data const> const_iterator;
+  typedef range<iterator>               range_type;
+  typedef range<const_iterator>         const_range_type;
+  typedef sequence_node<Data>           node_type; 
 
   void default_construct (void);
   

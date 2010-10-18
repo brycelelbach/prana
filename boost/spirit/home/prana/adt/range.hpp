@@ -49,7 +49,7 @@ struct range {
 
   iterator begin (void) const;
   iterator end (void) const;
-  
+
   template<typename Container> bool operator== (Container const&) const;
   template<typename Container> bool operator!= (Container const&) const;
 
@@ -73,21 +73,13 @@ inline void range<Iterator>::copy (iterator first_, iterator last_) {
 
 template<typename Iterator>
 inline void range<Iterator>::copy (iterator bits, size_type len) {
-  if (!first) first = new iterator(bits);
-  else *first = bits;
-
-  if (!last) last = new iterator(bits + len);
-  else *last = bits + len;
+  copy(bits, bits + len);
 }
 
 template<typename Iterator>
 template<typename Container>
 inline void range<Iterator>::copy (Container const& c) {
-  if (!first) first = new iterator(c.begin());
-  else *first = c.begin();
-
-  if (!last) last = new iterator(c.end());
-  else *last = c.end();
+  copy(c.begin(), c.end());
 }
 
 template<typename Iterator>
