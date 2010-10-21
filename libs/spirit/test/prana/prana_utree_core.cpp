@@ -7,7 +7,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_utree
+#define BOOST_TEST_MODULE prana_utree_core
 
 #include <cstddef>
 
@@ -15,22 +15,17 @@
 #include <list>
 
 #include <boost/spirit/home/prana/utree.hpp>
+#include <boost/spirit/home/prana/functional/default_asserter.hpp>
 
 #include "prana_test_harness.hpp"
 
 using namespace boost::spirit::prana;
 
+typedef utree<utree_policy<char, functional::default_asserter> > char_utree;
+typedef utree<utree_policy<wchar_t, functional::default_asserter> > wchar_utree;
+
 BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
-  utree<char> s;
-  utree<wchar_t> w;
+  char_utree s;
+  wchar_utree w;
+  BOOST_CHECK(sizeof(char_utree) == sizeof(wchar_utree));
 }
-
-BOOST_AUTO_TEST_CASE(sizes) {
-  BOOST_TEST_MESSAGE
-    (  "byte size is "
-    << CHAR_BIT << " bits");
-  BOOST_TEST_MESSAGE
-    (  "utree size is "
-    << (sizeof(utree<char>) * CHAR_BIT) << " bits");
-}
-

@@ -23,9 +23,18 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-template<typename Char>
+template<typename Char, typename ErrorHandler>
+struct utree_policy {
+  typedef Char char_type;
+  typedef ErrorHandler error_handler;
+};
+
+template<typename Policy>
 class utree {
  public:
+  typedef typename Policy::char_type     char_type;
+  typedef typename Policy::error_handler error_handler;
+
   typedef utree          value_type;
   typedef utree&         reference;
   typedef utree const&   const_reference;
@@ -34,15 +43,8 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t    size_type;
   
-  typedef sequence<utree>                           sequence_type;
-  typedef typename sequence_type::iterator          sequence_iterator;  
-  typedef typename sequence_type::range_type        sequence_range;  
-  typedef typename sequence_type::const_iterator    sequence_const_iterator;  
-  typedef typename sequence_type::const_range_type  sequence_const_range;  
- 
-  typedef symbol<Char>                          symbol_type;
-  typedef typename symbol_type::iterator        symbol_iterator;  
-  typedef typename symbol_type::const_iterator  symbol_const_iterator;  
+  typedef adt::sequence<utree>   sequence_type;
+  typedef adt::symbol<char_type> symbol_type;
 
   utree (void);
   utree (utree const&);
@@ -50,26 +52,27 @@ class utree {
   utree& operator= (utree const&);  
 
  private:
-  union data_type { 
-    sequence_type   seq;
-    sequence_range  seq_rge;
-    symbol_type     sym;
-  } data;  
+  union { 
+    sequence_type                      sequence;
+    typename sequence_type::range_type sequence_range;
+    symbol_type                        symbol;
+    typename symbol_type::range_type   symbol_range;
+  }; 
 };
 
-template<typename Char>
-utree<Char>::utree (void) {
-
+template<typename Policy>
+utree<Policy>::utree (void) {
+  // we leave a line here to ease breakpointing the ctor in a debugger
 }
 
-template<typename Char>
-utree<Char>::utree (utree const& other) {
-  data = other.data;
+template<typename Policy>
+utree<Policy>::utree (utree const& other) {
+  // FIXME: implement 
 }
 
-template<typename Char>
-utree<Char>& utree<Char>::operator= (utree const& other) {
-  data = other.data;
+template<typename Policy>
+utree<Policy>& utree<Policy>::operator= (utree const& other) {
+  // FIXME: implement 
 }
 
 } // prana

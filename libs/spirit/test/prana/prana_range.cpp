@@ -18,7 +18,7 @@
 
 #include "prana_test_harness.hpp"
 
-using namespace boost::spirit::prana;
+using namespace boost::spirit::prana::adt;
 
 BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
   range<std::vector<int>::const_iterator> r;

@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_RANGE_HPP)
-#define BOOST_SPIRIT_PRANA_RANGE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_RANGE_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_RANGE_HPP
 
 #include <cstddef>
 
@@ -17,6 +17,7 @@
 namespace boost { 
 namespace spirit {
 namespace prana {
+namespace adt {
 
 template<typename Iterator>
 struct range {
@@ -151,8 +152,9 @@ inline bool range<Iterator>::operator!= (Container const& c) const {
   return !std::equal(begin(), end(), c.begin());
 }
 
+} // adt
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_RANGE_HPP
+#endif // BOOST_SPIRIT_PRANA_ADT_RANGE_HPP

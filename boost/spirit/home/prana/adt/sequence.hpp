@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEQUENCE_HPP)
-#define BOOST_SPIRIT_PRANA_SEQUENCE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_SEQUENCE_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_SEQUENCE_HPP
 
 #include <algorithm>
 
@@ -20,6 +20,7 @@
 namespace boost {
 namespace spirit {
 namespace prana {
+namespace adt {
 
 template<typename Data>
 struct sequence {
@@ -32,9 +33,11 @@ struct sequence {
   typedef std::size_t                   size_type;
   typedef sequence_iterator<Data>       iterator;
   typedef sequence_iterator<Data const> const_iterator;
-  typedef range<iterator>               range_type;
-  typedef range<const_iterator>         const_range_type;
-  typedef sequence_node<Data>           node_type; 
+
+  typedef range<iterator>       range_type;
+  typedef range<const_iterator> const_range_type;
+  
+  typedef sequence_node<Data> node_type; 
 
   void default_construct (void);
   
@@ -263,8 +266,9 @@ inline bool sequence<Data>::operator!= (Container const& c) const {
   return !std::equal(begin(), end(), c.begin());
 }
 
+} // adt
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SEQUENCE_HPP
+#endif // BOOST_SPIRIT_PRANA_ADT_SEQUENCE_HPP

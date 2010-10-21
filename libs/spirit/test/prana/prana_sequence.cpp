@@ -18,7 +18,7 @@
 
 #include "prana_test_harness.hpp"
 
-using namespace boost::spirit::prana;
+using namespace boost::spirit::prana::adt;
 
 BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
   sequence<int> l;
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(get_to_vector) {
   BOOST_CHECK(++it == end);
 }
 
-BOOST_AUTO_TEST_CASE(get_to_irange) {
+BOOST_AUTO_TEST_CASE(get_to_range) {
   sequence<int> l;
   l.default_construct();
   l.push_back(6325);

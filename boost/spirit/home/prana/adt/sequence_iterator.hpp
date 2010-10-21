@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_NODE_HPP)
-#define BOOST_SPIRIT_PRANA_NODE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_SEQUENCE_ITERATOR_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_SEQUENCE_ITERATOR_HPP
 
 #include <boost/noncopyable.hpp>
 #include <boost/type_traits/is_const.hpp>
@@ -19,6 +19,7 @@
 namespace boost {
 namespace spirit {
 namespace prana {
+namespace adt {
 
 template<typename Data>
 struct sequence_node: private boost::noncopyable {
@@ -79,7 +80,7 @@ void sequence_node<Data>::unlink (void) {
   prev->next = next;
   next->prev = prev;
 }
-  
+
 template<typename Data>
 sequence_iterator<Data>::sequence_iterator (void):
   curr(0), prev(0) {
@@ -120,8 +121,9 @@ sequence_iterator<Data>::dereference (void) const {
   return curr->val;
 }
 
+} // adt
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_NODE_HPP
+#endif // BOOST_SPIRIT_PRANA_ADT_SEQUENCE_ITERATOR_HPP

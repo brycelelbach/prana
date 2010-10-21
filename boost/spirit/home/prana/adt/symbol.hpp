@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SYMBOL_HPP)
-#define BOOST_SPIRIT_PRANA_SYMBOL_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_SYMBOL_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_SYMBOL_HPP
 
 #include <string>
 
@@ -18,12 +18,12 @@
 
 #include <boost/cstdint.hpp>
 
-#include <boost/spirit/home/prana/meta/unroll_copy.hpp>
 #include <boost/spirit/home/prana/adt/range.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
+namespace adt {
 
 template<typename Char>
 struct symbol {
@@ -36,6 +36,9 @@ struct symbol {
   typedef std::size_t size_type; 
   typedef Char const* iterator;
   typedef Char const* const_iterator;
+
+  typedef range<iterator>       range_type;
+  typedef range<const_iterator> const_range_type;
 
   static size_type const stack_size;
 
@@ -69,7 +72,7 @@ struct symbol {
     } stack;
     struct {
       uint8_t storage;
-      range<Char const*>* str;
+      range_type* str;
     } heap;
   } data;
 };
@@ -81,8 +84,7 @@ typename symbol<Char>::size_type const symbol<Char>::stack_size =
 template<typename Char>
 inline void symbol<Char>::default_construct (void) {
   data.stack.storage = 1;
-  Char* ptr = data.stack.str;
-  unroll_copy_c<stack_size, '\0'>::apply(ptr);
+  for (size_type i = 0; i < stack_size; ++i) data.stack.str[i] = '\0';
 }
 
 template<typename Char>
@@ -124,7 +126,7 @@ inline void symbol<Char>::copy (Iterator f, Iterator l) {
     Char* p = new Char[size];
     for (size_type i = 0; i != size; ++i) p[i] = *f++;
   
-    data.heap.str = new range<Char const*>;
+    data.heap.str = new range_type;
     data.heap.str->default_construct();
     data.heap.str->copy(p, size); 
   }
@@ -147,6 +149,7 @@ template<typename Char>
 template<typename Iterator>
 inline symbol<Char> symbol<Char>::make (Iterator f, Iterator l) {
   symbol s;
+  s.default_construct();
   s.copy(f, l);
   return s;
 } 
@@ -154,7 +157,10 @@ inline symbol<Char> symbol<Char>::make (Iterator f, Iterator l) {
 template<typename Char>
 template<typename Container>
 inline symbol<Char> symbol<Char>::make (Container const& c) {
-  copy(c.begin(), c.end());
+  symbol s;
+  s.default_construct();
+  s.copy(c.begin(), c.end());
+  return s;
 }
 
 template<typename Char>
@@ -203,13 +209,9 @@ inline bool symbol<Char>::operator!= (Container const& c) const {
   return !std::equal(c.begin(), c.end(), str());
 }
 
-#undef STORAGE     
-#undef HEAP       
-#undef HEAP_SIZE   
-#undef STACK_SIZE  
-
+} // adt
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SYMBOL_HPP
+#endif // BOOST_SPIRIT_PRANA_ADT_SYMBOL_HPP

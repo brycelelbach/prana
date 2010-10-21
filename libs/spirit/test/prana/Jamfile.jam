@@ -13,14 +13,14 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-run prana_range.cpp    : : : <address-model>32 : prana_range_32bit    ;
-run prana_range.cpp    : : : <address-model>64 : prana_range_64bit    ;
+run prana_range.cpp      : : : <address-model>32 : prana_range_32bit      ;
+run prana_range.cpp      : : : <address-model>64 : prana_range_64bit      ;
 
-run prana_symbol.cpp   : : : <address-model>32 : prana_symbol_32bit   ;
-run prana_symbol.cpp   : : : <address-model>64 : prana_symbol_64bit   ;
+run prana_symbol.cpp     : : : <address-model>32 : prana_symbol_32bit     ;
+run prana_symbol.cpp     : : : <address-model>64 : prana_symbol_64bit     ;
 
-run prana_sequence.cpp : : : <address-model>32 : prana_sequence_32bit ;
-run prana_sequence.cpp : : : <address-model>64 : prana_sequence_64bit ;
+run prana_sequence.cpp   : : : <address-model>32 : prana_sequence_32bit   ;
+run prana_sequence.cpp   : : : <address-model>64 : prana_sequence_64bit   ;
 
-run prana_utree.cpp    : : : <address-model>32 : prana_utree_32bit    ;
-run prana_utree.cpp    : : : <address-model>64 : prana_utree_64bit    ;
+run prana_utree_core.cpp : : : <address-model>32 : prana_utree_core_32bit ;
+run prana_utree_core.cpp : : : <address-model>64 : prana_utree_core_64bit ;
