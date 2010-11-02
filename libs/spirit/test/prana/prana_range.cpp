@@ -20,23 +20,14 @@
 
 using namespace boost::spirit::prana::adt;
 
-BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
-  range<std::vector<int>::const_iterator> r;
-  r.default_construct();
-  r.free();
-  r = range<std::vector<int>::const_iterator>::make();
-  r.free();
-  r.free();
-}
-
-BOOST_AUTO_TEST_CASE(copy_list) {
+BOOST_AUTO_TEST_CASE(deep_copy_list) {
   std::list<short> l;
   range<std::list<short>::const_iterator> r;
   r.default_construct();
   l.push_back(12);
   l.push_back(53);
   l.push_back(21);
-  r.copy(l);
+  r.deep_copy(l);
   range<std::list<short>::const_iterator>::iterator
     it = r.begin(), end = r.end();
   BOOST_CHECK(*(--end) == 21);
@@ -46,17 +37,17 @@ BOOST_AUTO_TEST_CASE(copy_list) {
   r.free();
 }
  
-BOOST_AUTO_TEST_CASE(copy_c_str) {
+BOOST_AUTO_TEST_CASE(deep_copy_c_str) {
   char const* hello = "hello";
   range<char const*> r;
   r.default_construct();
-  r.copy(hello, hello + std::strlen(hello));
+  r.deep_copy(hello, hello + std::strlen(hello));
   std::string s(r.begin(), r.end());
   r.free();
   BOOST_CHECK(s == "hello");
 }
 
-BOOST_AUTO_TEST_CASE(copy_range) {
+BOOST_AUTO_TEST_CASE(deep_copy_range) {
   std::list<char> l;
   range<std::list<char>::const_iterator> r0, r1;
   r0.default_construct();
@@ -64,8 +55,8 @@ BOOST_AUTO_TEST_CASE(copy_range) {
   l.push_back('z');
   l.push_back('f');
   l.push_back('b');
-  r0.copy(l);
-  r1.copy(r0);
+  r0.deep_copy(l);
+  r1.deep_copy(r0);
   r0.free();
   range<std::list<char>::const_iterator>::iterator
     it = r1.begin(), end = r1.end();
@@ -84,7 +75,7 @@ BOOST_AUTO_TEST_CASE(get_to_vector) {
   v0.push_back("car");
   v0.push_back("bus");
   v0.push_back("train");
-  r.copy(v0);
+  r.deep_copy(v0);
   std::vector<std::string> v1 = r.get<std::vector<std::string> >();
   std::vector<std::string>::iterator it = v1.begin(), end = v1.end();
   r.free();

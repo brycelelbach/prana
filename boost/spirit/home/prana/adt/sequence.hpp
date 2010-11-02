@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include <boost/swap.hpp>
+#include <boost/spirit/home/prana/common_terminals.hpp>
 
 #include <boost/spirit/home/prana/adt/range.hpp>
 #include <boost/spirit/home/prana/adt/sequence_iterator.hpp>
@@ -41,21 +41,19 @@ struct sequence {
 
   void default_construct (void);
   
-  void copy (sequence const& other);
+  void shallow_copy (sequence const&);
   
-  static sequence make (void);
+  void deep_copy (sequence const&);
   
   void free (void);
-
-  void swap (sequence&);
   
   template<typename Container> Container get (void) const;
 
   template<typename T, typename Iterator>
-  void insert (T const& val, Iterator pos);
+  void insert (T const&, Iterator);
 
-  template<typename T> void push_front (T const& val);
-  template<typename T> void push_back (T const& val);
+  template<typename T> void push_front (T const&);
+  template<typename T> void push_back (T const&);
 
   void pop_front (void);
   void pop_back (void);
@@ -67,7 +65,7 @@ struct sequence {
   const_iterator end (void) const;
 
   template<typename Iterator>
-  iterator erase (Iterator pos);
+  iterator erase (Iterator);
 
   template<typename Container> bool operator== (Container const&) const;
   template<typename Container> bool operator!= (Container const&) const;
@@ -82,26 +80,19 @@ inline void sequence<Data>::default_construct (void) {
 }
 
 template<typename Data>
-inline void sequence<Data>::copy (sequence const& other) {
+inline void sequence<Data>::shallow_copy (sequence const& other) {
+  
+}
+
+template<typename Data>
+inline void sequence<Data>::deep_copy (sequence const& other) {
   free();
-  node_type* p = other.first;
 
-  while (p != 0) {
-    push_back(p->val);
-    p = p->next;
+  first = new node_type(other.first, 0, deep);
+
+  for (node_type* it = first; it != 0; it = it->next) {
+    if (it->next == 0) last = it;
   }
-}
-
-template<typename Data>
-inline sequence<Data> sequence<Data>::make (void) {
-  sequence s;
-  s.default_construct();
-  return s;
-}
-
-template<typename Data>
-inline void sequence<Data>::swap (sequence& other) {
-  boost::swap(*this, other);
 }
 
 template<typename Data>

@@ -10,35 +10,47 @@
 #if !defined(BOOST_SPIRIT_PRANA_EXCEPTIONS_HPP)
 #define BOOST_SPIRIT_PRANA_EXCEPTIONS_HPP
 
-#include <stdexcept>
+#include <boost/config.hpp>
+
+#if !defined(BOOST_NO_EXCEPTIONS)
+  #include <stdexcept>
+#endif // BOOST_NO_EXCEPTIONS
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 template<typename Data>
-struct hygienic_error: public std::runtime_error {
-  template<typename T>
-  hygienic_error (
-    T const&, char const* message = "boost::spirit::prana::hygienic_error"
-  );
+struct hygienic_error
+  #if !defined(BOOST_NO_EXCEPTIONS)
+    : public std::runtime_error
+  #endif // BOOST_NO_EXCEPTIONS
+{
+  #if !defined(BOOST_NO_EXCEPTIONS)
+    template<typename T>
+    hygienic_error (
+      T const&, char const* message = "boost::spirit::prana::hygienic_error"
+    );
   
-  virtual ~hygienic_error (void) throw();
+    virtual ~hygienic_error (void) throw();
 
-  Data context;
+    Data context;
+  #endif // BOOST_NO_EXCEPTIONS
 };
 
-template<typename Data>
-template<typename T>
-hygienic_error<Data>::hygienic_error (T const& val, char const* message):
-  std::runtime_error(message), context(val) {
-    // line here to ease breakpointing in a debugger
-  } 
+#if !defined(BOOST_NO_EXCEPTIONS)
+  template<typename Data>
+  template<typename T>
+  hygienic_error<Data>::hygienic_error (T const& val, char const* message):
+    std::runtime_error(message), context(val) {
+      // line here to ease breakpointing in a debugger
+    } 
 
-template<typename Data>
-hygienic_error<Data>::~hygienic_error (void) throw() {
-  // line here to ease breakpointing in a debugger
-}
+  template<typename Data>
+  hygienic_error<Data>::~hygienic_error (void) throw() {
+    // line here to ease breakpointing in a debugger
+  }
+#endif // BOOST_NO_EXCEPTIONS
 
 } // prana
 } // spirit

@@ -20,65 +20,50 @@
 
 using namespace boost::spirit::prana::adt;
 
-BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
-  symbol<char> s;
-  symbol<wchar_t> w;
-  s.default_construct();
-  w.default_construct();
-  s.free();
-  w.free();
-  s = symbol<char>::make();
-  w = symbol<wchar_t>::make();
-  s.free();
-  s.free();
-  w.free();
-  w.free();
-}
-
-BOOST_AUTO_TEST_CASE(copy_char_string_stack) {
+BOOST_AUTO_TEST_CASE(deep_copy_char_string_stack) {
   symbol<char> s;
   s.default_construct();
-  s.copy("hello");
+  s.deep_copy("hello");
   BOOST_CHECK(s.str() == "hello");
   std::string h = s.get<std::string>();
   s.free();
   BOOST_CHECK(h == "hello");
 }
 
-BOOST_AUTO_TEST_CASE(copy_wchar_string_stack) {
+BOOST_AUTO_TEST_CASE(deep_copy_wchar_string_stack) {
   symbol<wchar_t> s;
   s.default_construct();
-  s.copy(L"hello");
+  s.deep_copy(L"hello");
   BOOST_CHECK(s.str() == L"hello");
   std::wstring h = s.get<std::wstring>();
   s.free();
   BOOST_CHECK(h == L"hello");
 }
 
-BOOST_AUTO_TEST_CASE(copy_char_string_heap) {
+BOOST_AUTO_TEST_CASE(deep_copy_char_string_heap) {
   symbol<char> s;
   s.default_construct();
-  s.copy("The long string is quite long.");
+  s.deep_copy("The long string is quite long.");
   BOOST_CHECK(s.str() == "The long string is quite long.");
   std::string h = s.get<std::string>();
   s.free();
   BOOST_CHECK(h == "The long string is quite long.");
 }
 
-BOOST_AUTO_TEST_CASE(copy_wchar_string_heap) {
+BOOST_AUTO_TEST_CASE(deep_copy_wchar_string_heap) {
   symbol<wchar_t> s;
   s.default_construct();
-  s.copy(L"The long string is quite long.");
+  s.deep_copy(L"The long string is quite long.");
   BOOST_CHECK(s.str() == L"The long string is quite long.");
   std::wstring h = s.get<std::wstring>();
   s.free();
   BOOST_CHECK(h == L"The long string is quite long.");
 }
 
-BOOST_AUTO_TEST_CASE(copy_empty_char_string) {
+BOOST_AUTO_TEST_CASE(deep_copy_empty_char_string) {
   symbol<char> s;
   s.default_construct();
-  s.copy("");
+  s.deep_copy("");
   BOOST_TEST_MESSAGE(s.str());
   BOOST_CHECK(s.str() == "");
   std::string h = s.get<std::string>();
@@ -86,10 +71,10 @@ BOOST_AUTO_TEST_CASE(copy_empty_char_string) {
   BOOST_CHECK(h == "");
 }
 
-BOOST_AUTO_TEST_CASE(copy_empty_wchar_string) {
+BOOST_AUTO_TEST_CASE(deep_copy_empty_wchar_string) {
   symbol<wchar_t> s;
   s.default_construct();
-  s.copy(L"");
+  s.deep_copy(L"");
   BOOST_CHECK(s.str() == L"");
   std::wstring h = s.get<std::wstring>();
   s.free();

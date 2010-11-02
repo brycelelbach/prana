@@ -16,6 +16,8 @@
 #include <boost/mpl/if.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
+#include <boost/spirit/home/prana/functional/copiers.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -30,15 +32,67 @@ struct sequence_node: private boost::noncopyable {
   typedef Data const* const_pointer;
   typedef std::size_t size_type;
 
+  sequence_node (
+    sequence_node*, sequence_node*, functional::shallow_copier const&
+  );
+  
+  sequence_node (
+    sequence_node*, sequence_node*, functional::deep_copier const&
+  );
+
   template<typename T>
   sequence_node (T const&, sequence_node*, sequence_node*);
 
+  ~sequence_node (void);
+
   void unlink (void);
 
-  Data val;
+  Data* val;
   sequence_node* next;
   sequence_node* prev;
 };
+
+template<typename Data>
+sequence_node<Data>::sequence_node (
+  sequence_node* other, sequence_node* prev, functional::shallow_copier const& f
+):
+  val(other->val),
+  next((other->next ? new sequence_node(other->next, this, f) : 0)),
+  prev(prev)
+{
+  // we leave a line here so we can breakpoint the ctor in gdb if needed
+}
+
+template<typename Data>
+sequence_node<Data>::sequence_node (
+  sequence_node* other, sequence_node* prev, functional::deep_copier const& f
+):
+  val((other->val ? new Data(*other->val) : 0)),
+  next((other->next ? new sequence_node(other->next, this, f) : 0)),
+  prev(prev)
+{
+  // we leave a line here so we can breakpoint the ctor in gdb if needed
+}
+
+template<typename Data>
+template<typename T>
+sequence_node<Data>::sequence_node (
+  T const& val, sequence_node* next_, sequence_node* prev_
+): val(new Data(val)), next(next_), prev(prev_) {
+  // we leave a line here so we can breakpoint the ctor in gdb if needed
+}
+
+template<typename Data>
+sequence_node<Data>::~sequence_node (void) {
+  if (val) delete val;
+}
+
+template<typename Data>
+void sequence_node<Data>::unlink (void) {
+  // WARN: do not call unlink unless the node comes from a utree sequence
+  prev->next = next;
+  next->prev = prev;
+}
 
 template<typename Data>
 struct sequence_iterator: public boost::iterator_facade<
@@ -65,21 +119,6 @@ struct sequence_iterator: public boost::iterator_facade<
   node_type* curr;
   node_type* prev;
 };
-
-template<typename Data>
-template<typename T>
-sequence_node<Data>::sequence_node (
-  T const& val, sequence_node* next_, sequence_node* prev_
-): val(val), next(next_), prev(prev_) {
-  // we leave a line here so we can breakpoint the ctor in gdb if needed
-}
-
-template<typename Data>
-void sequence_node<Data>::unlink (void) {
-  // WARN: do not call unlink unless the node comes from a utree sequence
-  prev->next = next;
-  next->prev = prev;
-}
 
 template<typename Data>
 sequence_iterator<Data>::sequence_iterator (void):
@@ -118,7 +157,7 @@ bool sequence_iterator<Data>::equal (Iterator const& other) const {
 template<typename Data>
 typename sequence_iterator<Data>::reference
 sequence_iterator<Data>::dereference (void) const {
-  return curr->val;
+  return *curr->val;
 }
 
 } // adt

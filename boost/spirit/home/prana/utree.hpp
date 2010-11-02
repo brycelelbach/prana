@@ -11,6 +11,7 @@
 #define BOOST_SPIRIT_PRANA_UTREE_HPP
 
 #include <boost/ref.hpp>
+#include <boost/cstdint.hpp>
 
 #include <boost/spirit/home/prana/adt/sequence.hpp>
 #include <boost/spirit/home/prana/adt/symbol.hpp>
@@ -19,17 +20,13 @@
 #include <boost/spirit/home/prana/kind.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
 
+#include <boost/spirit/home/prana/policy/default.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
 
-template<typename Char, typename ErrorHandler>
-struct utree_policy {
-  typedef Char char_type;
-  typedef ErrorHandler error_handler;
-};
-
-template<typename Policy>
+template<typename Policy = policy::default_>
 class utree {
  public:
   typedef typename Policy::char_type     char_type;
@@ -43,26 +40,30 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t    size_type;
   
-  typedef adt::sequence<utree>   sequence_type;
-  typedef adt::symbol<char_type> symbol_type;
+  typedef adt::sequence<utree>   sequence;
+  typedef adt::symbol<char_type> symbol;
 
-  utree (void);
-  utree (utree const&);
+  utree (void); // default ctor
+
+  utree (utree const&); // policy default 
 
   utree& operator= (utree const&);  
 
+  kind_type kind (void) const;
+  void kind (kind_type); 
+
  private:
-  union { 
-    sequence_type                      sequence;
-    typename sequence_type::range_type sequence_range;
-    symbol_type                        symbol;
-    typename symbol_type::range_type   symbol_range;
+  boost::uint8_t _kind;
+  union {
+    pointer   _pointer; 
+    sequence  _sequence;
+    symbol    _symbol;
   }; 
 };
 
 template<typename Policy>
 utree<Policy>::utree (void) {
-  // we leave a line here to ease breakpointing the ctor in a debugger
+  // we leave a line here for breakpointing in a debugger 
 }
 
 template<typename Policy>

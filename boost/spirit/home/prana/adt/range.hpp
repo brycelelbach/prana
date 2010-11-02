@@ -33,15 +33,12 @@ struct range {
 
   void default_construct (void);
 
-  // FIXME: add shallow copies, maybe
-  void copy (iterator, iterator);
-  void copy (iterator, size_type);
-  template<typename Container> void copy (Container const&);
+  void shallow_copy (iterator*, iterator*);
+  void shallow_copy (range const&);
   
-  static range make (void);
-  static range make (iterator, iterator); 
-  static range make (iterator, size_type);
-  template<typename Container> static range make (Container const&);
+  void deep_copy (iterator, iterator);
+  void deep_copy (iterator, size_type);
+  template<typename Container> void deep_copy (Container const&);
 
   void free (void);
   
@@ -54,6 +51,11 @@ struct range {
   template<typename Container> bool operator== (Container const&) const;
   template<typename Container> bool operator!= (Container const&) const;
 
+  iterator* last_ptr (void) const;
+
+  bool alias (void) const;
+  void alias (bool);
+
   iterator* first;
   iterator* last;
 };
@@ -64,62 +66,46 @@ inline void range<Iterator>::default_construct (void) {
 }
 
 template<typename Iterator>
-inline void range<Iterator>::copy (iterator first_, iterator last_) {
-  if (!first) first = new iterator(first_);
+inline void range<Iterator>::shallow_copy (iterator* first_, iterator* last_) {
+  free();
+  first = first_;
+  last = last_;
+  alias(true);
+}
+
+template<typename Iterator>
+inline void range<Iterator>::shallow_copy (range const& other) {
+  shallow_copy(other.first, other.last);
+}
+
+template<typename Iterator>
+inline void range<Iterator>::deep_copy (iterator first_, iterator last_) {
+  if (!first || alias()) first = new iterator(first_);
   else *first = first_;
 
-  if (!last) last = new iterator(last_);
+  if (!last || alias()) last = new iterator(last_);
   else *last = last_;
 }
 
 template<typename Iterator>
-inline void range<Iterator>::copy (iterator bits, size_type len) {
-  copy(bits, bits + len);
+inline void range<Iterator>::deep_copy (iterator bits, size_type len) {
+  deep_copy(bits, bits + len);
 }
 
 template<typename Iterator>
 template<typename Container>
-inline void range<Iterator>::copy (Container const& c) {
-  copy(c.begin(), c.end());
-}
-
-template<typename Iterator>
-inline range<Iterator> range<Iterator>::make (void) {
-  range r;
-  r.default_construct();
-  return r; 
-}
-
-template<typename Iterator>
-inline range<Iterator> range<Iterator>::make (iterator f, iterator l) {
-  range r;
-  r.copy(f, l);
-  return r;
-}
-
-template<typename Iterator>
-inline range<Iterator> range<Iterator>::make (iterator b, size_type len) {
-  range r;
-  r.copy(b, len);
-  return r;
-}
-
-template<typename Iterator>
-template<typename Container>
-inline range<Iterator> range<Iterator>::make (Container const& c) {
-  range r;
-  r.copy(c);
-  return r;
+inline void range<Iterator>::deep_copy (Container const& c) {
+  deep_copy(c.begin(), c.end());
 }
 
 template<typename Iterator>
 inline void range<Iterator>::free (void) {
-  if (first) {
+  if (first && !alias()) {
     delete first;
     first = 0;
   }
-  if (last) {
-    delete last;
+  if (last && !alias()) {
+    delete last_ptr();
     last = 0;
   }
 }
@@ -137,7 +123,13 @@ inline Iterator range<Iterator>::begin (void) const {
 
 template<typename Iterator>
 inline Iterator range<Iterator>::end (void) const {
-  return (last ? *last : iterator());
+  // TODO: This will seg fault if the last pointer is 0 and the range
+  // is an alias. Is there any reason why we would want an alias to
+  // a range with a NULL last pointer? I have been unable to think of
+  // one, so I'm leaving the condition as "last", instead of the more
+  // expensive "last_ptr()". A safer version of this expression would
+  // be "(last_ptr() ? *last_ptr() : iterator())".
+  return (last ? *last_ptr() : iterator());
 }
 
 template<typename Iterator>
@@ -150,6 +142,28 @@ template<typename Iterator>
 template<typename Container>
 inline bool range<Iterator>::operator!= (Container const& c) const {
   return !std::equal(begin(), end(), c.begin());
+}
+
+template<typename Iterator>
+inline typename range<Iterator>::iterator*
+range<Iterator>::last_ptr (void) const {
+  if (alias())
+    return (iterator*) (((size_type) last) - 1);
+
+  return last;
+}
+
+template<typename Iterator>
+inline bool range<Iterator>::alias (void) const {
+  return ((size_type) last) & 1;
+}
+
+template<typename Iterator>
+inline void range<Iterator>::alias (bool alias_) {
+  if (alias_ && !alias())
+    last = (iterator*) (((size_type) last) + 1);
+  else if (!alias_ && alias())
+    last = (iterator*) (((size_type) last) - 1);
 }
 
 } // adt

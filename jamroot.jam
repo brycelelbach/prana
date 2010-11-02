@@ -1,0 +1,9 @@
+import os ;
+local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
+use-project /boost : $(BOOST_ROOT) ;
+
+project prana : build-dir bin ;
+
+using testing ;
+
+build-project libs/spirit/test/prana ;

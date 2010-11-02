@@ -20,15 +20,6 @@
 
 using namespace boost::spirit::prana::adt;
 
-BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
-  sequence<int> l;
-  l.default_construct();
-  l.free();
-  l = sequence<int>::make();
-  l.free();
-  l.free();
-}
-
 BOOST_AUTO_TEST_CASE(insertion) {
   sequence<int> l;
   l.default_construct();
@@ -108,7 +99,7 @@ BOOST_AUTO_TEST_CASE(iterator_removal) {
   l.free();
 }
 
-BOOST_AUTO_TEST_CASE(copy) {
+BOOST_AUTO_TEST_CASE(deep_copy) {
   sequence<int> l0;
   l0.default_construct();
   l0.push_back(12);
@@ -116,7 +107,7 @@ BOOST_AUTO_TEST_CASE(copy) {
   l0.push_back(21);
   sequence<int> l1;
   l1.default_construct();
-  l1.copy(l0);
+  l1.deep_copy(l0);
   sequence<int>::iterator it = l1.begin(), end = l1.end();
   BOOST_CHECK(*(--end) == 21);
   BOOST_CHECK(*(--end) == 53);

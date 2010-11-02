@@ -15,17 +15,12 @@
 #include <list>
 
 #include <boost/spirit/home/prana/utree.hpp>
-#include <boost/spirit/home/prana/functional/default_asserter.hpp>
 
 #include "prana_test_harness.hpp"
 
 using namespace boost::spirit::prana;
 
-typedef utree<utree_policy<char, functional::default_asserter> > char_utree;
-typedef utree<utree_policy<wchar_t, functional::default_asserter> > wchar_utree;
-
-BOOST_AUTO_TEST_CASE(ctors_and_dtors) {
-  char_utree s;
-  wchar_utree w;
-  BOOST_CHECK(sizeof(char_utree) == sizeof(wchar_utree));
+BOOST_AUTO_TEST_CASE(default_ctor) {
+  utree<> t;
 }
+

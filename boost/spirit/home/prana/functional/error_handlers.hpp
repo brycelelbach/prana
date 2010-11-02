@@ -7,19 +7,37 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_FUNCTIONAL_DEFAULT_ASSERTER_HPP)
-#define BOOST_SPIRIT_PRANA_FUNCTIONAL_DEFAULT_ASSERTER_HPP
+#if !defined(BOOST_SPIRIT_PRANA_FUNCTIONAL_ERROR_HANDLERS_HPP)
+#define BOOST_SPIRIT_PRANA_FUNCTIONAL_ERROR_HANDLERS_HPP
 
 #include <boost/assert.hpp>
-
 #include <boost/spirit/home/prana/exceptions.hpp>
+
+#if !defined(BOOST_NO_EXCEPTIONS)
+  #include <boost/throw_exception.hpp>
+#endif // BOOST_NO_EXCEPTIONS
 
 namespace boost {
 namespace spirit {
 namespace prana {
 namespace functional {
 
-struct default_asserter {
+#if !defined(BOOST_NO_EXCEPTIONS)
+  struct exception_handler {
+    template<typename>
+    struct result { typedef void type; };
+
+    template<typename Exception>
+    void operator() (Exception error) const;
+  };
+
+  template<typename Exception>
+  inline void exception_handler::operator() (Exception error) const {
+    boost::throw_exception(error);
+  }
+#endif // BOOST_NO_EXCEPTIONS
+
+struct assertion_handler {
   template<typename>
   struct result { typedef void type; };
 
@@ -28,7 +46,7 @@ struct default_asserter {
 };
 
 template<typename Data>
-void default_asserter::operator() (hygienic_error<Data> error) const {
+inline void assertion_handler::operator() (hygienic_error<Data> error) const {
   BOOST_ASSERT(0 && "boost::spirit::prana::hygienic_error");
 }
 
@@ -37,4 +55,4 @@ void default_asserter::operator() (hygienic_error<Data> error) const {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_FUNCTIONAL_DEFAULT_ASSERTER_HPP
+#endif // BOOST_SPIRIT_PRANA_FUNCTIONAL_ERROR_HANDLERS_HPP

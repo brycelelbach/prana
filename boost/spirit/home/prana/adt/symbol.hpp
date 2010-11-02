@@ -43,15 +43,13 @@ struct symbol {
   static size_type const stack_size;
 
   void default_construct (void);
+  
+  void shallow_copy (symbol const&);
  
-  void copy (symbol const&);
-  void copy (Char const*);
-  template<typename Iterator> void copy (Iterator, Iterator);
-  template<typename Container> void copy (Container const&);
- 
-  static symbol make (void);
-  template<typename Iterator> static symbol make (Iterator, Iterator);
-  template<typename Container> static symbol make (Container const&);
+  void deep_copy (symbol const&);
+  void deep_copy (Char const*);
+  template<typename Iterator> void deep_copy (Iterator, Iterator);
+  template<typename Container> void deep_copy (Container const&);
   
   void free (void);
   
@@ -72,9 +70,10 @@ struct symbol {
     } stack;
     struct {
       uint8_t storage;
+      uint8_t alias;
       range_type* str;
     } heap;
-  } data;
+  };
 };
 
 template<typename Char>
@@ -83,113 +82,104 @@ typename symbol<Char>::size_type const symbol<Char>::stack_size =
 
 template<typename Char>
 inline void symbol<Char>::default_construct (void) {
-  data.stack.storage = 1;
-  for (size_type i = 0; i < stack_size; ++i) data.stack.str[i] = '\0';
+  stack.storage = 1;
+  for (size_type i = 0; i < stack_size; ++i) stack.str[i] = '\0';
 }
 
 template<typename Char>
-inline void symbol<Char>::copy (symbol const& other) {
-  copy(other.begin(), other.end());
+inline void symbol<Char>::shallow_copy (symbol const& other) {
+  if (other != *this) {
+    if (stack.storage) {
+      heap.str = new range_type;
+      heap.str->default_construct();
+    } else {
+      delete[] heap.str->begin();
+    }
+    
+    stack.storage = 0;
+    heap.alias = 1;
+    heap.str->deep_copy(other.begin(), other.end());
+  }
 }
 
 template<typename Char>
-inline void symbol<Char>::copy (Char const* c) {
-  copy(c, c + std::strlen(c));
+inline void symbol<Char>::deep_copy (symbol const& other) {
+  if (other != *this) deep_copy(other.begin(), other.end());
+}
+
+template<typename Char>
+inline void symbol<Char>::deep_copy (Char const* c) {
+  deep_copy(c, c + std::strlen(c));
 }
 
 template<>
-inline void symbol<wchar_t>::copy (wchar_t const* c) {
-  copy(c, c + std::wcslen(c));
+inline void symbol<wchar_t>::deep_copy (wchar_t const* c) {
+  deep_copy(c, c + std::wcslen(c));
 }
 
 template<typename Char>
 template<typename Iterator>
-inline void symbol<Char>::copy (Iterator f, Iterator l) {
+inline void symbol<Char>::deep_copy (Iterator f, Iterator l) {
   free();
 
   size_type size = l - f;
 
   if (!size) {
-    data.stack.storage = CHAR_MAX;
+    stack.storage = CHAR_MAX;
     return;
   }
 
   else if (size <= stack_size) {
-    data.stack.storage = size;
+    stack.storage = size;
   
-    for (size_type i = 0; i != size; ++i) data.stack.str[i] = *f++;
+    for (size_type i = 0; i != size; ++i) stack.str[i] = *f++;
   }
 
   else { // store it in the heap
-    data.stack.storage = 0;
+    stack.storage = 0;
   
     Char* p = new Char[size];
     for (size_type i = 0; i != size; ++i) p[i] = *f++;
   
-    data.heap.str = new range_type;
-    data.heap.str->default_construct();
-    data.heap.str->copy(p, size); 
+    heap.str = new range_type;
+    heap.str->default_construct();
+    heap.str->deep_copy(p, size); 
   }
 }
 
 template<typename Char>
 template<typename Container>
-inline void symbol<Char>::copy (Container const& c) {
-  copy(c.begin(), c.end());
-}
-
-template<typename Char>
-inline symbol<Char> symbol<Char>::make (void) {
-  symbol s;
-  s.default_construct();
-  return s;
-}
-
-template<typename Char>
-template<typename Iterator>
-inline symbol<Char> symbol<Char>::make (Iterator f, Iterator l) {
-  symbol s;
-  s.default_construct();
-  s.copy(f, l);
-  return s;
-} 
-
-template<typename Char>
-template<typename Container>
-inline symbol<Char> symbol<Char>::make (Container const& c) {
-  symbol s;
-  s.default_construct();
-  s.copy(c.begin(), c.end());
-  return s;
+inline void symbol<Char>::deep_copy (Container const& c) {
+  deep_copy(c.begin(), c.end());
 }
 
 template<typename Char>
 inline void symbol<Char>::free (void) { 
-  if (!data.stack.storage) {
-    delete[] data.heap.str->begin();
-    data.heap.str->free();
-    delete data.heap.str;
-    default_construct();
+  if (!stack.storage) {
+    if (!heap.alias) delete[] heap.str->begin();
+    heap.str->free();
+    delete heap.str;
+    stack.storage = CHAR_MAX;
   } 
 }
 
 template<typename Char>
 template<typename Container>
 inline Container symbol<Char>::get (void) const {
-  if (data.stack.storage == CHAR_MAX) return Container();
+  if (stack.storage == CHAR_MAX) return Container();
   return Container(begin(), end());
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::begin (void) const {
-  if (!data.stack.storage) return data.heap.str->begin();
-  return data.stack.str;
+  if (!stack.storage) return heap.str->begin();
+  return stack.str;
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::end (void) const {
-  if (!data.stack.storage) return data.heap.str->end();
-  return data.stack.str + data.stack.storage;
+  if (!stack.storage) return heap.str->end();
+  return stack.str + stack.storage;
 }
 
 template<typename Char>
