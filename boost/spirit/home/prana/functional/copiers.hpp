@@ -31,7 +31,7 @@ struct shallow_copier {
   template<
     typename FromTree, typename FromKind, typename ToTree, typename ToKind
   >
-  void operator() (FromTree, FromKind, ToTree&, ToKind&) const; 
+  void operator() (FromTree const&, FromKind, ToTree&, ToKind&) const; 
 };
 
 template<typename From, typename To>
@@ -41,9 +41,18 @@ inline void shallow_copier::operator() (From from, To to) const {
 
 template<typename FromTree, typename FromKind, typename ToTree, typename ToKind>
 inline void shallow_copier::operator() (
-  FromTree from_tree, FromKind from_kind, ToTree& to_tree, ToKind& to_kind
+  FromTree const& from_tree, FromKind from_kind,
+  ToTree& to_tree, ToKind& to_kind
 ) const {
   to_kind = from_kind | reference_kind;
+
+  // If the source is a reference, reference the source's target
+  // instead of the source itself.
+  if (from_kind & reference_kind) to_tree._pointer = from_tree._pointer;
+
+  // from_tree has to be a reference to the actual tree; if it's passed
+  // by value, then the address we take here would be the wrong one.
+  else to_tree._pointer = &from_tree;
 }
 
 struct deep_copier {
@@ -58,7 +67,7 @@ struct deep_copier {
   template<
     typename FromTree, typename FromKind, typename ToTree, typename ToKind
   >
-  void operator() (FromTree, FromKind, ToTree&, ToKind&) const; 
+  void operator() (FromTree const&, FromKind, ToTree&, ToKind&) const; 
 };
 
 template<typename From, typename To>
@@ -68,9 +77,51 @@ inline void deep_copier::operator() (From from, To to) const {
 
 template<typename FromTree, typename FromKind, typename ToTree, typename ToKind>
 inline void deep_copier::operator() (
-  FromTree from_tree, FromKind from_kind, ToTree& to_tree, ToKind& to_kind
+  FromTree const& from_tree, FromKind from_kind,
+  ToTree& to_tree, ToKind& to_kind
 ) const {
-  to_kind = from_kind | ~reference_kind;
+  // If the source is a reference, copy from the referenced tree. Note that
+  // a bad reference will seg fault here. By design, the user is responsible
+  // for validating shallow copies. Should this behavior be changed?
+  if (from_kind & reference_kind) {
+    (*this)(
+      *from_tree._pointer, *from_tree._pointer->_kind, to_tree, to_tree._kind
+    );
+    return;
+  }
+
+  to_kind = from_kind;
+
+  switch ((kind_type) from_kind) {
+    case reference_kind:
+    case numeric_kind:
+    case container_kind:
+      // The above three are impossible; they fall through to nil_kind for
+      // now. Perhaps they should throw an error if hit?
+    case nil_kind:
+      break; // nothing to copy
+    case symbol_kind:
+      (*this)(from_tree._symbol, to_tree._symbol);
+      break; 
+    case record_kind:
+      break; // FIXME: implement 
+    case bool_kind:
+      (*this)(from_tree._bool, to_tree._bool);
+      break; 
+    case integer_kind:
+      (*this)(from_tree._integer, to_tree._integer);
+      break; 
+    case floating_kind:
+      (*this)(from_tree._floating, to_tree._floating);
+      break; 
+    case sequence_kind:
+      (*this)(from_tree._sequence, to_tree._sequence);
+      break; 
+    case array_kind:
+      break; // FIXME: implement array
+    case unique_kind:
+      break; // FIXME: implement unique
+  }
 }
 
 } // functional
