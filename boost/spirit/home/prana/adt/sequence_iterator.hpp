@@ -60,7 +60,7 @@ sequence_node<Data>::sequence_node (
   next((other->next ? new sequence_node(other->next, this, f) : 0)),
   prev(prev)
 {
-  // we leave a line here so we can breakpoint the ctor in gdb if needed
+  // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
 }
 
 template<typename Data>
@@ -71,7 +71,7 @@ sequence_node<Data>::sequence_node (
   next((other->next ? new sequence_node(other->next, this, f) : 0)),
   prev(prev)
 {
-  // we leave a line here so we can breakpoint the ctor in gdb if needed
+  // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
 }
 
 template<typename Data>
@@ -79,7 +79,7 @@ template<typename T>
 sequence_node<Data>::sequence_node (
   T const& val, sequence_node* next_, sequence_node* prev_
 ): val(new Data(val)), next(next_), prev(prev_) {
-  // we leave a line here so we can breakpoint the ctor in gdb if needed
+  // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
 }
 
 template<typename Data>
@@ -89,7 +89,6 @@ sequence_node<Data>::~sequence_node (void) {
 
 template<typename Data>
 void sequence_node<Data>::unlink (void) {
-  // WARN: do not call unlink unless the node comes from a utree sequence
   prev->next = next;
   next->prev = prev;
 }
@@ -123,18 +122,18 @@ struct sequence_iterator: public boost::iterator_facade<
 template<typename Data>
 sequence_iterator<Data>::sequence_iterator (void):
   curr(0), prev(0) {
-    // we leave a line here so we can breakpoint the ctor in gdb if needed
+    // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
 template<typename Data>
 sequence_iterator<Data>::sequence_iterator (node_type* curr_, node_type* prev_):
   curr(curr_), prev(prev_) {
-    // we leave a line here so we can breakpoint the ctor in gdb if needed
+    // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
 template<typename Data>
 void sequence_iterator<Data>::increment (void) {
-  if (curr != 0) { // not at end
+  if (curr != 0) { 
     prev = curr;
     curr = curr->next;
   }
@@ -142,7 +141,7 @@ void sequence_iterator<Data>::increment (void) {
 
 template<typename Data>
 void sequence_iterator<Data>::decrement (void) {
-  if (prev != 0) { // not at begin
+  if (prev != 0) {
     curr = prev;
     prev = prev->prev;
   }

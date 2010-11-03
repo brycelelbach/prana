@@ -88,6 +88,8 @@ inline void symbol<Char>::default_construct (void) {
 
 template<typename Char>
 inline void symbol<Char>::shallow_copy (symbol const& other) {
+  // EXPLAIN (wash): If the existing symbol is storing data on the heap, we
+  // reuse the allocated range.
   if (other != *this) {
     if (stack.storage) {
       heap.str = new range_type;
@@ -109,11 +111,14 @@ inline void symbol<Char>::deep_copy (symbol const& other) {
 
 template<typename Char>
 inline void symbol<Char>::deep_copy (Char const* c) {
+  // DISCUSS (wash): Is this inefficient? Can we find a way to avoid using
+  // strlen?
   deep_copy(c, c + std::strlen(c));
 }
 
 template<>
 inline void symbol<wchar_t>::deep_copy (wchar_t const* c) {
+  // DISCUSS (wash): Is there a way to negate the need for this specialization?
   deep_copy(c, c + std::wcslen(c));
 }
 
@@ -135,7 +140,7 @@ inline void symbol<Char>::deep_copy (Iterator f, Iterator l) {
     for (size_type i = 0; i != size; ++i) stack.str[i] = *f++;
   }
 
-  else { // store it in the heap
+  else {
     stack.storage = 0;
   
     Char* p = new Char[size];
@@ -190,12 +195,14 @@ inline std::basic_string<Char> symbol<Char>::str (void) const {
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator== (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return std::equal(c.begin(), c.end(), str());
 }
 
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator!= (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return !std::equal(c.begin(), c.end(), str());
 }
 

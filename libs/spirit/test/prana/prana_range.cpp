@@ -71,51 +71,169 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_list, T, test::rounds) {
   r.free();
 }
  
-BOOST_AUTO_TEST_CASE(deep_copy_c_str) {
-  char const* hello = "hello";
-  range<char const*> r;
-  r.default_construct();
-  r.deep_copy(hello, hello + std::strlen(hello));
-  std::string s(r.begin(), r.end());
-  r.free();
-  BOOST_CHECK(s == "hello");
+BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_str, T, test::strings) {
+  typedef range<char const*> range_type;
+
+  range_type ra, rb, rc, rd, re;
+
+  BOOST_TEST_CHECKPOINT("default constructing 5 ranges");
+  ra.default_construct();
+  rb.default_construct();
+  rc.default_construct();
+  rd.default_construct();
+  re.default_construct();
+
+  BOOST_TEST_CHECKPOINT("generating 5 random c-strings");
+  std::string ia = random<T>(),
+              ib = random<T>(),
+              ic = random<T>(),
+              id = random<T>(),
+              ie = random<T>();
+
+  char const* a = ia.c_str();
+  char const* b = ib.c_str();
+  char const* c = ic.c_str();
+  char const* d = id.c_str();
+  char const* e = ie.c_str();
+
+  BOOST_TEST_MESSAGE("a: " << a);
+  BOOST_TEST_MESSAGE("b: " << b);
+  BOOST_TEST_MESSAGE("c: " << c);
+  BOOST_TEST_MESSAGE("d: " << d);
+  BOOST_TEST_MESSAGE("e: " << e);
+
+  BOOST_TEST_CHECKPOINT("deep copying c-strings into ranges");
+  ra.deep_copy(a, a + std::strlen(a));
+  rb.deep_copy(b, b + std::strlen(b));
+  rc.deep_copy(c, c + std::strlen(c));
+  rd.deep_copy(d, d + std::strlen(d));
+  re.deep_copy(e, e + std::strlen(e));
+
+  BOOST_TEST_CHECKPOINT("forming std::strings from ranges");
+  std::string sa(ra.begin(), ra.end()),
+              sb(rb.begin(), rb.end()),
+              sc(rc.begin(), rc.end()),
+              sd(rd.begin(), rd.end()),
+              se(re.begin(), re.end());
+
+  BOOST_TEST_CHECKPOINT("freeing ranges");  
+  ra.free();
+  rb.free();
+  rc.free();
+  rd.free();
+  re.free();
+
+  BOOST_TEST_CHECKPOINT("verifying string data");
+  BOOST_CHECK_EQUAL(sa, a);
+  BOOST_CHECK_EQUAL(sb, b);
+  BOOST_CHECK_EQUAL(sc, c);
+  BOOST_CHECK_EQUAL(sd, d);
+  BOOST_CHECK_EQUAL(se, e);
 }
 
-BOOST_AUTO_TEST_CASE(deep_copy_range) {
-  std::list<char> l;
-  range<std::list<char>::const_iterator> r0, r1;
-  r0.default_construct();
-  r1.default_construct();
-  l.push_back('z');
-  l.push_back('f');
-  l.push_back('b');
-  r0.deep_copy(l);
-  r1.deep_copy(r0);
-  r0.free();
-  range<std::list<char>::const_iterator>::iterator
-    it = r1.begin(), end = r1.end();
-  BOOST_CHECK(*(--end) == 'b');
-  BOOST_CHECK(*(--end) == 'f');
-  BOOST_CHECK(*(--end) == 'z');
+BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_range, T, test::rounds) {
+  typedef std::list<typename T::type> list_type;
+  typedef range<typename list_type::const_iterator> range_type; 
+
+  list_type l;
+  range_type ra, rb;  
+
+  BOOST_TEST_CHECKPOINT("default constructing ranges");
+  ra.default_construct();
+  rb.default_construct();
+
+  BOOST_TEST_CHECKPOINT("generating 5 random list elements"); 
+  typename T::type a = random<T>(),
+                   b = random<T>(),
+                   c = random<T>(),
+                   d = random<T>(),
+                   e = random<T>();
+
+  BOOST_TEST_MESSAGE("a: " << a);
+  BOOST_TEST_MESSAGE("b: " << b);
+  BOOST_TEST_MESSAGE("c: " << c);
+  BOOST_TEST_MESSAGE("d: " << d);
+  BOOST_TEST_MESSAGE("e: " << e);
+
+  BOOST_TEST_CHECKPOINT("inserting elements into list"); 
+  l.push_back(a);
+  l.push_back(b);
+  l.push_back(c);
+  l.push_back(d);
+  l.push_back(e);
+
+  BOOST_TEST_CHECKPOINT("deep copying list into first range");
+  ra.deep_copy(l);
+
+  BOOST_TEST_CHECKPOINT("deep copying first range into second range");
+  rb.deep_copy(ra);
+
+  BOOST_TEST_CHECKPOINT("freeing first range");
+  ra.free();
+
+  BOOST_TEST_CHECKPOINT("retrieving second range iterators"); 
+  typename range_type::iterator it = rb.begin(), end = rb.end();
+
+  BOOST_TEST_CHECKPOINT("verifying list data");
+  BOOST_CHECK(*(--end) == e);
+  BOOST_CHECK(*(--end) == d);
+  BOOST_CHECK(*(--end) == c);
+  BOOST_CHECK(*(--end) == b);
+  BOOST_CHECK(*(--end) == a);
   BOOST_CHECK(it == end);
-  r1.free();
-  r0.free();
+
+  BOOST_TEST_CHECKPOINT("freeing range");
+  rb.free();
 }
 
-BOOST_AUTO_TEST_CASE(get_to_vector) {
-  std::vector<std::string> v0;
-  range<std::vector<std::string>::const_iterator> r;
+BOOST_AUTO_TEST_CASE_TEMPLATE(get_to_vector, T, test::rounds) {
+  typedef std::vector<typename T::type> vector_type;
+  typedef range<typename vector_type::const_iterator> range_type;
+
+  vector_type va;
+  range_type r;
+
+  BOOST_TEST_CHECKPOINT("default constructing range");
   r.default_construct();
-  v0.push_back("car");
-  v0.push_back("bus");
-  v0.push_back("train");
-  r.deep_copy(v0);
-  std::vector<std::string> v1 = r.get<std::vector<std::string> >();
-  std::vector<std::string>::iterator it = v1.begin(), end = v1.end();
+
+  BOOST_TEST_CHECKPOINT("generating 5 random vector elements"); 
+  typename T::type a = random<T>(),
+                   b = random<T>(),
+                   c = random<T>(),
+                   d = random<T>(),
+                   e = random<T>();
+
+  BOOST_TEST_MESSAGE("a: " << a);
+  BOOST_TEST_MESSAGE("b: " << b);
+  BOOST_TEST_MESSAGE("c: " << c);
+  BOOST_TEST_MESSAGE("d: " << d);
+  BOOST_TEST_MESSAGE("e: " << e);
+
+  BOOST_TEST_CHECKPOINT("inserting elements into vector"); 
+  va.push_back(a);
+  va.push_back(b);
+  va.push_back(c);
+  va.push_back(d);
+  va.push_back(e);
+
+  BOOST_TEST_CHECKPOINT("deep copying vector into range");
+  r.deep_copy(va);
+  
+  BOOST_TEST_CHECKPOINT("getting vector from range");
+  vector_type vb = r.template get<vector_type>();
+  
+  BOOST_TEST_CHECKPOINT("freeing range");
   r.free();
-  BOOST_CHECK(*(--end) == "train");
-  BOOST_CHECK(*(--end) == "bus");
-  BOOST_CHECK(*(--end) == "car");
+
+  BOOST_TEST_CHECKPOINT("retrieving vector iterators");
+  typename vector_type::iterator it = vb.begin(), end = vb.end();
+
+  BOOST_TEST_CHECKPOINT("verifying list data");
+  BOOST_CHECK(*(--end) == e);
+  BOOST_CHECK(*(--end) == d);
+  BOOST_CHECK(*(--end) == c);
+  BOOST_CHECK(*(--end) == b);
+  BOOST_CHECK(*(--end) == a);
   BOOST_CHECK(it == end);
 }
 

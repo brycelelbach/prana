@@ -10,11 +10,15 @@
 #if !defined(BOOST_SPIRIT_PRANA_TEST_HARNESS_HPP)
 #define BOOST_SPIRIT_PRANA_TEST_HARNESS_HPP
 
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+#define BOOST_MPL_LIMIT_LIST_SIZE 40
+
 #include <ctime>
 
 #include <boost/mpl/list.hpp>
 #include <boost/mpl/size_t.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/random.hpp>
 #include <boost/integer_traits.hpp>
 #include <boost/type_traits.hpp>
@@ -35,10 +39,23 @@ struct string: boost::mpl::size_t<N> {
 };
 
 typedef boost::mpl::list<
-  boost::mpl::identity<short>, boost::mpl::identity<signed>,
-  boost::mpl::identity<unsigned>, boost::mpl::identity<double>,
-  string<2>, string<4>, string<8>, string<16>, string<32>
+  boost::mpl::identity<boost::int8_t>, boost::mpl::identity<boost::uint8_t>,
+  boost::mpl::identity<boost::int16_t>, boost::mpl::identity<boost::uint16_t>,
+  boost::mpl::identity<boost::int32_t>, boost::mpl::identity<boost::uint32_t>,
+  boost::mpl::identity<float>, boost::mpl::identity<double>,
+  string<2>, string<4>, string<6>, string<8>,
+  string<16>, string<32>, string<64>, string<128>
 > rounds;
+
+typedef boost::mpl::list<
+  string<1>, string<2>, string<3>, string<4>, string<5>,
+  string<6>, string<7>, string<8>, string<9>, string<10>,
+  string<11>, string<12>, string<13>, string<14>, string<15>,
+  string<16>, string<17>, string<18>, string<19>, string<20>,
+  string<21>, string<22>, string<23>, string<24>, string<25>,
+  string<26>, string<27>, string<28>, string<29>, string<30>,
+  string<31>, string<32> 
+> strings;
 
 struct fixture {
   std::size_t seed; 

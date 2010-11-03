@@ -81,8 +81,16 @@ inline void sequence<Data>::default_construct (void) {
 
 template<typename Data>
 inline void sequence<Data>::shallow_copy (sequence const& other) {
+  // DISCUSS (wash): Do we have to free here? Would it be more efficient to
+  // reuse the memory allocated for nodes and/or data, or would the complexity
+  // of those intrinsics make such semantics more trouble than they're worth?
   free();
 
+  // EXPLAIN (wash): This particular sequence_node ctor allocates recursively,
+  // doing the copying work for us.
+  // DISCUSS (wash): Is it more efficient to use a simple for loop to allocate
+  // here, instead of recursing in sequence_node's ctor? Which can be optimized
+  // best by the compiler?
   first = new node_type(other.first, 0, shallow);
 
   for (node_type* it = first; it != 0; it = it->next) {
@@ -92,8 +100,16 @@ inline void sequence<Data>::shallow_copy (sequence const& other) {
 
 template<typename Data>
 inline void sequence<Data>::deep_copy (sequence const& other) {
+  // DISCUSS (wash): Do we have to free here? Would it be more efficient to
+  // reuse the memory allocated for nodes and/or data, or would the complexity
+  // of those intrinsics make such semantics more trouble than they're worth?
   free();
 
+  // EXPLAIN (wash): This particular sequence_node ctor allocates recursively,
+  // doing the copying work for us.
+  // DISCUSS (wash): Is it more efficient to use a simple for loop to allocate
+  // here, instead of recursing in sequence_node's ctor? Which can be optimized
+  // best by the compiler?
   first = new node_type(other.first, 0, deep);
 
   for (node_type* it = first; it != 0; it = it->next) {
@@ -103,7 +119,7 @@ inline void sequence<Data>::deep_copy (sequence const& other) {
 
 template<typename Data>
 inline void sequence<Data>::free (void) {
-  if (first == last) { // we only have one element
+  if (first == last) {
     if (first) delete first;
     return;
   }
@@ -176,7 +192,7 @@ template<typename Data>
 inline void sequence<Data>::pop_front (void) {
   if (!first) return;
 
-  else if (first == last) { // there's only one item
+  else if (first == last) {
     delete first;
     first = last = 0;
   }
@@ -193,7 +209,7 @@ template<typename Data>
 inline void sequence<Data>::pop_back (void) {
   if (!first) return;
 
-  else if (first == last) { // there's only one item
+  else if (first == last) { 
     delete first;
     first = last = 0;
   }
@@ -254,12 +270,14 @@ inline typename sequence<Data>::iterator sequence<Data>::erase (Iterator pos) {
 template<typename Data>
 template<typename Container>
 inline bool sequence<Data>::operator== (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return std::equal(begin(), end(), c.begin());
 }
 
 template<typename Data>
 template<typename Container>
 inline bool sequence<Data>::operator!= (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return !std::equal(begin(), end(), c.begin());
 }
 

@@ -123,24 +123,25 @@ inline Iterator range<Iterator>::begin (void) const {
 
 template<typename Iterator>
 inline Iterator range<Iterator>::end (void) const {
-  // TODO: This will seg fault if the last pointer is 0 and the range
-  // is an alias. Is there any reason why we would want an alias to
-  // a range with a NULL last pointer? I have been unable to think of
-  // one, so I'm leaving the condition as "last", instead of the more
-  // expensive "last_ptr()". A safer version of this expression would
-  // be "(last_ptr() ? *last_ptr() : iterator())".
+  // DISCUSS (wash): This will seg fault if the last pointer is 0 and the range
+  // is an alias. Is there any reason why we would want an alias to a range with
+  // a NULL last pointer? I have been unable to think of one, so I'm leaving the
+  // condition as "last", instead of the more expensive "last_ptr()". A safer
+  // version would be "(last_ptr() ? *last_ptr() : iterator())".
   return (last ? *last_ptr() : iterator());
 }
 
 template<typename Iterator>
 template<typename Container>
 inline bool range<Iterator>::operator== (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return std::equal(begin(), end(), c.begin());
 }
 
 template<typename Iterator>
 template<typename Container>
 inline bool range<Iterator>::operator!= (Container const& c) const {
+  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return !std::equal(begin(), end(), c.begin());
 }
 

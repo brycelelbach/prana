@@ -17,22 +17,22 @@ namespace spirit {
 namespace prana {
 
 enum kind_type {
-  // fundamental kinds
+  // EXPLAIN (wash): Fundamental kinds.
   nil_kind       =              00000000,
   reference_kind = BOOST_BINARY(00000001), 
   symbol_kind    = BOOST_BINARY(00000010),
   record_kind    = BOOST_BINARY(00000100),
 
-  // abstract kinds
+  // EXPLAIN (wash): Abstract kinds.
   numeric_kind   = BOOST_BINARY(00001000),
   container_kind = BOOST_BINARY(00010000),
 
-  // numeric kinds
+  // EXPLAIN (wash): Numeric kinds.
   bool_kind      = BOOST_BINARY(00101000),
   integer_kind   = BOOST_BINARY(01001000),
   floating_kind  = BOOST_BINARY(10001000),
 
-  // container kinds
+  // EXPLAIN (wash): Container kinds.
   sequence_kind  = BOOST_BINARY(00110000),  
   array_kind     = BOOST_BINARY(01010000),  
   unique_kind    = BOOST_BINARY(10010000)  
