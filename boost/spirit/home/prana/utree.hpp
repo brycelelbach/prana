@@ -73,7 +73,6 @@ class utree {
   utree& copy (std::string const&); 
 
   boost::uint8_t kind (void) const;
-  void kind (boost::uint8_t); 
 
  private:
   boost::uint8_t _kind;
@@ -89,55 +88,132 @@ class utree {
 
 template<typename Policy>
 utree<Policy>::utree (void) {
-  kind(nil_kind); 
+  _kind = nil_kind; 
 }
 
 template<typename Policy>
 utree<Policy>::utree (utree const& other) {
-  typename Policy::copier copier;
-  copier(other._kind, _kind);
-  // TODO: implement copy
+  copy(other);
 }
 
 template<typename Policy>
 template<typename Copier>
 utree<Policy>::utree (utree const& other, Copier copier) {
-  copier(other._kind, _kind);
-  // TODO: implement copy 
+  copy(other, copier);
 }
 
 template<typename Policy>
 utree<Policy>::utree (bool bool_) {
-  _bool = bool_;
-  kind(bool_kind); 
+  copy(bool_);
 }
 
 template<typename Policy>
 utree<Policy>::utree (char char_) {
-  _symbol.default_construct();
-  _symbol.deep_copy((char const*) &char_, (char const*) 0); 
+  copy(char_);
 }
 
 template<typename Policy>
 utree<Policy>::utree (int int_) {
-  _integer = int_;
-  kind(integer_kind); 
+  copy(int_);
 }
 
 template<typename Policy>
 utree<Policy>::utree (double double_) {
+  copy(double_);
+}
+
+template<typename Policy>
+utree<Policy>::utree (char const* str) {
+  copy(str);
+}
+
+template<typename Policy>
+utree<Policy>::utree (char const* first, char const* last) {
+  copy(first, last);
+}
+
+template<typename Policy>
+utree<Policy>::utree (char const* bits, size_type len) {
+  copy(bits, lens);
+}
+
+template<typename Policy>
+utree<Policy>::utree (std::string const& str) {
+  copy(str);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::copy (utree const& other) {
+  typename Policy::copier copier;
+  copier(other._kind, _kind);
+  
+  switch (kind()) {
+    // FIXME: implement
+  }
+}
+
+template<typename Policy>
+template<typename Copier>
+utree<Policy>& utree<Policy>::copy (utree const& other, Copier copier) {
+  copier(other._kind, _kind);
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (bool bool_) {
+  _bool = bool_;
+  _kind = bool_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (char char_) {
+  _symbol.default_construct();
+  _symbol.deep_copy((char const*) &char_, (char const*) 0); 
+  _kind = symbol_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (int int_) {
+  _integer = int_;
+  _kind = integer_kind;
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (double double_) {
   _floating = double_;
-  kind(floating_kind); 
+  _kind = floating_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (char const* str) {
+  _symbol.default_construct();
+  _symbol.deep_copy(str);
+  _kind = symbol_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (char const* first, char const* last) {
+  _symbol.default_construct();
+  _symbol.deep_copy(first, last);
+  _kind = symbol_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (char const* bits, size_type len) {
+  _symbol.default_construct();
+  _symbol.deep_copy(bits, bits + len);
+  _kind = symbol_kind; 
+}
+
+template<typename Policy>
+utree<Policy>& utree<Policy>::copy (std::string const& str) {
+  _symbol.default_construct();
+  _symbol.deep_copy(str);
+  _kind = symbol_kind; 
 }
 
 template<typename Policy>
 boost::uint8_t utree<Policy>::kind (void) const {
-  return _kind;
-}
-
-template<typename Policy>
-void utree<Policy>::kind (boost::uint8_t kind_) {
-  _kind = kind_;
+  return _kind | ~reference_kind;
 }
 
 } // prana
