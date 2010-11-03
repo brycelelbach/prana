@@ -23,49 +23,37 @@ using namespace boost::spirit::prana::adt;
 
 BOOST_FIXTURE_TEST_SUITE(prana_range, test::fixture) 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_list, T, test::rounds) {
-  typedef std::list<typename T::type> list_type;
-  typedef range<typename list_type::const_iterator> range_type;
+BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_container, T, test::containers) {
+  typedef range<typename T::container::const_iterator> range_type;
 
-  list_type l;
+  typename T::container c;
   range_type r;
 
   BOOST_TEST_CHECKPOINT("default constructing range");
   r.default_construct();
 
-  BOOST_TEST_CHECKPOINT("generating 5 random list elements"); 
-  typename T::type a = random<T>(),
-                   b = random<T>(),
-                   c = random<T>(),
-                   d = random<T>(),
-                   e = random<T>();
+  BOOST_TEST_CHECKPOINT(
+    "creating container with " << T::elements::value << " elements"
+  );
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    c.push_back(generator.get<T>());
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+  }
 
-  BOOST_TEST_MESSAGE("a: " << a);
-  BOOST_TEST_MESSAGE("b: " << b);
-  BOOST_TEST_MESSAGE("c: " << c);
-  BOOST_TEST_MESSAGE("d: " << d);
-  BOOST_TEST_MESSAGE("e: " << e);
+  BOOST_TEST_CHECKPOINT("deep copying container into range"); 
+  r.deep_copy(c);
 
-  BOOST_TEST_CHECKPOINT("inserting elements into list"); 
-  l.push_back(a);
-  l.push_back(b);
-  l.push_back(c);
-  l.push_back(d);
-  l.push_back(e);
+  BOOST_TEST_CHECKPOINT("retrieving iterators"); 
+  typename range_type::iterator rit = r.begin(), rend = r.end();
 
-  BOOST_TEST_CHECKPOINT("deep copying list into range"); 
-  r.deep_copy(l);
-
-  BOOST_TEST_CHECKPOINT("retrieving range iterators"); 
-  typename range_type::iterator it = r.begin(), end = r.end();
-
-  BOOST_TEST_CHECKPOINT("verifying list data");
-  BOOST_CHECK(*(--end) == e);
-  BOOST_CHECK(*(--end) == d);
-  BOOST_CHECK(*(--end) == c);
-  BOOST_CHECK(*(--end) == b);
-  BOOST_CHECK(*(--end) == a);
-  BOOST_CHECK(it == end);
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    BOOST_CHECK_EQUAL(*cit, *rit); ++cit; ++rit;
+  }
+ 
+  BOOST_CHECK(rit == rend);
+  BOOST_CHECK(cit == cend);
 
   BOOST_TEST_CHECKPOINT("freeing range");
   r.free();
@@ -84,11 +72,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_str, T, test::strings) {
   re.default_construct();
 
   BOOST_TEST_CHECKPOINT("generating 5 random c-strings");
-  std::string ia = random<T>(),
-              ib = random<T>(),
-              ic = random<T>(),
-              id = random<T>(),
-              ie = random<T>();
+  std::string ia = generator.get<T>(),
+              ib = generator.get<T>(),
+              ic = generator.get<T>(),
+              id = generator.get<T>(),
+              ie = generator.get<T>();
 
   char const* a = ia.c_str();
   char const* b = ib.c_str();
@@ -131,39 +119,26 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_str, T, test::strings) {
   BOOST_CHECK_EQUAL(se, e);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_range, T, test::rounds) {
-  typedef std::list<typename T::type> list_type;
-  typedef range<typename list_type::const_iterator> range_type; 
+BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_range, T, test::containers) {
+  typedef range<typename T::container::const_iterator> range_type; 
 
-  list_type l;
+  typename T::container c;
   range_type ra, rb;  
 
   BOOST_TEST_CHECKPOINT("default constructing ranges");
   ra.default_construct();
   rb.default_construct();
 
-  BOOST_TEST_CHECKPOINT("generating 5 random list elements"); 
-  typename T::type a = random<T>(),
-                   b = random<T>(),
-                   c = random<T>(),
-                   d = random<T>(),
-                   e = random<T>();
+  BOOST_TEST_CHECKPOINT(
+    "creating container with " << T::elements::value << " elements"
+  );
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    c.push_back(generator.get<T>());
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+  }
 
-  BOOST_TEST_MESSAGE("a: " << a);
-  BOOST_TEST_MESSAGE("b: " << b);
-  BOOST_TEST_MESSAGE("c: " << c);
-  BOOST_TEST_MESSAGE("d: " << d);
-  BOOST_TEST_MESSAGE("e: " << e);
-
-  BOOST_TEST_CHECKPOINT("inserting elements into list"); 
-  l.push_back(a);
-  l.push_back(b);
-  l.push_back(c);
-  l.push_back(d);
-  l.push_back(e);
-
-  BOOST_TEST_CHECKPOINT("deep copying list into first range");
-  ra.deep_copy(l);
+  BOOST_TEST_CHECKPOINT("deep copying container into first range");
+  ra.deep_copy(c);
 
   BOOST_TEST_CHECKPOINT("deep copying first range into second range");
   rb.deep_copy(ra);
@@ -172,69 +147,49 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_range, T, test::rounds) {
   ra.free();
 
   BOOST_TEST_CHECKPOINT("retrieving second range iterators"); 
-  typename range_type::iterator it = rb.begin(), end = rb.end();
+  typename range_type::iterator rit = rb.begin(), rend = rb.end();
 
-  BOOST_TEST_CHECKPOINT("verifying list data");
-  BOOST_CHECK(*(--end) == e);
-  BOOST_CHECK(*(--end) == d);
-  BOOST_CHECK(*(--end) == c);
-  BOOST_CHECK(*(--end) == b);
-  BOOST_CHECK(*(--end) == a);
-  BOOST_CHECK(it == end);
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    BOOST_CHECK_EQUAL(*cit, *rit); ++cit; ++rit;
+  }
+ 
+  BOOST_CHECK(rit == rend);
+  BOOST_CHECK(cit == cend);
 
   BOOST_TEST_CHECKPOINT("freeing range");
   rb.free();
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(get_to_vector, T, test::rounds) {
-  typedef std::vector<typename T::type> vector_type;
-  typedef range<typename vector_type::const_iterator> range_type;
+BOOST_AUTO_TEST_CASE_TEMPLATE(get_to_container, T, test::containers) {
+  typedef range<typename T::container::const_iterator> range_type;
 
-  vector_type va;
+  typename T::container ca;
   range_type r;
 
   BOOST_TEST_CHECKPOINT("default constructing range");
   r.default_construct();
 
-  BOOST_TEST_CHECKPOINT("generating 5 random vector elements"); 
-  typename T::type a = random<T>(),
-                   b = random<T>(),
-                   c = random<T>(),
-                   d = random<T>(),
-                   e = random<T>();
+  BOOST_TEST_CHECKPOINT(
+    "creating container with " << T::elements::value << " elements"
+  );
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    ca.push_back(generator.get<T>());
+    BOOST_TEST_MESSAGE("element " << i << ": " << ca.back()); 
+  }
 
-  BOOST_TEST_MESSAGE("a: " << a);
-  BOOST_TEST_MESSAGE("b: " << b);
-  BOOST_TEST_MESSAGE("c: " << c);
-  BOOST_TEST_MESSAGE("d: " << d);
-  BOOST_TEST_MESSAGE("e: " << e);
-
-  BOOST_TEST_CHECKPOINT("inserting elements into vector"); 
-  va.push_back(a);
-  va.push_back(b);
-  va.push_back(c);
-  va.push_back(d);
-  va.push_back(e);
-
-  BOOST_TEST_CHECKPOINT("deep copying vector into range");
-  r.deep_copy(va);
+  BOOST_TEST_CHECKPOINT("deep copying container into range"); 
+  r.deep_copy(ca);
   
-  BOOST_TEST_CHECKPOINT("getting vector from range");
-  vector_type vb = r.template get<vector_type>();
+  BOOST_TEST_CHECKPOINT("getting container from range");
+  typename T::container cb = r.template get<typename T::container>();
   
   BOOST_TEST_CHECKPOINT("freeing range");
   r.free();
 
-  BOOST_TEST_CHECKPOINT("retrieving vector iterators");
-  typename vector_type::iterator it = vb.begin(), end = vb.end();
-
-  BOOST_TEST_CHECKPOINT("verifying list data");
-  BOOST_CHECK(*(--end) == e);
-  BOOST_CHECK(*(--end) == d);
-  BOOST_CHECK(*(--end) == c);
-  BOOST_CHECK(*(--end) == b);
-  BOOST_CHECK(*(--end) == a);
-  BOOST_CHECK(it == end);
+  BOOST_TEST_CHECKPOINT("verifying container data");
+  BOOST_CHECK(ca == cb);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
