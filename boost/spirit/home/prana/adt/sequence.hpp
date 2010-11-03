@@ -81,7 +81,13 @@ inline void sequence<Data>::default_construct (void) {
 
 template<typename Data>
 inline void sequence<Data>::shallow_copy (sequence const& other) {
-  
+  free();
+
+  first = new node_type(other.first, 0, shallow);
+
+  for (node_type* it = first; it != 0; it = it->next) {
+    if (it->next == 0) last = it;
+  }
 }
 
 template<typename Data>

@@ -28,8 +28,8 @@ enum kind_type {
   container_kind = BOOST_BINARY(00010000),
 
   // numeric kinds
-  unsigned_kind  = BOOST_BINARY(00101000),
-  signed_kind    = BOOST_BINARY(01001000),
+  integer_kind   = BOOST_BINARY(00101000),
+  bool_kind      = BOOST_BINARY(01001000),
   floating_kind  = BOOST_BINARY(10001000),
 
   // container kinds

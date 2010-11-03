@@ -18,22 +18,56 @@
 
 #include "prana_test_harness.hpp"
 
+using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::adt;
 
-BOOST_AUTO_TEST_CASE(deep_copy_list) {
-  std::list<short> l;
-  range<std::list<short>::const_iterator> r;
+BOOST_FIXTURE_TEST_SUITE(prana_range, test::fixture) 
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_list, T, test::rounds) {
+  typedef std::list<typename T::type> list_type;
+  typedef range<typename list_type::const_iterator> range_type;
+
+  list_type l;
+  range_type r;
+
+  BOOST_TEST_CHECKPOINT("default constructing range");
   r.default_construct();
-  l.push_back(12);
-  l.push_back(53);
-  l.push_back(21);
+
+  BOOST_TEST_CHECKPOINT("generating 5 random list elements"); 
+  typename T::type a = random<T>(),
+                   b = random<T>(),
+                   c = random<T>(),
+                   d = random<T>(),
+                   e = random<T>();
+
+  BOOST_TEST_MESSAGE("a: " << a);
+  BOOST_TEST_MESSAGE("b: " << b);
+  BOOST_TEST_MESSAGE("c: " << c);
+  BOOST_TEST_MESSAGE("d: " << d);
+  BOOST_TEST_MESSAGE("e: " << e);
+
+  BOOST_TEST_CHECKPOINT("inserting elements into list"); 
+  l.push_back(a);
+  l.push_back(b);
+  l.push_back(c);
+  l.push_back(d);
+  l.push_back(e);
+
+  BOOST_TEST_CHECKPOINT("deep copying list into range"); 
   r.deep_copy(l);
-  range<std::list<short>::const_iterator>::iterator
-    it = r.begin(), end = r.end();
-  BOOST_CHECK(*(--end) == 21);
-  BOOST_CHECK(*(--end) == 53);
-  BOOST_CHECK(*(--end) == 12);
+
+  BOOST_TEST_CHECKPOINT("retrieving range iterators"); 
+  typename range_type::iterator it = r.begin(), end = r.end();
+
+  BOOST_TEST_CHECKPOINT("verifying list data");
+  BOOST_CHECK(*(--end) == e);
+  BOOST_CHECK(*(--end) == d);
+  BOOST_CHECK(*(--end) == c);
+  BOOST_CHECK(*(--end) == b);
+  BOOST_CHECK(*(--end) == a);
   BOOST_CHECK(it == end);
+
+  BOOST_TEST_CHECKPOINT("freeing range");
   r.free();
 }
  
@@ -84,3 +118,5 @@ BOOST_AUTO_TEST_CASE(get_to_vector) {
   BOOST_CHECK(*(--end) == "car");
   BOOST_CHECK(it == end);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

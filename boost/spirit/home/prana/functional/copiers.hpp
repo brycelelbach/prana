@@ -10,6 +10,10 @@
 #if !defined(BOOST_SPIRIT_PRANA_FUNCTIONAL_COPIERS_HPP)
 #define BOOST_SPIRIT_PRANA_FUNCTIONAL_COPIERS_HPP
 
+#include <boost/cstdint.hpp>
+
+#include <boost/spirit/home/prana/kinds.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -28,6 +32,13 @@ inline void shallow_copier::operator() (From from, To to) const {
   to.shallow_copy(from);
 }
 
+template<>
+inline void shallow_copier::operator() (
+  boost::uint8_t from, boost::uint8_t& to
+) const {
+  to = from | reference_kind;
+}
+
 struct deep_copier {
   template<typename>
   struct result { typedef void type; };
@@ -39,6 +50,13 @@ struct deep_copier {
 template<typename From, typename To>
 inline void deep_copier::operator() (From from, To to) const {
   to.deep_copy(from);
+}
+
+template<>
+inline void deep_copier::operator() (
+  boost::uint8_t from, boost::uint8_t& to
+) const {
+  to = from | ~reference_kind;
 }
 
 } // functional

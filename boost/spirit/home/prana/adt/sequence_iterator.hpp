@@ -33,11 +33,11 @@ struct sequence_node: private boost::noncopyable {
   typedef std::size_t size_type;
 
   sequence_node (
-    sequence_node*, sequence_node*, functional::shallow_copier const&
+    sequence_node*, sequence_node*, functional::shallow_copier
   );
   
   sequence_node (
-    sequence_node*, sequence_node*, functional::deep_copier const&
+    sequence_node*, sequence_node*, functional::deep_copier
   );
 
   template<typename T>
@@ -54,7 +54,7 @@ struct sequence_node: private boost::noncopyable {
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev, functional::shallow_copier const& f
+  sequence_node* other, sequence_node* prev, functional::shallow_copier f
 ):
   val(other->val),
   next((other->next ? new sequence_node(other->next, this, f) : 0)),
@@ -65,7 +65,7 @@ sequence_node<Data>::sequence_node (
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev, functional::deep_copier const& f
+  sequence_node* other, sequence_node* prev, functional::deep_copier f
 ):
   val((other->val ? new Data(*other->val) : 0)),
   next((other->next ? new sequence_node(other->next, this, f) : 0)),
