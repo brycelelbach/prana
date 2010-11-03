@@ -138,24 +138,55 @@ utree<Policy>::utree (char const* bits, size_type len) {
 }
 
 template<typename Policy>
-utree<Policy>::utree (std::string const& str) {
+inline utree<Policy>::utree (std::string const& str) {
+  copy(str);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (utree const& other) {
+  copy(other);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (bool bool_) {
+  copy(bool_);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (char char_) {
+  copy(char_);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (int int_) {
+  copy(int_);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (double double_) {
+  copy(double_);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (char const* str) {
+  copy(str);
+}
+
+template<typename Policy>
+inline utree<Policy>& utree<Policy>::operator= (std::string const& str) {
   copy(str);
 }
 
 template<typename Policy>
 inline utree<Policy>& utree<Policy>::copy (utree const& other) {
-  typename Policy::copier copier;
-  copier(other._kind, _kind);
-  
-  switch (kind()) {
-    // FIXME: implement
-  }
+  copy(other, typename Policy::copier());
 }
 
 template<typename Policy>
 template<typename Copier>
 utree<Policy>& utree<Policy>::copy (utree const& other, Copier copier) {
   copier(other._kind, _kind);
+  copier(other, *this);  
 }
 
 template<typename Policy>
