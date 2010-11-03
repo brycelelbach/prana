@@ -134,7 +134,7 @@ utree<Policy>::utree (char const* first, char const* last) {
 
 template<typename Policy>
 utree<Policy>::utree (char const* bits, size_type len) {
-  copy(bits, lens);
+  copy(bits, len);
 }
 
 template<typename Policy>
@@ -185,8 +185,7 @@ inline utree<Policy>& utree<Policy>::copy (utree const& other) {
 template<typename Policy>
 template<typename Copier>
 utree<Policy>& utree<Policy>::copy (utree const& other, Copier copier) {
-  copier(other._kind, _kind);
-  copier(other, *this);  
+  copier(other, other._kind, *this, _kind);
 }
 
 template<typename Policy>

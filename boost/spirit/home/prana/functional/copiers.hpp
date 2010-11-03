@@ -20,11 +20,18 @@ namespace prana {
 namespace functional {
 
 struct shallow_copier {
-  template<typename>
+  template<
+    typename A, typename B, typename C = unused_type, typename D = unused_type
+  >
   struct result { typedef void type; };
 
   template<typename From, typename To>
   void operator() (From, To) const;
+
+  template<
+    typename FromTree, typename FromKind, typename ToTree, typename ToKind
+  >
+  void operator() (FromTree, FromKind, ToTree&, ToKind&) const; 
 };
 
 template<typename From, typename To>
@@ -32,19 +39,26 @@ inline void shallow_copier::operator() (From from, To to) const {
   to.shallow_copy(from);
 }
 
-template<>
+template<typename FromTree, typename FromKind, typename ToTree, typename ToKind>
 inline void shallow_copier::operator() (
-  boost::uint8_t from, boost::uint8_t& to
+  FromTree from_tree, FromKind from_kind, ToTree& to_tree, ToKind& to_kind
 ) const {
-  to = from | reference_kind;
+  to_kind = from_kind | reference_kind;
 }
 
 struct deep_copier {
-  template<typename>
+  template<
+    typename A, typename B, typename C = unused_type, typename D = unused_type
+  >
   struct result { typedef void type; };
 
   template<typename From, typename To>
   void operator() (From, To) const;
+  
+  template<
+    typename FromTree, typename FromKind, typename ToTree, typename ToKind
+  >
+  void operator() (FromTree, FromKind, ToTree&, ToKind&) const; 
 };
 
 template<typename From, typename To>
@@ -52,11 +66,11 @@ inline void deep_copier::operator() (From from, To to) const {
   to.deep_copy(from);
 }
 
-template<>
+template<typename FromTree, typename FromKind, typename ToTree, typename ToKind>
 inline void deep_copier::operator() (
-  boost::uint8_t from, boost::uint8_t& to
+  FromTree from_tree, FromKind from_kind, ToTree& to_tree, ToKind& to_kind
 ) const {
-  to = from | ~reference_kind;
+  to_kind = from_kind | ~reference_kind;
 }
 
 } // functional
