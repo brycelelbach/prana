@@ -9,14 +9,9 @@
 
 #define BOOST_TEST_MODULE prana_utree_core
 
-#include <cstddef>
-
-#include <vector>
-#include <list>
-
 #include <boost/spirit/home/prana/utree.hpp>
 
-#include "prana_test_harness.hpp"
+#include <fixture.hpp>
 
 using namespace boost::spirit::prana;
 

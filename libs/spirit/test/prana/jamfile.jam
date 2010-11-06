@@ -9,18 +9,20 @@
 
 project spirit_prana_test :
   requirements
+    <cxxflags>-Wno-unused
+    <include>./
     <include>../../../../
     <source>/boost//unit_test_framework
   ;
 
-run prana_range.cpp      : : : <address-model>32 : prana_range_32bit      ;
-run prana_range.cpp      : : : <address-model>64 : prana_range_64bit      ;
+run adt/range.cpp    : : : <address-model>32 : prana_adt_range_32bit      ;
+run adt/range.cpp    : : : <address-model>64 : prana_adt_range_64bit      ;
 
-run prana_symbol.cpp     : : : <address-model>32 : prana_symbol_32bit     ;
-run prana_symbol.cpp     : : : <address-model>64 : prana_symbol_64bit     ;
+run adt/symbol.cpp   : : : <address-model>32 : prana_adt_symbol_32bit     ;
+run adt/symbol.cpp   : : : <address-model>64 : prana_adt_symbol_64bit     ;
 
-run prana_sequence.cpp   : : : <address-model>32 : prana_sequence_32bit   ;
-run prana_sequence.cpp   : : : <address-model>64 : prana_sequence_64bit   ;
+run adt/sequence.cpp : : : <address-model>32 : prana_adt_sequence_32bit   ;
+run adt/sequence.cpp : : : <address-model>64 : prana_adt_sequence_64bit   ;
 
-run prana_utree_core.cpp : : : <address-model>32 : prana_utree_core_32bit ;
-run prana_utree_core.cpp : : : <address-model>64 : prana_utree_core_64bit ;
+run utree/core.cpp   : : : <address-model>32 : prana_utree_core_32bit     ;
+run utree/core.cpp   : : : <address-model>64 : prana_utree_core_64bit     ;

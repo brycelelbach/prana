@@ -7,17 +7,13 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_symbol
-
-#include <cstddef>
-
-#include <vector>
-#include <list>
+#define BOOST_TEST_MODULE prana_adt_symbol
 
 #include <boost/spirit/home/prana/adt/symbol.hpp>
 
-#include "prana_test_harness.hpp"
+#include <fixture.hpp>
 
+using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::adt;
 
 BOOST_AUTO_TEST_CASE(deep_copy_char_string_stack) {

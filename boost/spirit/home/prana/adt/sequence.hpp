@@ -12,8 +12,10 @@
 
 #include <algorithm>
 
-#include <boost/spirit/home/prana/common_terminals.hpp>
+#include <boost/mpl/size_t.hpp>
 
+#include <boost/spirit/home/prana/kind.hpp>
+#include <boost/spirit/home/prana/tag.hpp>
 #include <boost/spirit/home/prana/adt/range.hpp>
 #include <boost/spirit/home/prana/adt/sequence_iterator.hpp>
 
@@ -25,6 +27,10 @@ namespace adt {
 template<typename Data>
 struct sequence {
  public:
+  struct retrieve;
+
+  typedef mpl::size_t<sequence_kind>    kind;
+
   typedef Data                          value_type;
   typedef Data&                         reference;
   typedef Data const&                   const_reference;
@@ -49,6 +55,8 @@ struct sequence {
   
   template<typename Container> Container get (void) const;
 
+  // TODO (wash): Insertation needs to support shallow copying!
+
   template<typename T, typename Iterator>
   void insert (T const&, Iterator);
 
@@ -72,6 +80,27 @@ struct sequence {
 
   node_type* first;
   node_type* last;
+};
+
+template<typename Data>
+struct sequence<Data>::retrieve {
+  template<typename T> struct result;
+
+  template<typename This, typename Tree>
+  struct result<This(Tree&)> { typedef sequence<Data>& type; };
+
+  template<typename This, typename Tree>
+  struct result<This(Tree const&)> { typedef sequence<Data> const& type; };
+
+  template<typename Tree>
+  sequence<Data>& operator() (Tree& tree) const {
+    return tree.raw()._sequence;
+  }
+  
+  template<typename Tree>
+  sequence<Data> const& operator() (Tree const& tree) const {
+    return tree.raw()._sequence;
+  }
 };
 
 template<typename Data>

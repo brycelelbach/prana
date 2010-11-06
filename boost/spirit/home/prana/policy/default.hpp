@@ -10,18 +10,22 @@
 #if !defined(BOOST_SPIRIT_PRANA_POLICY_DEFAULT_HPP)
 #define BOOST_SPIRIT_PRANA_POLICY_DEFAULT_HPP
 
-#include <boost/spirit/home/prana/functional/copiers.hpp>
-#include <boost/spirit/home/prana/functional/error_handlers.hpp>
+#include <boost/spirit/home/prana/adt/sequence.hpp>
+#include <boost/spirit/home/prana/fn/copy.hpp>
+#include <boost/spirit/home/prana/fn/container.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 namespace policy {
 
+template<typename Tree>
 struct default_ {
-  typedef char                          char_type;
-  typedef functional::exception_handler error_handler;
-  typedef functional::shallow_copier    copier;
+  typedef char                                 char_type;
+  typedef adt::sequence<Tree>                  container; 
+  typedef fn::shallow_copy                     copy;
+  typedef fn::with_transform<fn::to_container> insertation;
+  typedef fn::with_transform<fn::to_nil>       removal;
 };
 
 } // policy

@@ -13,13 +13,16 @@
 #define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #define BOOST_MPL_LIMIT_LIST_SIZE 40
 
+#include <cstring>
+#include <cstddef>
+
+#include <list>
 #include <vector>
 
 #include <boost/mpl/list.hpp>
-
 #include <boost/test/unit_test.hpp>
 
-#include "data_generator.hpp"
+#include <data_generator.hpp>
 
 namespace boost {
 namespace spirit {

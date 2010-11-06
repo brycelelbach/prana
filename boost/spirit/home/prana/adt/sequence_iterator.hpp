@@ -11,12 +11,15 @@
 #define BOOST_SPIRIT_PRANA_ADT_SEQUENCE_ITERATOR_HPP
 
 #include <boost/noncopyable.hpp>
+
 #include <boost/type_traits/is_const.hpp>
 #include <boost/type_traits/remove_const.hpp>
+
 #include <boost/mpl/if.hpp>
+
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <boost/spirit/home/prana/functional/copiers.hpp>
+#include <boost/spirit/home/prana/fn/copy.hpp>
 
 namespace boost {
 namespace spirit {
@@ -32,13 +35,9 @@ struct sequence_node: private boost::noncopyable {
   typedef Data const* const_pointer;
   typedef std::size_t size_type;
 
-  sequence_node (
-    sequence_node*, sequence_node*, functional::shallow_copier
-  );
+  sequence_node (sequence_node*, sequence_node*, fn::shallow_copy);
   
-  sequence_node (
-    sequence_node*, sequence_node*, functional::deep_copier
-  );
+  sequence_node (sequence_node*, sequence_node*, fn::deep_copy);
 
   template<typename T>
   sequence_node (T const&, sequence_node*, sequence_node*);
@@ -54,10 +53,10 @@ struct sequence_node: private boost::noncopyable {
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev, functional::shallow_copier f
+  sequence_node* other, sequence_node* prev, fn::shallow_copy copy
 ):
   val(other->val),
-  next((other->next ? new sequence_node(other->next, this, f) : 0)),
+  next((other->next ? new sequence_node(other->next, this, copy) : 0)),
   prev(prev)
 {
   // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
@@ -65,10 +64,10 @@ sequence_node<Data>::sequence_node (
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev, functional::deep_copier f
+  sequence_node* other, sequence_node* prev, fn::deep_copy copy
 ):
   val((other->val ? new Data(*other->val) : 0)),
-  next((other->next ? new sequence_node(other->next, this, f) : 0)),
+  next((other->next ? new sequence_node(other->next, this, copy) : 0)),
   prev(prev)
 {
   // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 

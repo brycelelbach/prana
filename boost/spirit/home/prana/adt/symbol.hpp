@@ -10,11 +10,11 @@
 #if !defined(BOOST_SPIRIT_PRANA_ADT_SYMBOL_HPP)
 #define BOOST_SPIRIT_PRANA_ADT_SYMBOL_HPP
 
-#include <string>
-
 #include <climits>
 #include <cstring>
 #include <cwchar>
+
+#include <string>
 
 #include <boost/cstdint.hpp>
 
@@ -65,12 +65,12 @@ struct symbol {
   
   union {
     struct {
-      uint8_t storage;
+      boost::uint8_t storage;
       Char str[(sizeof(void*[2]) / sizeof(Char)) - 1];
     } stack;
     struct {
-      uint8_t storage;
-      uint8_t alias;
+      boost::uint8_t storage;
+      boost::uint8_t alias;
       range_type* str;
     } heap;
   };

@@ -7,16 +7,11 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_range
-
-#include <cstring>
-
-#include <vector>
-#include <list>
+#define BOOST_TEST_MODULE prana_adt_range
 
 #include <boost/spirit/home/prana/adt/range.hpp>
 
-#include "prana_test_harness.hpp"
+#include <fixture.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::adt;

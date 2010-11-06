@@ -7,17 +7,15 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_sequence
-
-#include <vector>
-#include <list>
+#define BOOST_TEST_MODULE prana_adt_sequence
 
 #include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/adt/sequence.hpp>
 
-#include "prana_test_harness.hpp"
+#include <fixture.hpp>
 
+using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::adt;
 
 BOOST_AUTO_TEST_CASE(insertion) {

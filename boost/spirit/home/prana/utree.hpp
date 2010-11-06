@@ -10,24 +10,30 @@
 #if !defined(BOOST_SPIRIT_PRANA_UTREE_HPP)
 #define BOOST_SPIRIT_PRANA_UTREE_HPP
 
+#include <cstring>
+
+#include <boost/config.hpp>
+#include <boost/swap.hpp>
 #include <boost/cstdint.hpp>
 
 #include <boost/spirit/home/prana/adt/sequence.hpp>
 #include <boost/spirit/home/prana/adt/symbol.hpp>
 #include <boost/spirit/home/prana/adt/range.hpp>
-#include <boost/spirit/home/prana/kinds.hpp>
+#include <boost/spirit/home/prana/kind.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
+#include <boost/spirit/home/prana/tag.hpp>
 #include <boost/spirit/home/prana/policy/default.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-template<typename Policy = policy::default_>
+template<template<class> class Policy = policy::default_>
 class utree {
  public:
-  typedef typename Policy::char_type     char_type;
-  typedef typename Policy::error_handler error_handler;
+  typedef Policy<utree> policy;
+
+  typedef typename policy::char_type char_type;
 
   typedef utree          value_type;
   typedef utree&         reference;
@@ -37,296 +43,351 @@ class utree {
   typedef std::ptrdiff_t difference_type;
   typedef std::size_t    size_type;
   
+  typedef typename policy::container default_container;
+
   typedef adt::sequence<utree>   sequence;
   typedef adt::symbol<char_type> symbol;
-
-  utree (void);
-
-  utree (utree const&);
-  template<typename Copier> utree (utree const&, Copier);
-  utree (bool);
-  utree (char);
-  utree (int);
-  utree (double);
-  utree (char const*);
-  utree (char const*, char const*);
-  utree (char const*, size_type);
-  utree (std::string const&); 
   
-  utree& operator= (utree const&); 
-  utree& operator= (bool);
-  utree& operator= (char);
-  utree& operator= (int);
-  utree& operator= (double);
-  utree& operator= (char const*);
-  utree& operator= (std::string const&); 
-  
-  utree& copy (utree const&);
-  template<typename Copier> utree& copy (utree const&, Copier);
-  utree& copy (bool);
-  utree& copy (char);
-  utree& copy (int);
-  utree& copy (double);
-  utree& copy (char const*);
-  utree& copy (char const*, char const*);
-  utree& copy (char const*, size_type);
-  utree& copy (std::string const&); 
-
-  boost::uint8_t kind (void) const;
-
-  void clear (void);
-
- private:
-  boost::uint8_t _kind;
-  union {
+  union discriminated_union {
     pointer           _pointer; 
     sequence          _sequence;
     symbol            _symbol;
     bool              _bool;
     boost::intmax_t   _integer;
     double            _floating;
-  }; 
+  };
+
+  utree (void);
+
+  utree (const_reference);
+  template<typename Copy> utree (const_reference, Copy);
+  utree (bool);
+  utree (char_type);
+  utree (int);
+  utree (double);
+  utree (char_type const*);
+  utree (char_type const*, char_type const*);
+  utree (char_type const*, size_type);
+  utree (std::basic_string<char_type> const&); 
+
+  // TODO (wash): add equality checks to avoid unnecessary copies  
+  utree& operator= (const_reference); 
+  utree& operator= (bool);
+  utree& operator= (char_type);
+  utree& operator= (int);
+  utree& operator= (double);
+  utree& operator= (char_type const*);
+  utree& operator= (std::basic_string<char_type> const&); 
+  
+  // TODO (wash): add assign convienence method 
+
+  // TODO (wash): add equality checks to avoid unnecessary copies  
+  void swap (reference);
+
+  boost::uint8_t kind (void) const;
+
+  void clear (void);
+
+  discriminated_union& raw (void);
+  discriminated_union const& raw (void) const; 
+
+  default_container& container (void);
+  default_container const& container (void) const;
+  
+  void become (kind_type);  
+
+ private:
+  utree& copy (utree const&);
+  template<typename Copy> utree& copy (utree const&, Copy);
+  utree& copy (bool);
+  utree& copy (char_type);
+  utree& copy (int);
+  utree& copy (double);
+  utree& copy (char_type const*);
+  utree& copy (char_type const*, char_type const*);
+  utree& copy (char_type const*, size_type);
+  utree& copy (std::basic_string<char_type> const&);
+ 
+  boost::uint8_t       _kind;
+  discriminated_union  _du;
 };
 
-template<typename Policy>
+template<template<class> class Policy>
 utree<Policy>::utree (void) {
+  std::memset(&_du, 0, sizeof(discriminated_union));
   _kind = nil_kind; 
 }
 
-template<typename Policy>
-utree<Policy>::utree (utree const& other) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+utree<Policy>::utree (const_reference other) {
   copy(other);
 }
 
-template<typename Policy>
-template<typename Copier>
-utree<Policy>::utree (utree const& other, Copier copier) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
-  copy(other, copier);
+template<template<class> class Policy>
+template<typename Copy>
+utree<Policy>::utree (const_reference other, Copy copy) {
+  copy(other, copy);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 utree<Policy>::utree (bool bool_) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
   copy(bool_);
 }
 
-template<typename Policy>
-utree<Policy>::utree (char char_) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+utree<Policy>::utree (char_type char_) {
   copy(char_);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 utree<Policy>::utree (int int_) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
   copy(int_);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 utree<Policy>::utree (double double_) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
   copy(double_);
 }
 
-template<typename Policy>
-utree<Policy>::utree (char const* str) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+utree<Policy>::utree (char_type const* str) {
   copy(str);
 }
 
-template<typename Policy>
-utree<Policy>::utree (char const* first, char const* last) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+utree<Policy>::utree (char_type const* first, char_type const* last) {
   copy(first, last);
 }
 
-template<typename Policy>
-utree<Policy>::utree (char const* bits, size_type len) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+utree<Policy>::utree (char_type const* bits, size_type len) {
   copy(bits, len);
 }
 
-template<typename Policy>
-inline utree<Policy>::utree (std::string const& str) {
-  // TODO (wash): Inline copy by hand here to ensure that we avoid pointless
-  // equality-checking and clearing.
+template<template<class> class Policy>
+inline utree<Policy>::utree (std::basic_string<char_type> const& str) {
   copy(str);
 }
 
-template<typename Policy>
-inline utree<Policy>& utree<Policy>::operator= (utree const& other) {
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::operator= (const_reference other) {
   copy(other);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 inline utree<Policy>& utree<Policy>::operator= (bool bool_) {
   copy(bool_);
 }
 
-template<typename Policy>
-inline utree<Policy>& utree<Policy>::operator= (char char_) {
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::operator= (char_type char_) {
   copy(char_);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 inline utree<Policy>& utree<Policy>::operator= (int int_) {
   copy(int_);
 }
 
-template<typename Policy>
+template<template<class> class Policy>
 inline utree<Policy>& utree<Policy>::operator= (double double_) {
   copy(double_);
 }
 
-template<typename Policy>
-inline utree<Policy>& utree<Policy>::operator= (char const* str) {
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::operator= (char_type const* str) {
   copy(str);
 }
 
-template<typename Policy>
-inline utree<Policy>& utree<Policy>::operator= (std::string const& str) {
+template<template<class> class Policy>
+inline utree<Policy>& 
+utree<Policy>::operator= (std::basic_string<char_type> const& str) {
   copy(str);
 }
 
-template<typename Policy>
-inline utree<Policy>& utree<Policy>::copy (utree const& other) {
-  copy(other, typename Policy::copier());
+template<template<class> class Policy>
+inline void utree<Policy>::swap (reference other) {
+  boost::swap(_kind, other._kind);
+  boost::swap(_du, other._du);
+} 
+
+template<template<class> class Policy>
+inline boost::uint8_t utree<Policy>::kind (void) const {
+  return _kind; 
 }
 
-template<typename Policy>
-template<typename Copier>
-utree<Policy>& utree<Policy>::copy (utree const& other, Copier copier) {
-  // TODO (wash): Check if this is a reference; if it is, check if the reference
-  // is equal to the source, and return early if it is.
-  clear();
-  copier(other, other._kind, *this, _kind);
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (bool bool_) {
-  // TODO (wash): Check if this is a bool; if it is, check if the bool is
-  // equal to the source, and return early if it is.
-  clear();
-  _bool = bool_;
-  _kind = bool_kind; 
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (char char_) {
-  // TODO (wash): Check if this is a symbol; if it is, check if the symbol is
-  // equal to the source, and return early if it is.
-  clear();
-  _symbol.default_construct();
-  _symbol.deep_copy((char const*) &char_, (char const*) 0); 
-  _kind = symbol_kind; 
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (int int_) {
-  // TODO (wash): Check if this is a integer; if it is, check if the integer is
-  // equal to the source, and return early if it is.
-  clear();
-  _integer = int_;
-  _kind = integer_kind;
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (double double_) {
-  // TODO (wash): Check if this is a double; if it is, check if the double is
-  // equal to the source, and return early if it is.
-  clear();
-  _floating = double_;
-  _kind = floating_kind; 
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (char const* str) {
-  // TODO (wash): Check if this is a symbol; if it is, check if the symbol is
-  // equal to the source, and return early if it is.
-  clear();
-  _symbol.default_construct();
-  _symbol.deep_copy(str);
-  _kind = symbol_kind; 
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (char const* first, char const* last) {
-  // TODO (wash): Check if this is a symbol; if it is, check if the symbol is
-  // equal to the source, and return early if it is.
-  clear();
-  _symbol.default_construct();
-  _symbol.deep_copy(first, last);
-  _kind = symbol_kind; 
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (char const* bits, size_type len) {
-  // TODO (wash): Check if this is a symbol; if it is, check if the symbol is
-  // equal to the source, and return early if it is.
-  clear();
-  _symbol.default_construct();
-  _symbol.deep_copy(bits, bits + len);
-  _kind = symbol_kind;
-}
-
-template<typename Policy>
-utree<Policy>& utree<Policy>::copy (std::string const& str) {
-  // TODO (wash): Check if this is a symbol; if it is, check if the symbol is
-  // equal to the source, and return early if it is.
-  clear();
-  _symbol.default_construct();
-  _symbol.deep_copy(str);
-  _kind = symbol_kind;
-}
-
-template<typename Policy>
-boost::uint8_t utree<Policy>::kind (void) const {
-  return _kind | ~reference_kind;
-}
-
-template<typename Policy>
+template<template<class> class Policy>
 void utree<Policy>::clear (void) {
-  if (_kind & reference_kind) {
-    _kind = nil_kind; 
-    return;
+  if (!(_kind & reference_kind)) {
+    switch ((kind_type) _kind) {
+      case reference_kind:
+      case numeric_kind:
+      case container_kind:
+        // DISCUSS (wash): The above three are impossible; they fall through to
+        // nil_kind for now. Perhaps they should throw an error if hit? 
+      case nil_kind:
+        break; 
+      case symbol_kind:
+        _du._symbol.free();
+        break; 
+      case record_kind:
+        break; // TODO (wash): Requires the implementation of record. 
+      case bool_kind:
+        break; 
+      case integer_kind:
+        break; 
+      case floating_kind:
+        break; 
+      case sequence_kind:
+        _du._sequence.free();
+        break; 
+      case array_kind:
+        break; // TODO (wash): Requires the implementation of array.
+      case unique_kind:
+        break; // TODO (wash): Requires the implementation of unique.
+    }
   }
 
+  _kind = nil_kind;
+  std::memset(&_du, 0, sizeof(discriminated_union));
+}
+
+template<template<class> class Policy>
+inline typename utree<Policy>::discriminated_union&
+utree<Policy>::raw (void) {
+  return _du;
+}
+
+template<template<class> class Policy>
+inline typename utree<Policy>::discriminated_union const&
+utree<Policy>::raw (void) const {
+  return _du;
+}
+
+template<template<class> class Policy>
+inline typename utree<Policy>::default_container&
+utree<Policy>::container (void) {
+  return typename default_container::retrieve()(*this);
+}
+
+template<template<class> class Policy>
+inline typename utree<Policy>::default_container const&
+utree<Policy>::container (void) const {
+  return typename default_container::retrieve()(*this);
+}
+
+template<template<class> class Policy>
+void utree<Policy>::become (kind_type kind_) {
   switch ((kind_type) _kind) {
     case reference_kind:
     case numeric_kind:
     case container_kind:
       // DISCUSS (wash): The above three are impossible; they fall through to
       // nil_kind for now. Perhaps they should throw an error if hit? 
+    case bool_kind:
+    case integer_kind:
+    case floating_kind:
     case nil_kind:
+      clear();
       break; 
     case symbol_kind:
-      break; // TODO (wash) 
-    case record_kind:
-      break; // TODO (wash): Requires the implementation of record. 
-    case bool_kind:
-      break; // TODO (wash) 
-    case integer_kind:
-      break; // TODO (wash) 
-    case floating_kind:
-      break; // TODO (wash) 
+      clear();
+      _du._symbol.default_construct();
+      break; 
     case sequence_kind:
-      break; // TODO (wash) 
+      clear();
+      _du._sequence.default_construct();
+      break; 
+    case record_kind:
+      clear();
+      break; // TODO (wash): Requires the implementation of record. 
     case array_kind:
+      clear();
       break; // TODO (wash): Requires the implementation of array.
     case unique_kind:
+      clear();
       break; // TODO (wash): Requires the implementation of unique.
   }
+
+  _kind = kind_;
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (const_reference other) {
+  copy(other, typename policy::copy());
+}
+
+template<template<class> class Policy>
+template<typename Copy>
+inline utree<Policy>& utree<Policy>::copy (
+  const_reference other, Copy copy
+) {
+  clear();
+  copy(other, other._kind, *this, _kind);
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (bool bool_) {
+  clear();
+  _du._bool = bool_;
+  _kind = bool_kind; 
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (char_type char_) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy((char_type const*) &char_, (char_type const*) 0); 
+  _kind = symbol_kind; 
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (int int_) {
+  clear();
+  _du._integer = int_;
+  _kind = integer_kind;
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (double double_) {
+  clear();
+  _du._floating = double_;
+  _kind = floating_kind; 
+}
+
+template<template<class> class Policy>
+inline utree<Policy>& utree<Policy>::copy (char_type const* str) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy(str);
+  _kind = symbol_kind; 
+}
+
+template<template<class> class Policy>
+inline utree<Policy>&
+utree<Policy>::copy (char_type const* first, char_type const* last) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy(first, last);
+  _kind = symbol_kind; 
+}
+
+template<template<class> class Policy>
+inline utree<Policy>&
+utree<Policy>::copy (char_type const* bits, size_type len) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy(bits, bits + len);
+  _kind = symbol_kind;
+}
+
+template<template<class> class Policy>
+inline utree<Policy>&
+utree<Policy>::copy (std::basic_string<char_type> const& str) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy(str);
+  _kind = symbol_kind;
 }
 
 } // prana
