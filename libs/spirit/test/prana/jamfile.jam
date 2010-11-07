@@ -9,7 +9,8 @@
 
 project spirit_prana_test :
   requirements
-    <cxxflags>-Wno-unused
+    <toolset>clang:<cxxflags>-Wno-unused
+    <toolset>clang:<cxxflags>-Wno-tautological-compare
     <include>./
     <include>../../../../
     <source>/boost//unit_test_framework

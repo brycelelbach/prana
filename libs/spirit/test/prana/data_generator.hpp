@@ -32,9 +32,9 @@ namespace boost {
 namespace unit_test {
 
 template<
+  std::size_t Elements = 4,
   std::size_t Length = 8,
-  template<typename, typename> class Container = std::list,
-  std::size_t Elements = 4
+  template<typename, typename> class Container = std::list
 >
 struct string: boost::mpl::identity<std::string> {
   typedef Container<std::string, std::allocator<std::string> > container;
@@ -43,8 +43,8 @@ struct string: boost::mpl::identity<std::string> {
 };
 
 template<
-  template<typename, typename> class Container = std::list,
-  std::size_t Elements = 4
+  std::size_t Elements = 4,
+  template<typename, typename> class Container = std::list
 >
 struct integer: boost::mpl::identity<int> {
   typedef Container<int, std::allocator<int> > container;
@@ -52,8 +52,8 @@ struct integer: boost::mpl::identity<int> {
 };
 
 template<
-  template<typename, typename> class Container = std::list,
-  std::size_t Elements = 4
+  std::size_t Elements = 4,
+  template<typename, typename> class Container = std::list
 >
 struct floating: boost::mpl::identity<double> {
   typedef Container<double, std::allocator<double> > container;

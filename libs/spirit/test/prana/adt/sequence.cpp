@@ -16,87 +16,180 @@
 #include <fixture.hpp>
 
 using namespace boost::spirit::prana;
-using namespace boost::spirit::prana::adt;
 
-BOOST_AUTO_TEST_CASE(insertion) {
-  sequence<int> l;
-  l.default_construct();
-  l.push_back(15);
-  l.push_back(2134);
-  l.push_back(-423);
-  l.free();
+BOOST_FIXTURE_TEST_SUITE(unit_tests, test::fixture)
+
+typedef boost::mpl::list<bool, short, int, long> integers;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(size, T, integers) {
+  BOOST_CHECK_EQUAL(sizeof(void*[2]), sizeof(sequence<T>));
 }
 
-BOOST_AUTO_TEST_CASE(forward_iteration) {
-  sequence<double> l;
-  l.default_construct();
-  l.insert(7005.995, l.begin());
-  l.insert(153.51, l.begin());
-  l.insert(0.445, l.begin());
-  sequence<double>::iterator it = l.begin(), end = l.end();
-  BOOST_CHECK(*it == 0.445);
-  BOOST_CHECK(*(++it) == 153.51);
-  BOOST_CHECK(*(++it) == 7005.995);
-  BOOST_CHECK(++it == end);
-  l.free();
+BOOST_AUTO_TEST_CASE_TEMPLATE(forward_iteration, T, test::elements) {
+  typedef sequence<typename T::type> sequence_type;
+
+  typename T::container c;
+  sequence_type s;
+
+  BOOST_TEST_CHECKPOINT("default constructing sequence");
+  s.default_construct();
+
+  BOOST_TEST_CHECKPOINT(
+    "filling sequence with " << T::elements::value << " elements"
+  );
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    typename T::type t = generator.get<T>();
+    s.push_front(t);
+    c.push_front(t);
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+    BOOST_CHECK_EQUAL(*s.begin(), t); 
+    BOOST_CHECK_EQUAL(*c.begin(), t); 
+  }
+
+  BOOST_TEST_CHECKPOINT("retrieving iterators");
+  typename sequence_type::const_iterator sit = s.begin(), send = s.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  while ((sit != send) && (cit != cend)) {
+    BOOST_CHECK_EQUAL(*cit, *sit); ++cit; ++sit;
+  }
+  
+  BOOST_CHECK(sit == send);
+  BOOST_CHECK(cit == cend);
+
+  BOOST_TEST_CHECKPOINT("clearing sequence");
+  s.clear();
 }
 
-BOOST_AUTO_TEST_CASE(reverse_iteration) {
-  sequence<std::string> l;
-  l.default_construct();
-  l.insert("foo", l.end());
-  l.insert("bar", l.end());
-  l.insert("buzz", l.end());
-  sequence<std::string>::iterator it = l.begin(), end = l.end();
-  BOOST_CHECK(*(--end) == "buzz");
-  BOOST_CHECK(*(--end) == "bar");
-  BOOST_CHECK(*(--end) == "foo");
-  BOOST_CHECK(it == end);
-  l.free();
+BOOST_AUTO_TEST_CASE_TEMPLATE(reverse_iteration, T, test::elements) {
+  typedef sequence<typename T::type> sequence_type;
+
+  typename T::container c;
+  sequence_type s;
+
+  BOOST_TEST_CHECKPOINT("default constructing sequence");
+  s.default_construct();
+
+  BOOST_TEST_CHECKPOINT(
+    "filling sequence with " << T::elements::value << " elements"
+  );
+  for (std::size_t i = 0; i < T::elements::value; ++i) {
+    typename T::type t = generator.get<T>();
+    s.push_back(t);
+    c.push_back(t);
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+    BOOST_CHECK_EQUAL(*--s.end(), t); 
+    BOOST_CHECK_EQUAL(*--c.end(), t); 
+  }
+
+  BOOST_TEST_CHECKPOINT("retrieving iterators");
+  typename sequence_type::const_iterator sit = s.begin(), send = s.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  while ((sit != send) && (cit != cend)) {
+    BOOST_CHECK_EQUAL(*--cend, *--send); 
+  }
+
+  BOOST_CHECK(sit == send);
+  BOOST_CHECK(cit == cend);
+
+  BOOST_TEST_CHECKPOINT("clearing sequence");
+  s.clear();
 }
 
-BOOST_AUTO_TEST_CASE(front_removal) {
-  sequence<char> l;
-  l.default_construct();
-  l.push_front('c');
-  l.push_front('b');
-  l.push_front('a');
-  l.pop_front();
-  sequence<char>::iterator it = l.begin(), end = l.end();
-  it = l.erase(it);
-  BOOST_CHECK(*(it) == 'c');
-  BOOST_CHECK(++it == end);
-  l.free();
+BOOST_AUTO_TEST_CASE_TEMPLATE(front_removal, T, test::elements) {
+  typedef sequence<typename T::type> sequence_type;
+
+  typename T::container c;
+  sequence_type s;
+
+  BOOST_TEST_CHECKPOINT("default constructing sequence");
+  s.default_construct();
+
+  BOOST_TEST_CHECKPOINT(
+    "filling sequence with " << (T::elements::value + 2) << " elements"
+  );
+  for (std::size_t i = 0; i < (T::elements::value + 2); ++i) {
+    typename T::type t = generator.get<T>();
+    s.push_front(t);
+    c.push_front(t);
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+    BOOST_CHECK_EQUAL(*s.begin(), t); 
+    BOOST_CHECK_EQUAL(*c.begin(), t); 
+  }
+  
+  BOOST_TEST_CHECKPOINT("removing first element (pop_front)");
+  s.pop_front();
+  c.pop_front();
+
+  BOOST_TEST_CHECKPOINT("removing first element (erase)");
+  s.erase(s.begin());
+  c.erase(c.begin());
+
+  BOOST_TEST_CHECKPOINT("retrieving iterators");
+  typename sequence_type::const_iterator sit = s.begin(), send = s.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  while ((sit != send) && (cit != cend)) {
+    BOOST_CHECK_EQUAL(*cit, *sit); ++cit; ++sit;
+  }
+
+  BOOST_CHECK(sit == send);
+  BOOST_CHECK(cit == cend);
+
+  BOOST_TEST_CHECKPOINT("clearing sequence");
+  s.clear();
 }
 
-BOOST_AUTO_TEST_CASE(back_removal) {
-  sequence<short> l;
-  l.default_construct();
-  l.push_back(12);
-  l.push_back(17);
-  l.push_back(-5);
-  l.pop_back();
-  sequence<short>::iterator it = l.begin(), end = l.end();
-  end = l.erase(--end);
-  BOOST_CHECK(*(--end) == 12);
-  BOOST_CHECK(it == end);
-  l.free();
+BOOST_AUTO_TEST_CASE_TEMPLATE(back_removal, T, test::elements) {
+  typedef sequence<typename T::type> sequence_type;
+
+  typename T::container c;
+  sequence_type s;
+
+  BOOST_TEST_CHECKPOINT("default constructing sequence");
+  s.default_construct();
+
+  BOOST_TEST_CHECKPOINT(
+    "filling sequence with " << (T::elements::value + 2) << " elements"
+  );
+  for (std::size_t i = 0; i < (T::elements::value + 2); ++i) {
+    typename T::type t = generator.get<T>();
+    s.push_back(t);
+    c.push_back(t);
+    BOOST_TEST_MESSAGE("element " << i << ": " << c.back()); 
+    BOOST_CHECK_EQUAL(*--s.end(), t); 
+    BOOST_CHECK_EQUAL(*--c.end(), t); 
+  }
+  
+  BOOST_TEST_CHECKPOINT("removing last element (pop_back)");
+  s.pop_back();
+  c.pop_back();
+
+  BOOST_TEST_CHECKPOINT("removing last element (erase)");
+  s.erase(--s.end()); 
+  c.erase(--c.end()); 
+  
+  BOOST_TEST_CHECKPOINT("retrieving iterators");
+  typename sequence_type::const_iterator sit = s.begin(), send = s.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
+
+  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  while ((sit != send) && (cit != cend)) {
+    BOOST_CHECK_EQUAL(*cit, *sit); ++cit; ++sit;
+  }
+  
+  BOOST_CHECK(sit == send);
+  BOOST_CHECK(cit == cend);
+
+  BOOST_TEST_CHECKPOINT("clearing sequence");
+  s.clear();
 }
 
-BOOST_AUTO_TEST_CASE(iterator_removal) {
-  sequence<std::string> l;
-  l.default_construct();
-  l.push_back("hello");
-  l.push_back("world");
-  l.push_back("!");
-  sequence<std::string>::iterator it = l.begin(), end = l.end();
-  BOOST_CHECK(*(it) == "hello");
-  it = l.erase(++it);
-  BOOST_CHECK(*(it) == "!");
-  BOOST_CHECK(++it == end);
-  l.free();
-}
-
+#if 0
 BOOST_AUTO_TEST_CASE(deep_copy) {
   sequence<int> l0;
   l0.default_construct();
@@ -111,8 +204,8 @@ BOOST_AUTO_TEST_CASE(deep_copy) {
   BOOST_CHECK(*(--end) == 53);
   BOOST_CHECK(*(--end) == 12);
   BOOST_CHECK(it == end);
-  l1.free();
-  l0.free(); 
+  l1.clear();
+  l0.clear(); 
 }
  
 BOOST_AUTO_TEST_CASE(get_to_list) {
@@ -122,7 +215,7 @@ BOOST_AUTO_TEST_CASE(get_to_list) {
   l0.push_back("a");
   l0.push_back("list");
   std::list<std::string> l1 = l0.get<std::list<std::string> >();
-  l0.free();
+  l0.clear();
   std::list<std::string>::iterator it = l1.begin(), end = l1.end();
   BOOST_CHECK(*(it) == "I'm");
   BOOST_CHECK(*(++it) == "a");
@@ -137,7 +230,7 @@ BOOST_AUTO_TEST_CASE(get_to_vector) {
   l0.push_back(64.3);
   l0.push_back(12.0);
   std::vector<double> l1 = l0.get<std::vector<double> >();
-  l0.free();
+  l0.clear(>);
   std::vector<double>::iterator it = l1.begin(), end = l1.end();
   BOOST_CHECK(*(it) == 32.5);
   BOOST_CHECK(*(++it) == 64.3);
@@ -158,6 +251,8 @@ BOOST_AUTO_TEST_CASE(get_to_range) {
   BOOST_CHECK(*(++it) == -503);
   BOOST_CHECK(*(++it) == 10422);
   BOOST_CHECK(++it == end);
-  l.free();
+  l.clear();
 }
+#endif
 
+BOOST_AUTO_TEST_SUITE_END()

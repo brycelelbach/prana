@@ -14,9 +14,16 @@
 #include <fixture.hpp>
 
 using namespace boost::spirit::prana;
-using namespace boost::spirit::prana::adt;
 
 BOOST_FIXTURE_TEST_SUITE(prana_range, test::fixture) 
+
+typedef boost::mpl::list<
+  std::string::iterator, std::vector<int>::iterator, char*
+> iterators;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(size, T, iterators) {
+  BOOST_CHECK_EQUAL(sizeof(void*[2]), sizeof(range<T>));
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_container, T, test::containers) {
   typedef range<typename T::container::const_iterator> range_type;
@@ -40,18 +47,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_container, T, test::containers) {
 
   BOOST_TEST_CHECKPOINT("retrieving iterators"); 
   typename range_type::iterator rit = r.begin(), rend = r.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
 
   BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
-  typename T::container::const_iterator cit = c.begin(), cend = c.end();
-  for (std::size_t i = 0; i < T::elements::value; ++i) {
+  while ((rit != rend) && (cit != cend)) {
     BOOST_CHECK_EQUAL(*cit, *rit); ++cit; ++rit;
   }
- 
-  BOOST_CHECK(rit == rend);
-  BOOST_CHECK(cit == cend);
 
-  BOOST_TEST_CHECKPOINT("freeing range");
-  r.free();
+  BOOST_TEST_CHECKPOINT("clearing range");
+  r.clear();
 }
  
 BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_str, T, test::strings) {
@@ -99,12 +103,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_str, T, test::strings) {
               sd(rd.begin(), rd.end()),
               se(re.begin(), re.end());
 
-  BOOST_TEST_CHECKPOINT("freeing ranges");  
-  ra.free();
-  rb.free();
-  rc.free();
-  rd.free();
-  re.free();
+  BOOST_TEST_CHECKPOINT("clearing ranges");  
+  ra.clear();
+  rb.clear();
+  rc.clear();
+  rd.clear();
+  re.clear();
 
   BOOST_TEST_CHECKPOINT("verifying string data");
   BOOST_CHECK_EQUAL(sa, a);
@@ -138,23 +142,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_range, T, test::containers) {
   BOOST_TEST_CHECKPOINT("deep copying first range into second range");
   rb.deep_copy(ra);
 
-  BOOST_TEST_CHECKPOINT("freeing first range");
-  ra.free();
+  BOOST_TEST_CHECKPOINT("clearing first range");
+  ra.clear();
 
   BOOST_TEST_CHECKPOINT("retrieving second range iterators"); 
   typename range_type::iterator rit = rb.begin(), rend = rb.end();
+  typename T::container::const_iterator cit = c.begin(), cend = c.end();
 
   BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
-  typename T::container::const_iterator cit = c.begin(), cend = c.end();
-  for (std::size_t i = 0; i < T::elements::value; ++i) {
+  while ((rit != rend) && (cit != cend)) {
     BOOST_CHECK_EQUAL(*cit, *rit); ++cit; ++rit;
   }
- 
-  BOOST_CHECK(rit == rend);
-  BOOST_CHECK(cit == cend);
 
-  BOOST_TEST_CHECKPOINT("freeing range");
-  rb.free();
+  BOOST_TEST_CHECKPOINT("clearing range");
+  rb.clear();
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(get_to_container, T, test::containers) {
@@ -180,8 +181,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(get_to_container, T, test::containers) {
   BOOST_TEST_CHECKPOINT("getting container from range");
   typename T::container cb = r.template get<typename T::container>();
   
-  BOOST_TEST_CHECKPOINT("freeing range");
-  r.free();
+  BOOST_TEST_CHECKPOINT("clearing range");
+  r.clear();
 
   BOOST_TEST_CHECKPOINT("verifying container data");
   BOOST_CHECK(ca == cb);

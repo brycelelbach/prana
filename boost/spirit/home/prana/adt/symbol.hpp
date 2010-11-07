@@ -86,6 +86,7 @@ typename symbol<Char>::size_type const symbol<Char>::stack_size =
 template<typename Char>
 inline void symbol<Char>::default_construct (void) {
   stack.storage = 1;
+  heap.alias = 0;
   for (size_type i = 0; i < stack_size; ++i) stack.str[i] = '\0';
 }
 
@@ -168,6 +169,7 @@ inline void symbol<Char>::clear (void) {
     heap.str->clear();
     delete heap.str;
     stack.storage = CHAR_MAX;
+    heap.alias = 0;
   } 
 }
 
@@ -198,13 +200,13 @@ inline std::basic_string<Char> symbol<Char>::str (void) const {
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator== (Container const& c) const {
-  return std::equal(c.begin(), c.end(), str());
+  return std::equal(c.begin(), c.end(), begin());
 }
 
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator!= (Container const& c) const {
-  return !std::equal(c.begin(), c.end(), str());
+  return !std::equal(c.begin(), c.end(), begin());
 }
 
 } // prana

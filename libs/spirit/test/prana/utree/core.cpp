@@ -15,7 +15,10 @@
 
 using namespace boost::spirit::prana;
 
-BOOST_AUTO_TEST_CASE(default_ctor) {
-  utree<> t;
+BOOST_FIXTURE_TEST_SUITE(unit_tests, test::fixture)
+
+BOOST_AUTO_TEST_CASE(size) {
+  BOOST_CHECK_EQUAL(sizeof(void*[3]), sizeof(utree));
 }
 
+BOOST_AUTO_TEST_SUITE_END()
