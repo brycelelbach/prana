@@ -23,7 +23,6 @@
 namespace boost {
 namespace spirit {
 namespace prana {
-namespace adt {
 
 template<typename Char>
 struct symbol {
@@ -37,8 +36,7 @@ struct symbol {
   typedef Char const* iterator;
   typedef Char const* const_iterator;
 
-  typedef range<iterator>       range_type;
-  typedef range<const_iterator> const_range_type;
+  typedef range<iterator> range_type;
 
   static size_type const stack_size;
 
@@ -48,18 +46,23 @@ struct symbol {
  
   void deep_copy (symbol const&);
   void deep_copy (Char const*);
-  template<typename Iterator> void deep_copy (Iterator, Iterator);
-  template<typename Container> void deep_copy (Container const&);
+  template<typename Iterator>
+    void deep_copy (Iterator, Iterator);
+  template<typename Container>
+    void deep_copy (Container const&);
   
-  void free (void);
+  void clear (void);
   
-  template<typename Container> Container get (void) const;
+  template<typename Container>
+    Container get (void) const;
 
   iterator begin (void) const;
   iterator end (void) const;
 
-  template<typename Container> bool operator== (Container const&) const;
-  template<typename Container> bool operator!= (Container const&) const;
+  template<typename Container>
+    bool operator== (Container const&) const;
+  template<typename Container>
+    bool operator!= (Container const&) const;
   
   std::basic_string<Char> str (void) const;
   
@@ -125,7 +128,7 @@ inline void symbol<wchar_t>::deep_copy (wchar_t const* c) {
 template<typename Char>
 template<typename Iterator>
 inline void symbol<Char>::deep_copy (Iterator f, Iterator l) {
-  free();
+  clear();
 
   size_type size = l - f;
 
@@ -159,10 +162,10 @@ inline void symbol<Char>::deep_copy (Container const& c) {
 }
 
 template<typename Char>
-inline void symbol<Char>::free (void) { 
+inline void symbol<Char>::clear (void) { 
   if (!stack.storage) {
     if (!heap.alias) delete[] heap.str->begin();
-    heap.str->free();
+    heap.str->clear();
     delete heap.str;
     stack.storage = CHAR_MAX;
   } 
@@ -195,18 +198,15 @@ inline std::basic_string<Char> symbol<Char>::str (void) const {
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator== (Container const& c) const {
-  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return std::equal(c.begin(), c.end(), str());
 }
 
 template<typename Char>
 template<typename Container>
 inline bool symbol<Char>::operator!= (Container const& c) const {
-  // DISCUSS (wash): Is this too slow? Can we do this faster?
   return !std::equal(c.begin(), c.end(), str());
 }
 
-} // adt
 } // prana
 } // spirit
 } // boost

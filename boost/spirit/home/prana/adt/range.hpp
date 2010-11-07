@@ -17,7 +17,6 @@
 namespace boost { 
 namespace spirit {
 namespace prana {
-namespace adt {
 
 template<typename Iterator>
 struct range {
@@ -40,7 +39,7 @@ struct range {
   void deep_copy (iterator, size_type);
   template<typename Container> void deep_copy (Container const&);
 
-  void free (void);
+  void clear (void);
   
   template<typename Container>
   Container get (void) const;
@@ -67,7 +66,7 @@ inline void range<Iterator>::default_construct (void) {
 
 template<typename Iterator>
 inline void range<Iterator>::shallow_copy (iterator* first_, iterator* last_) {
-  free();
+  clear();
   first = first_;
   last = last_;
   alias(true);
@@ -99,7 +98,7 @@ inline void range<Iterator>::deep_copy (Container const& c) {
 }
 
 template<typename Iterator>
-inline void range<Iterator>::free (void) {
+inline void range<Iterator>::clear (void) {
   if (first && !alias()) {
     delete first;
     first = 0;
@@ -167,7 +166,6 @@ inline void range<Iterator>::alias (bool alias_) {
     last = (iterator*) (((size_type) last) - 1);
 }
 
-} // adt
 } // prana
 } // spirit
 } // boost

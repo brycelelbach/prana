@@ -10,11 +10,9 @@
 #if !defined(BOOST_SPIRIT_PRANA_TAG_HPP)
 #define BOOST_SPIRIT_PRANA_TAG_HPP
 
-#include <boost/spirit/home/support/terminal.hpp>
+#include <boost/preprocessor/seq.hpp>
 
 #include <boost/spirit/home/prana/fn/copy.hpp>
-#include <boost/spirit/home/prana/fn/front.hpp>
-#include <boost/spirit/home/prana/fn/back.hpp>
 
 #define BOOST_SPIRIT_PRANA_TAG(type, name)                            \
   type const name = {};                                               \
@@ -34,10 +32,8 @@ namespace spirit {
 namespace prana {
 
 BOOST_SPIRIT_PRANA_DEFINE_TAGS(
-  ((fn::shallow_copy, shallow))
-  ((fn::deep_copy,    deep))
-  ((fn::front,        front))
-  ((fn::back,         back))
+  ((shallow_copy, shallow))
+  ((deep_copy,    deep))
 )
 
 } // prana

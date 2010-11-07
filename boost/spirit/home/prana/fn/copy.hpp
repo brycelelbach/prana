@@ -15,7 +15,6 @@
 namespace boost {
 namespace spirit {
 namespace prana {
-namespace fn {
 
 struct shallow_copy {
   typedef void result_type;
@@ -34,11 +33,11 @@ struct shallow_copy {
     // EXPLAIN (wash): If the source is a reference, reference the source's
     // target instead of the source itself.
     if (lhs_kind & reference_kind)
-      rhs.raw()._pointer = lhs.raw()._pointer;
+      rhs._du._pointer = lhs._du._pointer;
   
     // EXPLAIN (wash): lhs has to be a reference to the actual tree; if it's
     // passed by value, then the address we take here would be the wrong one.
-    else rhs.raw()._pointer = &lhs;
+    else rhs._du._pointer = &lhs;
   }
 };
 
@@ -59,7 +58,7 @@ struct deep_copy {
     // is responsible for validating shallow copies. Should this behavior be
     // changed?
     if (lhs_kind & reference_kind) {
-      (*this)(*lhs.raw()._pointer, *lhs.raw()._pointer->kind(), rhs, rhs.kind());
+      (*this)(*lhs._du._pointer, *lhs._du._pointer->_kind, rhs, rhs._kind);
       return;
     }
   
@@ -75,19 +74,19 @@ struct deep_copy {
         rhs.clear();
         break; 
       case symbol_kind:
-        (*this)(lhs.raw()._symbol, rhs.raw()._symbol);
+        (*this)(lhs._du._symbol, rhs._du._symbol);
         break; 
       case bool_kind:
-        (*this)(lhs.raw()._bool, rhs.raw()._bool);
+        (*this)(lhs._du._bool, rhs._du._bool);
         break; 
       case integer_kind:
-        (*this)(lhs.raw()._integer, rhs.raw()._integer);
+        (*this)(lhs._du._integer, rhs._du._integer);
         break; 
       case floating_kind:
-        (*this)(lhs.raw()._floating, rhs.raw()._floating);
+        (*this)(lhs._du._floating, rhs._du._floating);
         break; 
       case sequence_kind:
-        (*this)(lhs.raw()._sequence, rhs.raw()._sequence);
+        (*this)(lhs._du._sequence, rhs._du._sequence);
         break; 
       case record_kind:
         break; // TODO (wash): Requires the implementation of record. 
@@ -99,7 +98,6 @@ struct deep_copy {
   }
 };
 
-} // fn
 } // prana
 } // spirit
 } // boost
