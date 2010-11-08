@@ -40,7 +40,7 @@ struct sequence {
 
   void default_construct (void);
   
-  void shallow_copy (sequence const&);
+  void shallow_copy (sequence&);
   
   void deep_copy (sequence const&);
   
@@ -48,7 +48,8 @@ struct sequence {
   
   template<typename Container> Container get (void) const;
 
-  // TODO (wash): Insertation needs to support shallow copying!
+  // TODO (wash): Insertation needs to support shallow copying! ATM, default is
+  // to deep copy.
 
   template<typename T, typename Iterator>
   void insert (T const&, Iterator);
@@ -81,7 +82,7 @@ inline void sequence<Data>::default_construct (void) {
 }
 
 template<typename Data>
-inline void sequence<Data>::shallow_copy (sequence const& other) {
+inline void sequence<Data>::shallow_copy (sequence& other) {
   // DISCUSS (wash): Do we have to clear here? Would it be more efficient to
   // reuse the memory allocated for nodes and/or data, or would the complexity
   // of those intrinsics make such semantics more trouble than they're worth?

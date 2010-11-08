@@ -33,7 +33,7 @@ struct range {
   void default_construct (void);
 
   void shallow_copy (iterator*, iterator*);
-  void shallow_copy (range const&);
+  void shallow_copy (range&);
   
   void deep_copy (iterator, iterator);
   void deep_copy (iterator, size_type);
@@ -73,7 +73,7 @@ inline void range<Iterator>::shallow_copy (iterator* first_, iterator* last_) {
 }
 
 template<typename Iterator>
-inline void range<Iterator>::shallow_copy (range const& other) {
+inline void range<Iterator>::shallow_copy (range& other) {
   shallow_copy(other.first, other.last);
 }
 

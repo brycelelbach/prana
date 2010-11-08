@@ -19,6 +19,7 @@
 #include <boost/cstdint.hpp>
 
 #include <boost/spirit/home/prana/adt/range.hpp>
+#include <boost/spirit/home/prana/tag.hpp>
 
 namespace boost {
 namespace spirit {
@@ -42,9 +43,10 @@ struct symbol {
 
   void default_construct (void);
   
-  void shallow_copy (symbol const&);
+  void shallow_copy (symbol&);
  
   void deep_copy (symbol const&);
+  void deep_copy (Char);
   void deep_copy (Char const*);
   template<typename Iterator>
     void deep_copy (Iterator, Iterator);
@@ -91,7 +93,7 @@ inline void symbol<Char>::default_construct (void) {
 }
 
 template<typename Char>
-inline void symbol<Char>::shallow_copy (symbol const& other) {
+inline void symbol<Char>::shallow_copy (symbol& other) {
   // EXPLAIN (wash): If the existing symbol is storing data on the heap, we
   // reuse the allocated range.
   if (other != *this) {
@@ -107,6 +109,15 @@ inline void symbol<Char>::shallow_copy (symbol const& other) {
     heap.str->deep_copy(other.begin(), other.end());
   }
 }
+
+template<typename Char>
+inline void symbol<Char>::deep_copy (Char c) {
+  clear();
+  stack.storage = 1;
+  // EXPLAIN (wash): clear() zero initializes the stack array, so no need to
+  // append a null byte.
+  stack.str[0] = c;
+} 
 
 template<typename Char>
 inline void symbol<Char>::deep_copy (symbol const& other) {
