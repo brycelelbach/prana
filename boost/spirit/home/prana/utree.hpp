@@ -13,7 +13,6 @@
 #include <cstring>
 
 #include <boost/swap.hpp>
-#include <boost/call_traits.hpp>
 
 #include <boost/spirit/home/prana/adt/symbol.hpp>
 #include <boost/spirit/home/prana/adt/sequence.hpp>
@@ -86,15 +85,15 @@ class utree {
     void become (void);
 
   template<class Value>
-    void push_front (typename call_traits<Value>::param_type);
+    void push_front (Value);
   template<class Value>
-    void push_back (typename call_traits<Value>::param_type);
+    void push_back (Value);
   
   void pop_front (void);
   void pop_back (void);
 
   template<class Value>
-    bool insert (typename call_traits<Value>::param_type, iterator);
+    bool insert (iterator, Value);
 
   bool erase (iterator);
 
@@ -310,7 +309,7 @@ inline void utree::become<sequence_kind> (void) {
 }
 
 template<class Value>
-void utree::push_front (typename call_traits<Value>::param_type val) {
+void utree::push_front (Value val) {
   if (kind() & reference_kind)
     return _du._alias->push_front(val);
 
@@ -334,7 +333,7 @@ void utree::push_front (typename call_traits<Value>::param_type val) {
 }
 
 template<class Value>
-void utree::push_back (typename call_traits<Value>::param_type val) {
+void utree::push_back (Value val) {
   if (kind() & reference_kind)
     return _du._alias->push_back(val);
 
@@ -396,14 +395,12 @@ void utree::pop_back (void) {
 }
 
 template<class Value>
-inline bool utree::insert (
-  typename call_traits<Value>::param_type val, iterator pos
-) {
+inline bool utree::insert (iterator pos, Value val) {
   if (kind() & reference_kind)
-    return _du._alias->insert(val, pos);
+    return _du._alias->insert(pos, val);
 
   else if (kind() == sequence_kind) {
-    _du._sequence.insert(val, pos);
+    _du._sequence.insert(pos, val);
     return true;
   }
 

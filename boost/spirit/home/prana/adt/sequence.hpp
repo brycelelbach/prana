@@ -267,10 +267,10 @@ struct sequence {
   // to deep copy.
 
   template<typename Value, typename Iterator>
-  void insert (Value const&, Iterator);
+  void insert (Iterator, Value);
 
-  template<typename Value> void push_front (Value const&);
-  template<typename Value> void push_back (Value const&);
+  template<typename Value> void push_front (Value);
+  template<typename Value> void push_back (Value);
 
   void pop_front (void);
   void pop_back (void);
@@ -363,7 +363,7 @@ inline Container sequence<Data>::get (void) const {
 
 template<typename Data>
 template<typename Value, typename Iterator>
-inline void sequence<Data>::insert (Value const& val_, Iterator pos_) {
+inline void sequence<Data>::insert (Iterator pos_, Value val_) {
   if (!pos_.curr)
     return push_back(val_);
 
@@ -380,7 +380,7 @@ inline void sequence<Data>::insert (Value const& val_, Iterator pos_) {
 
 template<typename Data>
 template<typename Value>
-inline void sequence<Data>::push_front (Value const& val_) {
+inline void sequence<Data>::push_front (Value val_) {
   node_type* new_node;
 
   if (_data._first == 0) {
@@ -399,7 +399,7 @@ inline void sequence<Data>::push_front (Value const& val_) {
 
 template<typename Data>
 template<typename Value>
-inline void sequence<Data>::push_back (Value const& val_) {
+inline void sequence<Data>::push_back (Value val_) {
   if (_data._last == 0)
     push_front(val_);
 

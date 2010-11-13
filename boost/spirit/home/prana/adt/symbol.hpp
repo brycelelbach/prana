@@ -15,7 +15,6 @@
 
 #include <string>
 
-#include <boost/call_traits.hpp>
 #include <boost/cstdint.hpp>
 
 #include <boost/spirit/home/prana/fn/length.hpp>
@@ -75,7 +74,7 @@ struct symbol {
   template<typename Iterator>
     void deep_copy (Iterator, Iterator);
   template<typename Container>
-    void deep_copy (typename call_traits<Container>::param_type);
+    void deep_copy (Container);
   
   void clear (void);
   
@@ -182,9 +181,7 @@ inline void symbol<Char>::deep_copy (Iterator first_, Iterator last_) {
 
 template<typename Char>
 template<typename Container>
-inline void symbol<Char>::deep_copy (
-  typename call_traits<Container>::param_type c_
-) {
+inline void symbol<Char>::deep_copy (Container c_) {
   deep_copy(c_.begin(), c_.end());
 }
 

@@ -16,11 +16,24 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-run adt/symbol.cpp   : : : <address-model>32 : prana_adt_symbol_32bit     ;
-run adt/symbol.cpp   : : : <address-model>64 : prana_adt_symbol_64bit     ;
+run adt/symbol/size.cpp
+  : : : <address-model>32 : prana_adt_symbol_size_32bit ;
 
-run adt/sequence.cpp : : : <address-model>32 : prana_adt_sequence_32bit   ;
-run adt/sequence.cpp : : : <address-model>64 : prana_adt_sequence_64bit   ;
+run adt/symbol/deep_copy.cpp
+  : : : <address-model>32 : prana_adt_symbol_deep_copy_32bit ;
 
-run utree/core.cpp   : : : <address-model>32 : prana_utree_core_32bit     ;
-run utree/core.cpp   : : : <address-model>64 : prana_utree_core_64bit     ;
+run adt/sequence/size.cpp
+  : : : <address-model>32 : prana_adt_sequence_size_32bit ;
+
+run adt/sequence/forward_iteration.cpp
+  : : : <address-model>32 : prana_adt_sequence_forward_iteration_32bit ;
+
+run adt/sequence/reverse_iteration.cpp
+  : : : <address-model>32 : prana_adt_sequence_reverse_iteration_32bit ;
+
+run adt/sequence/front_removal.cpp
+  : : : <address-model>32 : prana_adt_sequence_front_removal_32bit ;
+
+run adt/sequence/back_removal.cpp
+  : : : <address-model>32 : prana_adt_sequence_back_removal_32bit ;
+
