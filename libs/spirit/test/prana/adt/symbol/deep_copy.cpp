@@ -21,42 +21,42 @@ using namespace boost::spirit::prana::test;
 
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
-typedef boost::mpl::transform<
-  boost::mpl::list_c<int,
+typedef transform<
+  list_c<int,
     0,  1,  2,  3,  4,  5,  6,  7, 
     8,  9,  10, 11, 12, 13, 14, 15,
     16, 17, 18, 19, 20, 21, 22, 23,
     24, 25, 26, 27, 28, 29, 30, 31
   >,
-  boost::mpl::placeholders::_1
+  placeholders::_1
 >::type lengths;
 
-typedef boost::mpl::transform<
-  boost::mpl::list_c<int,
+typedef transform<
+  list_c<int,
     2,  4,  6,  8,  10, 12, 14, 16,
     18, 20, 22, 24, 26, 28, 30, 32,
     34, 36, 38, 40, 42, 44, 46, 48,
     50, 52, 54, 56, 58, 60, 62, 64
   >,
-  boost::mpl::placeholders::_1
+  placeholders::_1
 >::type evens;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_c_string, T, lengths) {
   std::string str;
   symbol<char> sym;
 
-  BOOST_TEST_CHECKPOINT("default constructing symbol");
+  BOOST_TEST_MESSAGE("default constructing symbol");
   sym.default_construct();
 
-  BOOST_TEST_CHECKPOINT("creating a " << T::value << " length string");
+  BOOST_TEST_MESSAGE("generating a " << T::value << " length string");
   str = generator.get<string<0, T::value> >();
 
-  BOOST_TEST_CHECKPOINT("deep copying c-string into symbol");
+  BOOST_TEST_MESSAGE("deep copying c-string into symbol");
   sym.deep_copy(str.c_str());
 
   BOOST_CHECK_EQUAL(sym.str(), str);
 
-  BOOST_TEST_CHECKPOINT("clearing symbol");
+  BOOST_TEST_MESSAGE("clearing symbol");
   sym.clear();
 }
 
@@ -64,18 +64,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_std_string, T, lengths) {
   std::string str;
   symbol<char> sym;
 
-  BOOST_TEST_CHECKPOINT("default constructing symbol");
+  BOOST_TEST_MESSAGE("default constructing symbol");
   sym.default_construct();
 
-  BOOST_TEST_CHECKPOINT("creating a " << T::value << " length string");
+  BOOST_TEST_MESSAGE("generating a " << T::value << " length string");
   str = generator.get<string<0, T::value> >();
 
-  BOOST_TEST_CHECKPOINT("deep copying std-string into symbol");
+  BOOST_TEST_MESSAGE("deep copying std-string into symbol");
   sym.deep_copy(str);
 
   BOOST_CHECK_EQUAL(sym.str(), str);
 
-  BOOST_TEST_CHECKPOINT("clearing symbol");
+  BOOST_TEST_MESSAGE("clearing symbol");
   sym.clear();
 }
 
@@ -83,21 +83,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_half_c_string, T, lengths) {
   std::string str;
   symbol<char> sym;
 
-  BOOST_TEST_CHECKPOINT("default constructing symbol");
+  BOOST_TEST_MESSAGE("default constructing symbol");
   sym.default_construct();
 
-  BOOST_TEST_CHECKPOINT("creating a " << T::value << " length string");
+  BOOST_TEST_MESSAGE("generating a " << T::value << " length string");
   str = generator.get<string<0, T::value> >();
 
-  BOOST_TEST_CHECKPOINT("deep copying c-string into symbol");
+  BOOST_TEST_MESSAGE("deep copying c-string into symbol");
   sym.deep_copy(str.c_str(), str.c_str() + (T::value / 2));
 
-  BOOST_TEST_CHECKPOINT("forming " << T::value << " length substring");
+  BOOST_TEST_MESSAGE("forming " << T::value << " length substring");
   std::string substr(str.begin(), str.begin() + (T::value / 2));
 
   BOOST_CHECK_EQUAL(sym.str(), substr);
 
-  BOOST_TEST_CHECKPOINT("clearing symbol");
+  BOOST_TEST_MESSAGE("clearing symbol");
   sym.clear();
 }
 
@@ -105,21 +105,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(deep_copy_half_std_string, T, lengths) {
   std::string str;
   symbol<char> sym;
 
-  BOOST_TEST_CHECKPOINT("default constructing symbol");
+  BOOST_TEST_MESSAGE("default constructing symbol");
   sym.default_construct();
 
-  BOOST_TEST_CHECKPOINT("creating a " << T::value << " length string");
+  BOOST_TEST_MESSAGE("generating a " << T::value << " length string");
   str = generator.get<string<0, T::value> >();
 
-  BOOST_TEST_CHECKPOINT("deep copying c-string into symbol");
+  BOOST_TEST_MESSAGE("deep copying c-string into symbol");
   sym.deep_copy(str.begin(), str.begin() + (T::value / 2));
 
-  BOOST_TEST_CHECKPOINT("forming " << T::value << " length substring");
+  BOOST_TEST_MESSAGE("forming " << T::value << " length substring");
   std::string substr(str.begin(), str.begin() + (T::value / 2));
 
   BOOST_CHECK_EQUAL(sym.str(), substr);
 
-  BOOST_TEST_CHECKPOINT("clearing symbol");
+  BOOST_TEST_MESSAGE("clearing symbol");
   sym.clear();
 }
 

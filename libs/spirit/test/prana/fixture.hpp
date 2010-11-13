@@ -32,6 +32,7 @@ namespace prana {
 namespace test {
 
 using namespace boost::unit_test;
+using namespace boost::mpl;
 
 struct fixture {
   data_generator<> generator;

@@ -27,7 +27,7 @@
 
 #include <boost/spirit/home/prana/kind.hpp>
 #include <boost/spirit/home/prana/tag.hpp>
-#include <boost/spirit/home/prana/fn/copy.hpp>
+#include <boost/spirit/home/prana/functional/copy.hpp>
 
 namespace boost {
 namespace spirit {

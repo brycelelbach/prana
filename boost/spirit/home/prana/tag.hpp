@@ -12,7 +12,7 @@
 
 #include <boost/preprocessor/seq.hpp>
 
-#include <boost/spirit/home/prana/fn/copy.hpp>
+#include <boost/spirit/home/prana/functional/copy.hpp>
 
 #define BOOST_SPIRIT_PRANA_TAG(type, name)                            \
   type const name = {};                                               \

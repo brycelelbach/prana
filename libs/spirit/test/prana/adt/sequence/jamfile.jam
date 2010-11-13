@@ -7,18 +7,11 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project spirit_prana_test :
-  requirements
-    <toolset>clang:<cxxflags>-Wno-unused
-    <toolset>clang:<cxxflags>-Wno-tautological-compare
-    <include>./
-    <include>../../../../
-    <source>/boost//unit_test_framework
-  ;
+project spirit_prana_test/sequence ;
 
-for i in 32 64 {
-  alias sequence_$(i) : adt/sequence : <address-model>$(i) ;
-  alias symbol_$(i)   : adt/symbol   : <address-model>$(i) ;
-  alias utree_$(i)    : utree        : <address-model>$(i) ;
-}
+run sizeof.cpp ;
+run forward_iteration.cpp ; 
+run reverse_iteration.cpp ; 
+run front_removal.cpp ;
+run back_removal.cpp ;
 

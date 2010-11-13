@@ -17,7 +17,7 @@
 
 #include <boost/cstdint.hpp>
 
-#include <boost/spirit/home/prana/fn/length.hpp>
+#include <boost/spirit/home/prana/functional/length.hpp>
 #include <boost/spirit/home/prana/tag.hpp>
 
 namespace boost {

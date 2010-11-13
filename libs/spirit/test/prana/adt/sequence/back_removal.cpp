@@ -18,7 +18,7 @@ using namespace boost::spirit::prana::test;
 
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
-typedef boost::mpl::list<
+typedef list<
   integer<2>,   floating<2>,   string<2, 4>,   string<2, 18>,
   integer<3>,   floating<3>,   string<3, 4>,   string<3, 18>,
   integer<4>,   floating<4>,   string<4, 4>,   string<4, 18>,
@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(back_removal, T, elements) {
   typename T::container c;
   sequence_type s;
 
-  BOOST_TEST_CHECKPOINT("default constructing sequence");
+  BOOST_TEST_MESSAGE("default constructing sequence");
   s.default_construct();
 
-  BOOST_TEST_CHECKPOINT(
+  BOOST_TEST_MESSAGE(
     "filling sequence with " << T::elements::value << " elements"
   );
   for (std::size_t i = 0; i < T::elements::value; ++i) {
@@ -50,19 +50,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(back_removal, T, elements) {
     BOOST_CHECK_EQUAL(*--c.end(), t); 
   }
   
-  BOOST_TEST_CHECKPOINT("removing last element (pop_back)");
+  BOOST_TEST_MESSAGE("removing last element (pop_back)");
   s.pop_back();
   c.pop_back();
 
-  BOOST_TEST_CHECKPOINT("removing last element (erase)");
+  BOOST_TEST_MESSAGE("removing last element (erase)");
   s.erase(--s.end()); 
   c.erase(--c.end()); 
   
-  BOOST_TEST_CHECKPOINT("retrieving iterators");
+  BOOST_TEST_MESSAGE("retrieving iterators");
   typename sequence_type::const_iterator sit = s.begin(), send = s.end();
   typename T::container::const_iterator cit = c.begin(), cend = c.end();
 
-  BOOST_TEST_CHECKPOINT("verifying retrieved iterators");
+  BOOST_TEST_MESSAGE("verifying retrieved iterators");
   while ((sit != send) && (cit != cend)) {
     BOOST_CHECK_EQUAL(*cit, *sit); ++cit; ++sit;
   }
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(back_removal, T, elements) {
   BOOST_CHECK(sit == send);
   BOOST_CHECK(cit == cend);
 
-  BOOST_TEST_CHECKPOINT("clearing sequence");
+  BOOST_TEST_MESSAGE("clearing sequence");
   s.clear();
 }
 

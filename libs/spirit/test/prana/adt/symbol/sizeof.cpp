@@ -7,9 +7,9 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_adt_sequence
+#define BOOST_TEST_MODULE prana_adt_symbol
 
-#include <boost/spirit/home/prana/adt/sequence.hpp>
+#include <boost/spirit/home/prana/adt/symbol.hpp>
 
 #include <fixture.hpp>
 
@@ -18,10 +18,12 @@ using namespace boost::spirit::prana::test;
 
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
-typedef boost::mpl::list<bool, short, int, long> integers;
+typedef list<
+  symbol<char>, symbol<wchar_t>
+> chars;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(size, T, integers) {
-  BOOST_CHECK_EQUAL(sizeof(void*[3]), sizeof(sequence<T>));
+BOOST_AUTO_TEST_CASE_TEMPLATE(size, T, chars) {
+  BOOST_CHECK_EQUAL(sizeof(void*[3]), sizeof(T));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

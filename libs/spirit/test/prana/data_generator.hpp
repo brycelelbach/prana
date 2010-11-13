@@ -60,6 +60,16 @@ struct floating: boost::mpl::identity<double> {
   typedef boost::mpl::size_t<Elements> elements;
 };
 
+template<
+  std::size_t Elements,
+  typename T,
+  template<typename, typename> class Container = std::list
+>
+struct type_: boost::mpl::identity<T> {
+  typedef Container<T, std::allocator<T> > container;
+  typedef boost::mpl::size_t<Elements> elements;
+};
+
 struct current_time {
   typedef std::size_t result_type;
 
