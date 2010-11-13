@@ -17,19 +17,18 @@ namespace spirit {
 namespace prana {
 
 enum kind_type {
-  numeric_kind     = BOOST_BINARY(00000001),
-    nil_kind       = BOOST_BINARY(00100001),
-    bool_kind      = BOOST_BINARY(01000001),
-    integer_kind   = BOOST_BINARY(01100001),
-    floating_kind  = BOOST_BINARY(10000001),
+  numeric_kind     = BOOST_BINARY(0000 0001),
+    nil_kind       = BOOST_BINARY(0001 0001),
+    integer_kind   = BOOST_BINARY(0010 0001),
+    floating_kind  = BOOST_BINARY(0011 0001),
 
-  container_kind   = BOOST_BINARY(00000010),
-    symbol_kind    = BOOST_BINARY(00100010),
-    sequence_kind  = BOOST_BINARY(01000010),  
+  container_kind   = BOOST_BINARY(0000 0010),
+    symbol_kind    = BOOST_BINARY(0001 0010),
+    sequence_kind  = BOOST_BINARY(0010 0010),  
 
-  reference_kind   = BOOST_BINARY(00000100), 
+  reference_kind   = BOOST_BINARY(0000 0100), 
 
-  record_kind      = BOOST_BINARY(00001000)
+  record_kind      = BOOST_BINARY(0000 1000)
 };
 
 } // prana

@@ -14,8 +14,9 @@
 #include <fixture.hpp>
 
 using namespace boost::spirit::prana;
+using namespace boost::spirit::prana::test;
 
-BOOST_FIXTURE_TEST_SUITE(unit_tests, test::fixture)
+BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
 BOOST_AUTO_TEST_CASE(size) {
   BOOST_CHECK_EQUAL(sizeof(void*[3]), sizeof(utree));

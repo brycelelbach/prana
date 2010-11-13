@@ -16,9 +16,6 @@ project spirit_prana_test :
     <source>/boost//unit_test_framework
   ;
 
-run adt/range.cpp    : : : <address-model>32 : prana_adt_range_32bit      ;
-run adt/range.cpp    : : : <address-model>64 : prana_adt_range_64bit      ;
-
 run adt/symbol.cpp   : : : <address-model>32 : prana_adt_symbol_32bit     ;
 run adt/symbol.cpp   : : : <address-model>64 : prana_adt_symbol_64bit     ;
 
