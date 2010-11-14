@@ -7,11 +7,7 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project spirit_prana_test/sequence ;
+project spirit_prana_test/adt/sequence ;
 
-run sizeof.cpp ;
-run forward_iteration.cpp ; 
-run reverse_iteration.cpp ; 
-run front_removal.cpp ;
-run back_removal.cpp ;
+for i in [ glob ./*.cpp ] { run $(i) ; }
 

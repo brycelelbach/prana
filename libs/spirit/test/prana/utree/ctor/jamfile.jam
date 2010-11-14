@@ -7,12 +7,7 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-import os ;
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-use-project /boost : $(BOOST_ROOT) ;
+project spirit_prana_test/utree/ctor ;
 
-project prana : build-dir bin ;
+for i in [ glob ./*.cpp ] { run $(i) ; }
 
-using testing ;
-
-build-project libs/spirit/test/prana ;

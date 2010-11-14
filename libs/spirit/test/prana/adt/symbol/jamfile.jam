@@ -7,8 +7,7 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project spirit_prana_test/symbol ;
+project spirit_prana_test/adt/symbol ;
 
-run sizeof.cpp ; 
-run deep_copy.cpp ;
+for i in [ glob ./*.cpp ] { run $(i) ; }
 

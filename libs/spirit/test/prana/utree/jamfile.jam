@@ -9,7 +9,8 @@
 
 project spirit_prana_test/utree ;
 
-run sizeof.cpp ;
-run ctor/numeric.cpp ;
-run ctor/string.cpp ;
+for i in 32 64 {
+  alias utree_core_$(i) : core : <address-model>$(i) ;
+  alias utree_ctor_$(i) : ctor : <address-model>$(i) ;
+}
 

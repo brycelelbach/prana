@@ -7,12 +7,10 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-import os ;
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-use-project /boost : $(BOOST_ROOT) ;
+project spirit_prana_test/adt ;
 
-project prana : build-dir bin ;
+for i in 32 64 {
+  alias adt_sequence_$(i) : sequence : <address-model>$(i) ;
+  alias adt_symbol_$(i)   : symbol   : <address-model>$(i) ;
+}
 
-using testing ;
-
-build-project libs/spirit/test/prana ;

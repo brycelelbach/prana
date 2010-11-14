@@ -21,6 +21,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 
 #include <boost/iterator/iterator_facade.hpp>
@@ -42,12 +43,12 @@ struct sequence_node: private boost::noncopyable {
   typedef Data const* const_pointer;
   typedef std::size_t size_type;
 
-  sequence_node (sequence_node*, sequence_node*, shallow_copy);
-  sequence_node (sequence_node*, sequence_node*, deep_copy);
+  sequence_node (sequence_node*, sequence_node*, sequence_node*&, shallow_copy);
+  sequence_node (sequence_node*, sequence_node*, sequence_node*&, deep_copy);
   template<typename Value>
-    sequence_node (Value* val, sequence_node*, sequence_node*, shallow_copy);
+    sequence_node (Value*, sequence_node*, sequence_node*, shallow_copy);
   template<typename Value>
-    sequence_node (Value* val, sequence_node*, sequence_node*, deep_copy);
+    sequence_node (Value*, sequence_node*, sequence_node*, deep_copy);
 
   ~sequence_node (void);
 
@@ -57,71 +58,84 @@ struct sequence_node: private boost::noncopyable {
 
   Data* ptr (void) const;
 
-  Data* val;
-  sequence_node* next;
-  sequence_node* prev;
+  Data* _val;
+  sequence_node* _next;
+  sequence_node* _prev;
 };
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev_, shallow_copy copy
+  sequence_node* other_, sequence_node* prev_,
+  sequence_node*& last_, shallow_copy copy_
 ):
-  val(other->val),
-  next((other->next ? new sequence_node(other->next, this, copy) : 0)),
-  prev(prev_)
+  _val(other_->_val),
+  _next((other_->_next
+        ? new sequence_node(other_->_next, this, last_, copy_)
+        : 0)),
+  _prev(prev_)
 {
-  // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
+  if (!other_->_next)
+    last_ = *this; 
 }
 
 template<typename Data>
 sequence_node<Data>::sequence_node (
-  sequence_node* other, sequence_node* prev_, deep_copy copy
+  sequence_node* other_, sequence_node* prev_,
+  sequence_node*& last_, deep_copy copy_
 ):
-  val((other->val ? new Data(*other->val) : 0)),
-  next((other->next ? new sequence_node(other->next, this, copy) : 0)),
-  prev(prev_)
+  _val((other_->_val
+       ? new Data(*other_->_val)
+       : 0)),
+  _next((other_->_next
+        ? new sequence_node(other_->_next, this, last_, copy_)
+        : 0)),
+  _prev(prev_)
 {
-  // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
+  if (!other_->_next)
+    last_ = this; 
 }
 
 template<typename Data>
 template<typename Value>
 sequence_node<Data>::sequence_node (
-  Value* val_, sequence_node* next_, sequence_node* prev_, shallow_copy copy
+  Value* val_, sequence_node* next_, sequence_node* prev_, shallow_copy copy_
 ):
-  val(val_), next(next_), prev(prev_) {
-    val = (Data*) (((uintptr_t) val) + 1); 
+  _val(val_), _next(next_), _prev(prev_) {
+    _val = (Data*) (((uintptr_t) _val) + 1); 
   }
 
 template<typename Data>
 template<typename Value>
 sequence_node<Data>::sequence_node (
-  Value* val_, sequence_node* next_, sequence_node* prev_, deep_copy deep
+  Value* val_, sequence_node* next_, sequence_node* prev_, deep_copy copy_
 ):
-  val((val_ ? new Data(*val_) : 0)), next(next_), prev(prev_) {
+  _val((val_ ? new Data(*val_) : 0)), _next(next_), _prev(prev_) {
     // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
 template<typename Data>
 sequence_node<Data>::~sequence_node (void) {
-  if (val && !is_shallow()) delete val;
+  if (_val && !is_shallow())
+    delete _val;
 }
 
 template<typename Data>
 inline void sequence_node<Data>::unlink (void) {
-  prev->next = next;
-  next->prev = prev;
+  _prev->_next = _next;
+  _next->_prev = _prev;
 }
 
 template<typename Data>
 inline bool sequence_node<Data>::is_shallow (void) const {
-  return bool(((uintptr_t) val) & 1); 
+  return bool(((uintptr_t) _val) & 1); 
 }
 
 template<typename Data>
 inline Data* sequence_node<Data>::ptr (void) const {
-  if (is_shallow()) return (Data*) (((uintptr_t) val) + 1);
-  else return val;
+  if (is_shallow())
+    return (Data*) (((uintptr_t) _val) + 1);
+  else
+    return _val;
 }
 
 template<typename Data>
@@ -135,6 +149,7 @@ struct sequence_iterator: public iterator_facade<
   >::type node_type;
 
   sequence_iterator (void);
+  sequence_iterator (Data*);
   sequence_iterator (node_type, node_type);
   template<typename Iterator>
     sequence_iterator (Iterator const&);
@@ -154,26 +169,33 @@ struct sequence_iterator: public iterator_facade<
 
   typename sequence_iterator::reference dereference (void) const;
 
-  node_type curr;
-  node_type prev;
+  node_type _curr;
+  union {
+    node_type _prev;
+    Data* _val;
+  };
 };
 
 template<typename Data>
 sequence_iterator<Data>::sequence_iterator (void):
-  curr(0), prev(0) {
+  _curr(0), _prev(0) {
     // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
 template<typename Data>
+sequence_iterator<Data>::sequence_iterator (Data* val_):
+  _curr(0), _val((Data*) (((uintptr_t) val_) + 1)) { }
+
+template<typename Data>
 sequence_iterator<Data>::sequence_iterator (node_type curr_, node_type prev_):
-  curr(curr_), prev(prev_) {
+  _curr(curr_), _prev(prev_) {
     // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
 template<typename Data>
 template<typename Iterator>
 sequence_iterator<Data>::sequence_iterator (Iterator const& it):
-  curr(it.curr), prev(it.prev) {
+  _curr(it._curr), _prev(it._prev) {
     // EXPLAIN (wash): We leave a line here so we can breakpoint the ctor 
   }
 
@@ -182,50 +204,55 @@ template<typename Iterator>
 sequence_iterator<Data>&
 sequence_iterator<Data>::operator= (Iterator const& it) {
   if (*this != it) {
-    curr = it.curr;
-    prev = it.prev;
+    _curr = it._curr;
+    _prev = it._prev;
   }
   return *this;
 }
 
 template<typename Data>
 void sequence_iterator<Data>::increment (void) {
-  if (curr != 0) { 
-    prev = curr;
-    curr = curr->next;
+  if (_curr != 0) { 
+    _prev = _curr;
+    _curr = _curr->_next;
   }
 }
 
 template<typename Data>
 void sequence_iterator<Data>::decrement (void) {
-  if (prev != 0) {
-    curr = prev;
-    prev = prev->prev;
+  if (_prev != 0) {
+    _curr = _prev;
+    _prev = _prev->_prev;
   }
 }
 
 template<typename Data>
 template<typename Iterator>
 bool sequence_iterator<Data>::equal (Iterator const& it) const {
-  return curr == it.curr;
+  return _curr == it._curr;
 }
 
 template<typename Data>
 template<typename Iterator>
 bool sequence_iterator<Data>::operator== (Iterator const& it) const {
-  return curr == it.curr;
+  return _curr == it._curr;
 }
 
 template<typename Data>
 template<typename Iterator>
 bool sequence_iterator<Data>::operator!= (Iterator const& it) const {
-  return curr != it.curr;
+  return _curr != it._curr;
 }
 
 template<typename Data>
 typename sequence_iterator<Data>::reference
 sequence_iterator<Data>::dereference (void) const {
-  return *curr->val;
+  if (((uintptr_t) _curr->_val) & 1)
+    return *((typename remove_reference<
+                typename sequence_iterator<Data>::reference
+              >::type*)
+            (((uintptr_t) _val) - 1));
+  return *_curr->_val;
 }
 
 template<typename Data>
@@ -261,16 +288,23 @@ struct sequence {
   
   void clear (void);
   
-  template<typename Container> Container get (void) const;
-
-  // TODO (wash): Insertation needs to support shallow copying! ATM, default is
-  // to deep copy.
+  template<typename Container>
+    Container get (void) const;
 
   template<typename Value, typename Iterator>
-  void insert (Iterator, Value);
+    void insert (Iterator, Value);
+  template<typename Value, typename Iterator, typename Copy>
+    void insert (Iterator, Value, Copy);
 
-  template<typename Value> void push_front (Value);
-  template<typename Value> void push_back (Value);
+  template<typename Value>
+    void push_front (Value);
+  template<typename Value, typename Copy>
+    void push_front (Value, Copy);
+  
+  template<typename Value>
+    void push_back (Value);
+  template<typename Value, typename Copy>
+    void push_back (Value, Copy);
 
   void pop_front (void);
   void pop_back (void);
@@ -298,6 +332,7 @@ struct sequence {
 template<typename Data>
 inline void sequence<Data>::default_construct (void) {
   std::memset(&_data, 0, sizeof(storage));
+  _data._control[0] = sequence_kind;
 }
 
 template<typename Data>
@@ -306,33 +341,21 @@ inline void sequence<Data>::shallow_copy (sequence& other_) {
   // reuse the memory allocated for nodes and/or data, or would the complexity
   // of those intrinsics make such semantics more trouble than they're worth?
   clear();
-
   // EXPLAIN (wash): This particular sequence_node ctor allocates recursively,
   // doing the copying work for us.
   // DISCUSS (wash): Is it more efficient to use a simple for loop to allocate
   // here, instead of recursing in sequence_node's ctor? Which can be optimized
   // best by the compiler?
-  _data._first = new node_type(other_._data._first, 0, shallow);
-
-  // DISCUSS (wash): Can we make the recursive allocation above take care of
-  // this? This is totally inefficient.
-  for (node_type* it = _data._first; it != 0; it = it->next)
-    if (it->next == 0)
-      _data._last = it;
-  
+  _data._control[0] = sequence_kind;
+  _data._first = new node_type(other_._data._first, 0, _data._last, shallow);
   _data._size = other_._data._size;
 }
 
 template<typename Data>
 inline void sequence<Data>::deep_copy (sequence const& other_) {
   clear();
-
-  _data._first = new node_type(other_._data._first, 0, deep);
-
-  for (node_type* it = _data._first; it != 0; it = it->next) 
-    if (it->next == 0)
-      _data._last = it;
-
+  _data._control[0] = sequence_kind;
+  _data._first = new node_type(other_._data._first, 0, _data._last, deep);
   _data._size = other_._data._size;
 }
 
@@ -347,9 +370,9 @@ inline void sequence<Data>::clear (void) {
   node_type* p = _data._first;
   
   while (p) {
-    node_type* next = p->next;
+    node_type* _next = p->_next;
     delete p;
-    p = next;
+    p = _next;
   } 
 
   std::memset(&_data, 0, sizeof(storage)); 
@@ -364,34 +387,47 @@ inline Container sequence<Data>::get (void) const {
 template<typename Data>
 template<typename Value, typename Iterator>
 inline void sequence<Data>::insert (Iterator pos_, Value val_) {
-  if (!pos_.curr)
+  insert(pos_, val_, deep);
+}
+
+template<typename Data>
+template<typename Value, typename Iterator, typename Copy>
+inline void sequence<Data>::insert (Iterator pos_, Value val_, Copy copy_) {
+  if (!pos_._curr)
     return push_back(val_);
 
-  node_type* new_node = new node_type(&val_, pos_.curr, pos_.curr->prev, deep);
+  node_type* new_node =
+    new node_type(&val_, pos_._curr, pos_._curr->_prev, copy_);
 
-  if (pos_.curr->prev)
-    pos_.curr->prev->next = new_node;
+  if (pos_._curr->_prev)
+    pos_._curr->_prev->_next = new_node;
   else
     _data._first = new_node;
 
-  pos_.curr->prev = new_node;
+  pos_._curr->_prev = new_node;
   ++_data._size;
 }
 
 template<typename Data>
 template<typename Value>
 inline void sequence<Data>::push_front (Value val_) {
+  push_front(val_, deep);
+}
+
+template<typename Data>
+template<typename Value, typename Copy>
+inline void sequence<Data>::push_front (Value val_, Copy copy_) {
   node_type* new_node;
 
   if (_data._first == 0) {
-    new_node = new node_type(&val_, 0, 0, deep);
+    new_node = new node_type(&val_, 0, 0, copy_);
     _data._first = _data._last = new_node;
     ++_data._size;
   }
 
   else {
-    new_node = new node_type(&val_, _data._first, _data._first->prev, deep);
-    _data._first->prev = new_node;
+    new_node = new node_type(&val_, _data._first, _data._first->_prev, copy_);
+    _data._first->_prev = new_node;
     _data._first = new_node;
     ++_data._size;
   }
@@ -400,13 +436,19 @@ inline void sequence<Data>::push_front (Value val_) {
 template<typename Data>
 template<typename Value>
 inline void sequence<Data>::push_back (Value val_) {
+  push_back(val_, deep);
+}
+
+template<typename Data>
+template<typename Value, typename Copy>
+inline void sequence<Data>::push_back (Value val_, Copy copy_) {
   if (_data._last == 0)
-    push_front(val_);
+    push_front(val_, copy_);
 
   else {
     node_type* new_node =
-      new node_type(&val_, _data._last->next, _data._last, deep);
-    _data._last->next = new_node;
+      new node_type(&val_, _data._last->_next, _data._last, copy_);
+    _data._last->_next = new_node;
     _data._last = new_node;
     ++_data._size;
   }
@@ -424,8 +466,8 @@ inline void sequence<Data>::pop_front (void) {
 
   else {
     node_type* np = _data._first;
-    _data._first = _data._first->next;
-    _data._first->prev = 0;
+    _data._first = _data._first->_next;
+    _data._first->_prev = 0;
     delete np;
     --_data._size;
   }
@@ -443,8 +485,8 @@ inline void sequence<Data>::pop_back (void) {
 
   else {
     node_type* np = _data._last;
-    _data._last = _data._last->prev;
-    _data._last->next = 0;
+    _data._last = _data._last->_prev;
+    _data._last->_next = 0;
     delete np;
     --_data._size;
   }
@@ -477,26 +519,26 @@ sequence<Data>::end (void) const {
 template<typename Data>
 template<typename Iterator>
 inline typename sequence<Data>::iterator sequence<Data>::erase (Iterator pos_) {
-  if (pos_.curr == 0)
+  if (pos_._curr == 0)
     return Iterator(0, _data._last);
 
-  else if (pos_.curr == _data._first) {
+  else if (pos_._curr == _data._first) {
     pop_front();
     return Iterator(_data._first, 0);
   }
 
-  else if (pos_.curr == _data._last) {
+  else if (pos_._curr == _data._last) {
     pop_back();
     return Iterator(0, _data._last);
   }
 
   // DISCUSS (wash): Size will get decremented here, even if the node given
   // isn't in this sequence. Should we fix this? It would be expensive.
-  node_type* next(pos_.curr->next);
-  pos_.curr->unlink();
-  delete pos_.curr;
+  node_type* next(pos_._curr->_next);
+  pos_._curr->unlink();
+  delete pos_._curr;
   --_data._size;
-  return Iterator(next, next->prev);
+  return Iterator(next, next->_prev);
 }
 
 template<typename Data>

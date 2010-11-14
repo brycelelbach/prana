@@ -109,6 +109,8 @@ class utree {
 
   bool erase (iterator);
 
+  // WARN (wash): The result of --end() is undefined.
+
         iterator begin (void);
   const_iterator begin (void) const;
 
@@ -195,6 +197,7 @@ class utree {
 
 utree::utree (void) {
   std::memset(&_du, 0, sizeof(discriminated_union));
+  _du._alias.kind(nil_kind); 
 }
 
 template<class T>
@@ -232,8 +235,7 @@ void utree::assign (char const* first_, char const* last_) {
     copy(first_, last_);
 
   // DISCUSS (wash): Is this more expensive than copying an identical symbol?
-  if (kind() == symbol_kind &&
-      !std::equal(first_, last_, _du._symbol.begin()))
+  if (kind() == symbol_kind && !std::equal(first_, last_, _du._symbol.begin()))
     copy(first_, last_); 
 }
 
@@ -288,7 +290,9 @@ void utree::clear (void) {
 template<>
 inline void utree::become<nil_kind> (void) {
   clear();
+  _du._alias.kind(nil_kind);
 }
+
 template<>
 inline void utree::become<integer_kind> (void) {
   clear();
@@ -446,7 +450,7 @@ inline utree::iterator utree::begin (void) {
   // conversion, and different behavior for const begin and non-const begin
   // would be annoying.
   else
-    return iterator(0, 0);
+    return iterator(this);
 }
 
 inline utree::const_iterator utree::begin (void) const {
@@ -457,7 +461,7 @@ inline utree::const_iterator utree::begin (void) const {
     return _du._sequence.begin();
 
   else
-    return const_iterator(0, 0);
+    return const_iterator(this);
 }
 
 inline utree::iterator utree::end (void) {
@@ -886,103 +890,89 @@ utree::equal (RHS rhs_) const {
 
 template<typename Tree, typename Copy>
 inline void utree::copy (Tree other_, Copy c_) {
-  clear();
   // TODO (wash): Let's add an inline method to the du structures that returns a
   // kind by reference to sugar the long member chain here.
   // DISCUSS (wash): Or, better yet, don't use kind references to dispatch the
   // copiers. I think this is the preferable solution.
-  c_(*this, _du._alias._data._control[0],
-     other_, other_._du._alias._data._control[0]);
+  clear();
+  c_(*this, other_);
 }
 
-inline void utree::copy (const_reference other) {
+inline void utree::copy (const_reference other_) {
   clear();
-  deep(*this, _du._alias._data._control[0],
-       other, other._du._alias._data._control[0]);
+  deep(*this, other_);
 }
 
-inline void utree::copy (reference other) {
+inline void utree::copy (reference other_) {
   clear();
-  shallow(*this, _du._alias._data._control[0],
-          other, other._du._alias._data._control[0]);
+  shallow(*this, other_);
 }
 
 inline void utree::copy (bool bool_) {
   clear();
-  _du._numeric._data._integer = bool_;
-  _du._numeric.kind(integer_kind);
+  _du._numeric.copy(bool_);
 }
 
 inline void utree::copy (char char_) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(char_); 
-  _du._symbol.kind(symbol_kind);
 }
 
 template<typename RHS>
 inline typename enable_if<is_integral<RHS>, void>::type
 utree::copy (RHS rhs_) {
   clear();
-  _du._numeric._data._integer = rhs_;
-  _du._numeric.kind(integer_kind);
+  _du._numeric.copy(rhs_);
 }
 
 template<typename RHS>
 inline typename enable_if<is_floating_point<RHS>, void>::type
 utree::copy (RHS rhs_) {
   clear();
-  _du._numeric._data._floating = rhs_;
-  _du._numeric.kind(floating_kind);
+  _du._numeric.copy(rhs_);
 }
 
 inline void utree::copy (char* str) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(str);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (char const* str) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(str);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (char* first, char* last) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(first, last);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (char const* first, char const* last) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(first, last);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (char* bits, size_type len) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(bits, bits + len);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (char const* bits, size_type len) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(bits, bits + len);
-  _du._symbol.kind(symbol_kind);
 }
 
 inline void utree::copy (std::string const& str_) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(str_.begin(), str_.end());
-  _du._symbol.kind(symbol_kind);
 }
 
 template<typename Iterator>
@@ -992,7 +982,6 @@ inline typename enable_if<
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(first_, last_);
-  _du._symbol.kind(symbol_kind);
 }
 
 } // prana

@@ -46,13 +46,11 @@ struct numeric {
 
   void default_construct (void);
   
-  void shallow_copy (numeric const&);
-  template<typename Number>
-    void shallow_copy (Number); 
- 
-  void deep_copy (numeric const&);
-  template<typename Number>
-    void deep_copy (Number); 
+  void copy (numeric const&);
+  template<typename Integer>
+    typename enable_if<is_integral<Integer>, void>::type copy (Integer); 
+  template<typename Floating>
+    typename enable_if<is_floating_point<Floating>, void>::type copy (Floating); 
   
   void clear (void);
 
@@ -75,19 +73,12 @@ struct numeric {
 
 inline void numeric::default_construct (void) {
   clear();
+  _data._control[0] = nil_kind;
 }
 
-template<typename Number> 
-inline void numeric::shallow_copy (Number num_) {
-  deep_copy(num_); 
-}
-
-inline void numeric::shallow_copy (numeric const& other_) {
-  deep_copy(other_); 
-}
-
-template<>
-inline void numeric::deep_copy<numeric::integer_type> (integer_type integer_) {
+template<typename Integer>
+inline typename enable_if<is_integral<Integer>, void>::type
+numeric::copy (Integer integer_) {
   if (*this != integer_) {
     clear();
     
@@ -101,14 +92,15 @@ inline void numeric::deep_copy<numeric::integer_type> (integer_type integer_) {
   }
 } 
 
-template<>
-inline void numeric::deep_copy<numeric::floating_type> (floating_type double_) {
-  if (*this != double_) {
+template<typename Floating>
+inline typename enable_if<is_floating_point<Floating>, void>::type
+numeric::copy (Floating floating_) {
+  if (*this != floating_) {
     clear();
     
-    if (double_) {
+    if (floating_) {
       _data._control[0] = floating_kind;
-      _data._floating = double_;
+      _data._floating = floating_;
     }
 
     else
@@ -116,7 +108,7 @@ inline void numeric::deep_copy<numeric::floating_type> (floating_type double_) {
   }
 } 
 
-inline void numeric::deep_copy (numeric const& other_) {
+inline void numeric::copy (numeric const& other_) {
   if (*this != other_) 
     _data = other_._data;
 }

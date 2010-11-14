@@ -15,6 +15,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <boost/spirit/home/prana/kind.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -37,13 +39,9 @@ struct alias {
 
   void default_construct (void);
 
-  void shallow_copy (alias const&);
+  void copy (alias const&);
   template<typename Pointer>
-    void shallow_copy (Pointer);
-  
-  void deep_copy (alias const&);
-  template<typename Pointer>
-    void deep_copy (Pointer);
+    void copy (Pointer);
 
   void clear (void);
 
@@ -71,32 +69,18 @@ struct alias {
 template<typename Data>
 inline void alias<Data>::default_construct (void) {
   clear();
+  _data._control[0] = reference_kind;
 }
 
 template<typename Data>
-inline void alias<Data>::shallow_copy (alias const& other_) {
-  // EXPLAIN (wash): For alias, deep copies are cheap, so we always deep
-  // copy here.
-  deep_copy(other_); 
-}
-
-template<typename Data>
-template<typename Pointer>
-inline void alias<Data>::shallow_copy (Pointer ptr_) {
-  if (_data._pointer != ptr_)
-    _data._pointer = ptr_;
-}
-
-
-template<typename Data>
-inline void alias<Data>::deep_copy (alias const& other_) {
+inline void alias<Data>::copy (alias const& other_) {
   if (*this != other_) 
     _data = other_._data;
 }
 
 template<typename Data>
 template<typename Pointer>
-inline void alias<Data>::deep_copy (Pointer ptr_) {
+inline void alias<Data>::copy (Pointer ptr_) {
   if (_data._pointer != ptr_)
     _data._pointer = ptr_;
 }

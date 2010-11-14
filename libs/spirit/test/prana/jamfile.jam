@@ -17,8 +17,7 @@ project spirit_prana_test :
   ;
 
 for i in 32 64 {
-  alias sequence_$(i) : adt/sequence : <address-model>$(i) ;
-  alias symbol_$(i)   : adt/symbol   : <address-model>$(i) ;
-  alias utree_$(i)    : utree        : <address-model>$(i) ;
+  alias adt_$(i)   : adt   : <address-model>$(i) ;
+  alias utree_$(i) : utree : <address-model>$(i) ;
 }
 

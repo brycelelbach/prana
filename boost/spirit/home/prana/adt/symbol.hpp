@@ -42,20 +42,17 @@ struct symbol {
   // here - alias could just be a bit in storage. Also, this can be restructured
   // into a structure with an anonymous union, to make member access less
   // painful.
-  union storage {
-    struct {
-      metadata _control  [(sizeof(void*[1]) / 2)];
-      metadata _storage;
-      metadata _alias;
-      Char     _str      [(sizeof(void*[2]) / sizeof(Char))];
-    } _stack;
-    struct {
-      metadata _control  [(sizeof(void*[1]) / 2)];
-      metadata _storage;
-      metadata _alias;
-      Char*    _first;
-      Char*    _last;
-    } _heap;
+  struct storage {
+    metadata _control [(sizeof(void*[1]) / 2)];
+    metadata _storage;
+    metadata _alias;
+    union {
+      Char _stack [(sizeof(void*[2]) / sizeof(Char))];
+      struct {
+        Char* _first;
+        Char* _last;
+      } _heap;
+    };
   };
 
   void default_construct (void);
@@ -111,13 +108,14 @@ struct symbol {
 template<typename Char>
 inline void symbol<Char>::default_construct (void) {
   std::memset(&_data, 0, sizeof(storage));
+  _data._control[0] = symbol_kind;
 }
 
 template<typename Char>
 inline void symbol<Char>::shallow_copy (symbol& other_) {
   if (other_ != *this) { 
     std::memcpy(&_data, &other_._data, sizeof(storage));
-    _data._stack._alias = true;
+    _data._alias = true;
   }
 }
 
@@ -125,10 +123,11 @@ template<typename Char>
 inline void symbol<Char>::deep_copy (Char c_) {
   if (*this != &c_) { 
     clear();
-    _data._stack._storage = 1;
+    _data._control[0] = symbol_kind;
+    _data._storage = 1;
     // EXPLAIN (wash): clear() zero initializes the discriminated union, so
     // there is no need to append a null byte.
-    _data._stack._str[0] = c_;
+    _data._stack[0] = c_;
   }
 } 
 
@@ -150,10 +149,11 @@ inline void symbol<Char>::deep_copy (symbol const& other_) {
 template<typename Char>
 template<typename Iterator>
 inline void symbol<Char>::deep_copy (Iterator first_, Iterator last_) {
-  if (std::equal(first_, last_, begin()) && !_data._stack._alias)
+  if (std::equal(first_, last_, begin()) && !_data._alias)
     return;
 
   clear();
+    _data._control[0] = symbol_kind;
 
   size_type const size = last_ - first_;
   static size_type const stack_size = (sizeof(void*[2]) / sizeof(Char));
@@ -162,14 +162,14 @@ inline void symbol<Char>::deep_copy (Iterator first_, Iterator last_) {
     return;
 
   else if (size <= stack_size) {
-    _data._stack._storage = size;
+    _data._storage = size;
   
     for (size_type i = 0; i != size; ++i)
-      _data._stack._str[i] = *first_++;
+      _data._stack[i] = *first_++;
   }
 
   else {
-    _data._heap._storage = CHAR_MAX;
+    _data._storage = CHAR_MAX;
     _data._heap._first = new Char[size];
 
     for (size_type i = 0; i != size; ++i)
@@ -187,8 +187,8 @@ inline void symbol<Char>::deep_copy (Container c_) {
 
 template<typename Char>
 inline void symbol<Char>::clear (void) { 
-  if (_data._heap._storage == CHAR_MAX) 
-    if (!_data._heap._alias)
+  if (_data._storage == CHAR_MAX) 
+    if (!_data._alias)
       delete[] _data._heap._first;
   
   std::memset(&_data, 0, sizeof(storage));
@@ -197,23 +197,23 @@ inline void symbol<Char>::clear (void) {
 template<typename Char>
 template<typename Container>
 inline Container symbol<Char>::get (void) const {
-  if (!_data._stack._storage)
+  if (!_data._storage)
     return Container();
   return Container(begin(), end());
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::begin (void) const {
-  if (_data._heap._storage == CHAR_MAX)
+  if (_data._storage == CHAR_MAX)
     return _data._heap._first;
-  return _data._stack._str;
+  return _data._stack;
 }
 
 template<typename Char>
 inline typename symbol<Char>::iterator symbol<Char>::end (void) const {
-  if (_data._heap._storage == CHAR_MAX)
+  if (_data._storage == CHAR_MAX)
     return _data._heap._last;
-  return _data._stack._str + _data._stack._storage;
+  return _data._stack + _data._storage;
 }
 
 template<typename Char>
@@ -223,8 +223,7 @@ inline std::basic_string<Char> symbol<Char>::str (void) const {
 
 template<typename Char>
 inline bool symbol<Char>::operator== (Char c_) const {
-  const_iterator b = begin();
-  return (b != end()) && (*b == c_);
+  return (begin() != end()) && (*begin() == c_);
 }
 
 template<typename Char>
@@ -276,20 +275,20 @@ inline bool symbol<Char>::operator!= (Container c_) const {
 
 template<typename Char>
 inline typename symbol<Char>::size_type symbol<Char>::size (void) const {
-  if (_data._heap._storage == CHAR_MAX)
+  if (_data._storage == CHAR_MAX)
     return _data._heap._last - _data._heap._first;
-  return _data._stack._storage;
+  return _data._storage;
 }
 
 template<typename Char>
 inline typename symbol<Char>::metadata
 symbol<Char>::kind (void) const {
-  return _data._stack._control[0];
+  return _data._control[0];
 }
 
 template<typename Char>
 inline void symbol<Char>::kind (metadata kind_) {
-  _data._stack._control[0] = kind_;
+  _data._control[0] = kind_;
 }
 
 } // prana
