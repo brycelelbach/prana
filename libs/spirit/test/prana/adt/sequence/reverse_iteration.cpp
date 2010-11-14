@@ -9,9 +9,9 @@
 
 #define BOOST_TEST_MODULE prana_adt_sequence
 
-#include <boost/spirit/home/prana/adt/sequence.hpp>
-
 #include <fixture.hpp>
+
+#include <boost/spirit/home/prana/adt/sequence.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::test;

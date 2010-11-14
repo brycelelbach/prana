@@ -9,9 +9,9 @@
 
 #define BOOST_TEST_MODULE prana_utree_core
 
-#include <boost/spirit/home/prana/utree.hpp>
-
 #include <fixture.hpp>
+
+#include <boost/spirit/home/prana/utree.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::test;

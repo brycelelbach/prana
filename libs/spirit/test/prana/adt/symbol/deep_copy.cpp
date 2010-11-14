@@ -9,12 +9,12 @@
 
 #define BOOST_TEST_MODULE prana_adt_symbol
 
+#include <fixture.hpp>
+
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/transform.hpp>
 
 #include <boost/spirit/home/prana/adt/symbol.hpp>
-
-#include <fixture.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::test;

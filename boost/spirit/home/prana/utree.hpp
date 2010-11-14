@@ -13,11 +13,11 @@
 #include <cstring>
 
 #include <boost/swap.hpp>
-#include <boost/utility/enable_if.hpp>
+
+#include <boost/mpl/logical.hpp>
 
 #include <boost/type_traits/is_class.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_floating_point.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
@@ -73,12 +73,16 @@ class utree {
     utree (T);
   template<class T0, class T1>
     utree (T0, T1);
+
+  ~utree (void);
  
   template<class T>
     reference operator= (T);
  
   template<class T>
     void assign (T);
+  void assign (char const*, char const*);
+  void assign (char const*, size_type);
   template<class T0, class T1>
     void assign (T0, T1);
 
@@ -119,17 +123,15 @@ class utree {
 
   // EXPLAIN (wash): Retrieve a numeric utree as an integral/floating point
   // type. Symbol utrees will return either a Karma (in the future,
-  // construe_cast) converted value, or throw conversion_error/assertion.
-  // Container utrees will also throw/assert. 
+  // construe_cast) converted value, or it'll throw/assert. Container utrees
+  // will also throw/assert. 
   template<class T>
     typename enable_if<is_integral<T>, T>::type get (void) const;
   template<class T>
     typename enable_if<is_floating_point<T>, T>::type get (void) const;
   // EXPLAIN (wash): Retrieve a symbol utree as an string. If the utree is
-  // a numeric, the value of the utree is converted to a string (using Karma;
-  // in the future it should use construe_cast, once construe_cast is added to
-  // Boost). If the utree is a sequence, conversion_error is thrown/assertion
-  // will occur. Record utrees will exhibit user-defined behavior. 
+  // a numeric, the value of the utree is converted to a string. If the utree is
+  // a sequence, it's converted to a cons, aka (a, (b, (c, 0))).
   template<class T>
     typename enable_if<is_same<T, std::string>, T>::type get (void) const;
   // EXPLAIN (wash): Get a sequence utree as an arbitrary STL Container with
@@ -140,7 +142,9 @@ class utree {
   // dynamic array first). This will be used for the utree <-> client AST
   // translation framework. 
   template<class T>
-    typename enable_if<is_class<T>, T>::type get (void) const;
+    typename enable_if<
+      mpl::and_<is_class<T>, mpl::not_<is_same<std::string, T> > >, T
+    >::type get (void) const;
 
   template<class RHS>
     bool operator== (RHS) const;
@@ -150,6 +154,7 @@ class utree {
  private:
   friend struct shallow_copy;
   friend struct deep_copy;
+  friend struct visitor;
   
   bool equal (bool) const;
   bool equal (char) const;
@@ -180,6 +185,10 @@ class utree {
   void copy (char*, size_type);
   void copy (char const*, size_type);
   void copy (std::string const&);
+  template<typename Iterator>
+    typename enable_if<
+      is_same<typename Iterator::value_type, char>, void
+    >::type copy (Iterator, Iterator);
  
   discriminated_union _du;
 };
@@ -198,6 +207,10 @@ utree::utree (T0 t0, T1 t1) {
   copy(t0, t1);
 }
 
+utree::~utree (void) {
+  clear();
+}
+
 template<class T>
 inline utree::reference utree::operator= (T t_) {
   if (*this != t_)
@@ -211,8 +224,7 @@ void utree::assign (T t_) {
     copy(t_);
 }
 
-template<>
-void utree::assign<char*, char*> (char* first_, char* last_) {
+void utree::assign (char const* first_, char const* last_) {
   if (kind() & reference_kind)
     return _du._alias->assign(first_, last_);
 
@@ -225,38 +237,7 @@ void utree::assign<char*, char*> (char* first_, char* last_) {
     copy(first_, last_); 
 }
 
-template<>
-void utree::assign<char const*, char const*> (
-  char const* first_, char const* last_
-) {
-  if (kind() & reference_kind)
-    return _du._alias->assign(first_, last_);
-
-  if (kind() != symbol_kind)
-    copy(first_, last_);
-
-  if (kind() == symbol_kind &&
-      !std::equal(first_, last_, _du._symbol.begin()))
-    copy(first_, last_); 
-}
-
-template<>
-void utree::assign<char*, utree::size_type> (char* bits_, size_type len_) {
-  if (kind() & reference_kind)
-    return _du._alias->assign(bits_, len_);
-
-  if (kind() != symbol_kind)
-    copy(bits_, len_);
-
-  if (kind() == symbol_kind &&
-      !std::equal(bits_, bits_ + len_, _du._symbol.begin()))
-    copy(bits_, len_); 
-}
-
-template<>
-void utree::assign<char const*, utree::size_type> (
-  char const* bits_, size_type len_
-) {
+void utree::assign (char const* bits_, size_type len_) {
   if (kind() & reference_kind)
     return _du._alias->assign(bits_, len_);
 
@@ -289,20 +270,18 @@ void utree::clear (void) {
     case nil_kind:
     case integer_kind:
     case floating_kind:
-      _du._numeric.clear();
-      break;
+      return _du._numeric.clear();
     case symbol_kind:
-      _du._symbol.clear();
-      break; 
+      return _du._symbol.clear();
     case sequence_kind:
-      _du._sequence.clear();
-      break; 
+      return _du._sequence.clear();
     case record_kind: // TODO (wash): Requires the implementation of record.
-      break;
+      return;
     case reference_kind:
-      _du._alias.clear();
-      break; 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      return _du._alias.clear();
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      return;
   }
 }
 
@@ -345,16 +324,18 @@ void utree::push_front (Value val) {
     case floating_kind:
     case record_kind:
     case symbol_kind: {
-      utree old_(*this, deep);
+      utree old(*this, deep);
       become<sequence_kind>();
-      _du._sequence.push_front(old_);
+      _du._sequence.push_front(old);
       _du._sequence.push_front(val);
       return;
     }
     case sequence_kind:
       _du._sequence.push_front(val);
       return;
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      return;
   } 
 }
 
@@ -369,16 +350,18 @@ void utree::push_back (Value val) {
     case floating_kind:
     case record_kind:
     case symbol_kind: {
-      utree old_(*this, deep);
+      utree old(*this, deep);
       become<sequence_kind>();
-      _du._sequence.push_back(old_);
+      _du._sequence.push_back(old);
       _du._sequence.push_back(val);
       return;
     }
     case sequence_kind:
       _du._sequence.push_back(val);
+      return; 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
       return;
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
   } 
 }
 
@@ -397,7 +380,9 @@ void utree::pop_front (void) {
     case sequence_kind:
       _du._sequence.pop_front();
       return;
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      return;
   } 
 }
 
@@ -416,7 +401,9 @@ void utree::pop_back (void) {
     case sequence_kind:
       _du._sequence.pop_back();
       return;
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      return;
   } 
 }
 
@@ -559,18 +546,19 @@ inline typename enable_if<is_integral<T>, T>::type utree::get (void) const {
         return temp;
       else {
         BOOST_ASSERT("cannot convert string utree to floating point type");
-        BOOST_UNREACHABLE_RETURN(T());
+        break; 
       }
     }
     case sequence_kind:
-      BOOST_ASSERT("cannot convert sequence utree to floating point type"); 
-      BOOST_UNREACHABLE_RETURN(T());
+      BOOST_ASSERT("cannot convert sequence utree to floating point type");
+      break;
     case record_kind:
-      return T(); // TODO (wash): Requires the implementation of record.
+      break; // TODO (wash): Requires the implementation of record.
     default:
       BOOST_ASSERT("kind is only valid when masking another kind");
-      BOOST_UNREACHABLE_RETURN(T());
+      break;
   }
+  return T();
 }
 
 template<class T>
@@ -593,18 +581,19 @@ utree::get (void) const {
         return temp;
       else {
         BOOST_ASSERT("cannot convert string utree to floating point type");
-        BOOST_UNREACHABLE_RETURN(T());
+        break;
       }
     }
     case sequence_kind:
       BOOST_ASSERT("cannot convert sequence utree to floating point type"); 
-      BOOST_UNREACHABLE_RETURN(T());
+      break;
     case record_kind:
-      return T(); // TODO (wash): Requires the implementation of record. 
+      break; // TODO (wash): Requires the implementation of record. 
     default:
       BOOST_ASSERT("kind is only valid when masking another kind");
-      BOOST_UNREACHABLE_RETURN(T());
+      break;
   }
+  return T();
 }
 
 template<class T>
@@ -620,40 +609,39 @@ utree::get (void) const {
       T temp;
       std::back_insert_iterator<T> sink(temp);
       karma::int_generator<boost::intmax_t> intmax_t_;
-
-      if (karma::generate(_du._numeric.get<boost::intmax_t>(), intmax_t_, sink))
-        return temp;
-      else {
-        BOOST_ASSERT("cannot convert integer utree to string");
-        BOOST_UNREACHABLE_RETURN(T());
-      }
+      karma::generate(sink, intmax_t_, _du._numeric.get<boost::intmax_t>());
+      return temp;
     }
     case floating_kind: {
       T temp;
       std::back_insert_iterator<T> sink(temp);
-
-      if (karma::generate(_du._numeric.get<double>(), karma::double_, sink))
-        return temp;
-      else {
-        BOOST_ASSERT("cannot convert floating utree to string");
-        BOOST_UNREACHABLE_RETURN(T());
-      }
+      karma::generate(sink, karma::double_, _du._numeric.get<double>());
+      return temp;
     }
     case symbol_kind:
       return _du._symbol.str();
-    case sequence_kind:
-      BOOST_ASSERT("cannot convert sequence utree to string"); 
-      BOOST_UNREACHABLE_RETURN(T());
+    case sequence_kind: {
+      T temp = "(";
+      for (const_iterator it = begin(), last = end(); it != last;) {
+        temp += it->template get<T>();
+        if (++it != last) temp += ", ";
+      }
+      temp += ")";
+      return temp;
+    }
     case record_kind:
-      return T(); // TODO (wash): Requires the implementation of record. 
+      break; // TODO (wash): Requires the implementation of record. 
     default:
       BOOST_ASSERT("kind is only valid when masking another kind");
-      BOOST_UNREACHABLE_RETURN(T());
+      break;
   }
+  return T();
 }
 
 template<class T>
-inline typename enable_if<is_class<T>, T>::type utree::get (void) const {
+typename enable_if<
+  mpl::and_<is_class<T>, mpl::not_<is_same<std::string, T> > >, T
+>::type utree::get (void) const {
   if (kind() & reference_kind)
     return _du._alias->template get<T>();
 
@@ -671,8 +659,9 @@ inline typename enable_if<is_class<T>, T>::type utree::get (void) const {
       return _du._sequence.template get<T>();
     default:
       BOOST_ASSERT("kind is only valid when masking another kind");
-      BOOST_UNREACHABLE_RETURN(T());
+      break;
   }
+  return T();
 }
 
 template<typename RHS>
@@ -703,10 +692,11 @@ bool utree::equal (bool bool_) const {
     case sequence_kind:
       return _du._sequence.size() == bool_;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -727,10 +717,11 @@ bool utree::equal (char char_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -753,10 +744,11 @@ utree::equal (RHS rhs_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break;  // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -779,10 +771,11 @@ utree::equal (RHS rhs_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -803,10 +796,11 @@ bool utree::equal (char* str_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -827,10 +821,11 @@ bool utree::equal (char const* str_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -851,10 +846,11 @@ bool utree::equal (std::string const& str_) const {
       else
         return false;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -880,10 +876,11 @@ utree::equal (RHS rhs_) const {
     case sequence_kind:
       return _du._sequence == rhs_._du._sequence;
     case record_kind:
-      return false; // TODO (wash): Requires the implementation of record. 
-    default: BOOST_ASSERT("kind is only valid when masking another kind");
+      break; // TODO (wash): Requires the implementation of record. 
+    default:
+      BOOST_ASSERT("kind is only valid when masking another kind");
+      break;
   }
-
   return false;
 }
 
@@ -935,7 +932,7 @@ template<typename RHS>
 inline typename enable_if<is_floating_point<RHS>, void>::type
 utree::copy (RHS rhs_) {
   clear();
-  _du._numeric._data._integer = rhs_;
+  _du._numeric._data._floating = rhs_;
   _du._numeric.kind(floating_kind);
 }
 
@@ -985,6 +982,16 @@ inline void utree::copy (std::string const& str_) {
   clear();
   _du._symbol.default_construct();
   _du._symbol.deep_copy(str_.begin(), str_.end());
+  _du._symbol.kind(symbol_kind);
+}
+
+template<typename Iterator>
+inline typename enable_if<
+  is_same<typename Iterator::value_type, char>, void
+>::type utree::copy (Iterator first_, Iterator last_) {
+  clear();
+  _du._symbol.default_construct();
+  _du._symbol.deep_copy(first_, last_);
   _du._symbol.kind(symbol_kind);
 }
 

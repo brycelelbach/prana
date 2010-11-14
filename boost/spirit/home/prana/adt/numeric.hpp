@@ -15,6 +15,10 @@
 
 #include <boost/assert.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/utility/enable_if.hpp>
+
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
 
 #include <boost/spirit/home/prana/kind.hpp>
 
@@ -53,16 +57,15 @@ struct numeric {
   void clear (void);
 
   bool operator== (numeric const&) const;
-  bool operator!= (numeric const&) const;
   template<typename Number>
     bool operator== (Number) const;
+  
+  bool operator!= (numeric const&) const;
   template<typename Number>
     bool operator!= (Number) const;
 
   template<typename Number>
-    Number& get (void);
-  template<typename Number>
-    Number const& get (void) const;
+    Number get (void) const;
 
   metadata kind (void) const;
   void kind (metadata);
@@ -85,29 +88,31 @@ inline void numeric::shallow_copy (numeric const& other_) {
 
 template<>
 inline void numeric::deep_copy<numeric::integer_type> (integer_type integer_) {
-  clear();
-  _data._control[0] = integer_kind;
-  _data._integer = integer_;
+  if (*this != integer_) {
+    clear();
+    
+    if (integer_) {
+      _data._control[0] = integer_kind;
+      _data._integer = integer_;
+    }
+
+    else
+      _data._control[0] = nil_kind;
+  }
 } 
 
 template<>
 inline void numeric::deep_copy<numeric::floating_type> (floating_type double_) {
-  clear();
-  _data._control[0] = floating_kind;
-  _data._floating = double_;
-} 
-
-template<>
-inline void numeric::deep_copy<kind_type> (kind_type kind_) {
-  clear();
-  switch (kind_) {
-    case nil_kind:
-      _data._control[0] = nil_kind;
-    case integer_kind:
-      _data._control[0] = integer_kind;
-    case floating_kind:
+  if (*this != double_) {
+    clear();
+    
+    if (double_) {
       _data._control[0] = floating_kind;
-    default: BOOST_ASSERT("invalid kind for numeric");
+      _data._floating = double_;
+    }
+
+    else
+      _data._control[0] = nil_kind;
   }
 } 
 
@@ -131,7 +136,9 @@ inline bool numeric::operator== (numeric const& other_) const {
           return other_._data._integer == 0; 
         case floating_kind:
           return other_._data._floating == 0;
-        default: BOOST_ASSERT("invalid kind for numeric");
+        default:
+          BOOST_ASSERT("invalid kind for numeric");
+          break; 
       }
     case integer_kind:
       switch (other_._data._control[0]) {
@@ -141,7 +148,9 @@ inline bool numeric::operator== (numeric const& other_) const {
           return other_._data._integer == _data._integer; 
         case floating_kind:
           return other_._data._floating == _data._integer;
-        default: BOOST_ASSERT("invalid kind for numeric");
+        default:
+          BOOST_ASSERT("invalid kind for numeric");
+          break;
       }
     case floating_kind:
       switch (other_._data._control[0]) {
@@ -151,15 +160,15 @@ inline bool numeric::operator== (numeric const& other_) const {
           return other_._data._integer == _data._floating; 
         case floating_kind:
           return other_._data._floating == _data._floating;
-        default: BOOST_ASSERT("invalid kind for numeric");
+        default:
+          BOOST_ASSERT("invalid kind for numeric");
+          break;
       }
-    default: BOOST_ASSERT("invalid kind for numeric");
+    default:
+      BOOST_ASSERT("invalid kind for numeric");
+      break;
   }
   return false;
-}
-
-inline bool numeric::operator!= (numeric const& other_) const {
-  return !operator==(other_);
 }
 
 template<typename Number>
@@ -171,9 +180,15 @@ inline bool numeric::operator== (Number num_) const {
       return num_ == _data._integer;
     case floating_kind:
       return num_ == _data._floating;
-    default: BOOST_ASSERT("invalid kind for numeric");
+    default:
+      BOOST_ASSERT("invalid kind for numeric");
+      break;
   }
   return false;
+}
+
+inline bool numeric::operator!= (numeric const& other_) const {
+  return !operator==(other_);
 }
 
 template<typename Number>
@@ -181,28 +196,20 @@ inline bool numeric::operator!= (Number num_) const {
   return !operator==(num_);
 }
 
-template<>
-inline numeric::integer_reference
-numeric::get<numeric::integer_type> (void) {
-  return _data._integer;
-}
-
-template<>
-inline numeric::const_integer_reference
-numeric::get<numeric::integer_type> (void) const {
-  return _data._integer;
-}
-
-template<>
-inline numeric::floating_reference
-numeric::get<numeric::floating_type> (void) {
-  return _data._floating;
-}
-
-template<>
-inline numeric::const_floating_reference
-numeric::get<numeric::floating_type> (void) const {
-  return _data._floating;
+template<typename Number>
+inline Number numeric::get (void) const {
+  switch (_data._control[0]) {
+    case nil_kind:
+      return 0;
+    case integer_kind:
+      return _data._integer;
+    case floating_kind:
+      return _data._floating;
+    default:
+      BOOST_ASSERT("invalid kind for numeric");
+      break;
+  }
+  return 0;
 }
 
 inline numeric::metadata numeric::kind (void) const {

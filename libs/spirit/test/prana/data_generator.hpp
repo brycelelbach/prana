@@ -14,6 +14,7 @@
 
 #include <list>
 
+#include <boost/mpl/logical.hpp>
 #include <boost/mpl/size_t.hpp>
 #include <boost/mpl/identity.hpp>
 
@@ -36,28 +37,28 @@ template<
   std::size_t Length = 8,
   template<typename, typename> class Container = std::list
 >
-struct string: boost::mpl::identity<std::string> {
+struct string: mpl::identity<std::string> {
   typedef Container<std::string, std::allocator<std::string> > container;
-  typedef boost::mpl::size_t<Elements> elements;
-  typedef boost::mpl::size_t<Length> length;
+  typedef mpl::size_t<Elements> elements;
+  typedef mpl::size_t<Length> length;
 };
 
 template<
   std::size_t Elements = 4,
   template<typename, typename> class Container = std::list
 >
-struct integer: boost::mpl::identity<int> {
+struct integer: mpl::identity<int> {
   typedef Container<int, std::allocator<int> > container;
-  typedef boost::mpl::size_t<Elements> elements;
+  typedef mpl::size_t<Elements> elements;
 };
 
 template<
   std::size_t Elements = 4,
   template<typename, typename> class Container = std::list
 >
-struct floating: boost::mpl::identity<double> {
+struct floating: mpl::identity<double> {
   typedef Container<double, std::allocator<double> > container;
-  typedef boost::mpl::size_t<Elements> elements;
+  typedef mpl::size_t<Elements> elements;
 };
 
 template<
@@ -65,9 +66,9 @@ template<
   typename T,
   template<typename, typename> class Container = std::list
 >
-struct type_: boost::mpl::identity<T> {
+struct type_: mpl::identity<T> {
   typedef Container<T, std::allocator<T> > container;
-  typedef boost::mpl::size_t<Elements> elements;
+  typedef mpl::size_t<Elements> elements;
 };
 
 struct current_time {
@@ -81,9 +82,10 @@ inline std::size_t current_time::operator() (void) const {
 }
 
 template<
-  typename Generator = boost::random::mt19937,
-  typename IntDistribution = boost::uniform_int<>,
-  typename RealDistribution = boost::uniform_real<>,
+  typename Generator = random::mt19937,
+  typename IntDistribution = uniform_int<>,
+  typename RealDistribution = uniform_real<>,
+  typename BoolDistribution = uniform_01<>,
   typename DefaultSeed = current_time
 >
 class data_generator {
@@ -93,6 +95,7 @@ class data_generator {
 
   IntDistribution  _int_dist;
   RealDistribution _real_dist;
+  BoolDistribution _bool_dist;
 
  public:
   data_generator (void):
@@ -110,37 +113,52 @@ class data_generator {
   std::size_t seed (void) const {
     return _seed;
   }
-
+  
   template<typename T>
-  typename boost::enable_if<
-    boost::is_floating_point<typename T::type>,
+  typename enable_if<
+    is_same<typename T::type, bool>,
     typename T::type
   >::type get (void) { 
-    boost::variate_generator<Generator&, RealDistribution>
+    variate_generator<Generator&, BoolDistribution>
+      gen(_generator, _bool_dist);
+    return gen();
+  }
+
+  template<typename T>
+  typename enable_if<
+    is_floating_point<typename T::type>,
+    typename T::type
+  >::type get (void) { 
+    variate_generator<Generator&, RealDistribution>
       gen(_generator, _real_dist);
     return gen();
   }
 
   template<typename T>
-  typename boost::enable_if<
-    boost::is_integral<typename T::type>,
+  typename enable_if<
+    mpl::and_<
+      is_integral<typename T::type>,
+      mpl::not_<
+        is_same<typename T::type, bool>
+      >
+    >,
     typename T::type
   >::type get (void) {
-    boost::variate_generator<Generator&, IntDistribution>
+    variate_generator<Generator&, IntDistribution>
       gen(_generator, _int_dist);
     return gen();
   }
   
   template<typename T>
-  typename boost::enable_if<
-    boost::is_same<typename T::type, std::string>,
+  typename enable_if<
+    is_same<typename T::type, std::string>,
     typename T::type
   >::type get (void) {
     static char const chars[] = 
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-    boost::variate_generator<Generator&, boost::uniform_int<> >
-      gen(_generator, boost::uniform_int<>(0, 61));
+    variate_generator<Generator&, uniform_int<> >
+      gen(_generator, uniform_int<>(0, 61));
 
     std::string r;
     for (unsigned i = 0; i < T::length::value; ++i) { r += chars[gen()]; }

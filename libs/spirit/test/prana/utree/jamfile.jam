@@ -10,5 +10,6 @@
 project spirit_prana_test/utree ;
 
 run sizeof.cpp ;
-run ctors.cpp ;
+run ctor/numeric.cpp ;
+run ctor/string.cpp ;
 

@@ -7,11 +7,11 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_utree_core
-
-#include <boost/spirit/home/prana/utree.hpp>
+#define BOOST_TEST_MODULE prana_utree
 
 #include <fixture.hpp>
+
+#include <boost/spirit/home/prana/utree.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::test;
@@ -29,15 +29,14 @@ typedef list<
   type_<8, double>
 > numbers;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(numeric_ctors, T, numbers) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(numeric_ctor, T, numbers) {
   for (std::size_t i = 0; i < T::elements::value; ++i) {
     typename T::type n = generator.get<T>();
-    BOOST_TEST_MESSAGE("value " << i << ": " << n); 
     
-    BOOST_TEST_MESSAGE("constructing utree with numeric value " << n);
+    BOOST_TEST_MESSAGE("constructing utree with value " << n);
     utree t(n);
 
-    BOOST_CHECK(t == n);
+    BOOST_CHECK_EQUAL(t.template get<typename T::type>(), n);
   }
 }
 
