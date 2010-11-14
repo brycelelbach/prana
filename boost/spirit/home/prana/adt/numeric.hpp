@@ -46,13 +46,15 @@ struct numeric {
 
   void default_construct (void);
   
-  void copy (numeric const&);
+  void assign (numeric const&);
   template<typename Integer>
-    typename enable_if<is_integral<Integer>, void>::type copy (Integer); 
+    typename enable_if<is_integral<Integer>, void>::type assign (Integer); 
   template<typename Floating>
-    typename enable_if<is_floating_point<Floating>, void>::type copy (Floating); 
+    typename enable_if<is_floating_point<Floating>, void>::type assign (Floating); 
   
   void clear (void);
+
+  void nillify (void);
 
   bool operator== (numeric const&) const;
   template<typename Number>
@@ -78,43 +80,36 @@ inline void numeric::default_construct (void) {
 
 template<typename Integer>
 inline typename enable_if<is_integral<Integer>, void>::type
-numeric::copy (Integer integer_) {
+numeric::assign (Integer integer_) {
   if (*this != integer_) {
     clear();
-    
-    if (integer_) {
-      _data._control[0] = integer_kind;
-      _data._integer = integer_;
-    }
-
-    else
-      _data._control[0] = nil_kind;
+    _data._control[0] = integer_kind;
+    _data._integer = integer_;
   }
 } 
 
 template<typename Floating>
 inline typename enable_if<is_floating_point<Floating>, void>::type
-numeric::copy (Floating floating_) {
+numeric::assign (Floating floating_) {
   if (*this != floating_) {
     clear();
-    
-    if (floating_) {
-      _data._control[0] = floating_kind;
-      _data._floating = floating_;
-    }
-
-    else
-      _data._control[0] = nil_kind;
+    _data._control[0] = floating_kind;
+    _data._floating = floating_;
   }
 } 
 
-inline void numeric::copy (numeric const& other_) {
+inline void numeric::assign (numeric const& other_) {
   if (*this != other_) 
     _data = other_._data;
 }
 
 inline void numeric::clear (void) {
   std::memset(&_data, 0, sizeof(storage));
+}
+
+inline void numeric::nillify (void) {
+  clear();
+  _data._control[0] = nil_kind;
 }
 
 inline bool numeric::operator== (numeric const& other_) const {

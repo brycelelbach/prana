@@ -26,12 +26,15 @@ struct shallow_copy {
   void operator() (LHS& lhs, RHS& rhs) const {
     // EXPLAIN (wash): If the source is a reference, reference the source's
     // target instead of the source itself.
+    if (lhs.kind() & reference_kind) 
+      return (*this)(*lhs._du._alias, rhs);
+
     if (rhs.kind() & reference_kind)
-      return lhs._du._alias.copy(rhs._du._alias);
+      return (*this)(lhs, *rhs._du._alias);
   
     // EXPLAIN (wash): lhs has to be a reference to the actual tree; if it's
     // passed by value, then the address we take here would be the wrong one.
-    lhs._du._alias.copy(&rhs);
+    lhs._du._alias.assign(&rhs);
   }
 };
 
@@ -52,19 +55,17 @@ struct deep_copy {
   
     switch ((kind_type) rhs.kind()) {
       case nil_kind:
-        lhs = 0;
+        lhs._du._numeric.assign(0);
         return;
-      case symbol_kind:
-        lhs._du._symbol.deep_copy(rhs._du._symbol);
-        return; 
       case integer_kind:
-        lhs._du._numeric.copy(rhs._du._numeric);
-        return; 
       case floating_kind:
-        lhs._du._numeric.copy(rhs._du._numeric);
+        lhs._du._numeric.assign(rhs._du._numeric);
+        return; 
+      case symbol_kind:
+        lhs._du._symbol.assign(rhs._du._symbol);
         return; 
       case sequence_kind:
-        lhs._du._sequence.deep_copy(rhs._du._sequence);
+        lhs._du._sequence.assign(rhs._du._sequence);
         return; 
       case record_kind:
         return; // TODO (wash): Requires the implementation of record. 

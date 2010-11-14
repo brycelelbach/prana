@@ -57,21 +57,14 @@ struct symbol {
 
   void default_construct (void);
   
-  void shallow_copy (Char*);
-  void shallow_copy (symbol&);
+  void assign (Char);
+  void assign (Char*);
+  void assign (Char const*);
+  void assign (symbol const&);
   template<typename Iterator>
-    void shallow_copy (Iterator&, Iterator&);
+    void assign (Iterator, Iterator);
   template<typename Container>
-    void shallow_copy (Container&);
- 
-  void deep_copy (Char);
-  void deep_copy (Char*);
-  void deep_copy (Char const*);
-  void deep_copy (symbol const&);
-  template<typename Iterator>
-    void deep_copy (Iterator, Iterator);
-  template<typename Container>
-    void deep_copy (Container);
+    void assign (Container);
   
   void clear (void);
   
@@ -112,15 +105,7 @@ inline void symbol<Char>::default_construct (void) {
 }
 
 template<typename Char>
-inline void symbol<Char>::shallow_copy (symbol& other_) {
-  if (other_ != *this) { 
-    std::memcpy(&_data, &other_._data, sizeof(storage));
-    _data._alias = true;
-  }
-}
-
-template<typename Char>
-inline void symbol<Char>::deep_copy (Char c_) {
+inline void symbol<Char>::assign (Char c_) {
   if (*this != &c_) { 
     clear();
     _data._control[0] = symbol_kind;
@@ -132,23 +117,23 @@ inline void symbol<Char>::deep_copy (Char c_) {
 } 
 
 template<typename Char>
-inline void symbol<Char>::deep_copy (Char* c_) {
-  deep_copy(c_, c_ + length()(c_));
+inline void symbol<Char>::assign (Char* c_) {
+  assign(c_, c_ + length()(c_));
 }
 
 template<typename Char>
-inline void symbol<Char>::deep_copy (Char const* c_) {
-  deep_copy(c_, c_ + length()(c_));
+inline void symbol<Char>::assign (Char const* c_) {
+  assign(c_, c_ + length()(c_));
 }
 
 template<typename Char>
-inline void symbol<Char>::deep_copy (symbol const& other_) {
-  deep_copy(other_.begin(), other_.end());
+inline void symbol<Char>::assign (symbol const& other_) {
+  assign(other_.begin(), other_.end());
 }
 
 template<typename Char>
 template<typename Iterator>
-inline void symbol<Char>::deep_copy (Iterator first_, Iterator last_) {
+inline void symbol<Char>::assign (Iterator first_, Iterator last_) {
   if (std::equal(first_, last_, begin()) && !_data._alias)
     return;
 
@@ -181,15 +166,14 @@ inline void symbol<Char>::deep_copy (Iterator first_, Iterator last_) {
 
 template<typename Char>
 template<typename Container>
-inline void symbol<Char>::deep_copy (Container c_) {
-  deep_copy(c_.begin(), c_.end());
+inline void symbol<Char>::assign (Container c_) {
+  assign(c_.begin(), c_.end());
 }
 
 template<typename Char>
 inline void symbol<Char>::clear (void) { 
-  if (_data._storage == CHAR_MAX) 
-    if (!_data._alias)
-      delete[] _data._heap._first;
+  if ((_data._storage == CHAR_MAX) && _data._heap._first) 
+    delete[] _data._heap._first;
   
   std::memset(&_data, 0, sizeof(storage));
 }

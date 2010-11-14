@@ -19,14 +19,8 @@ using namespace boost::spirit::prana::test;
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
 typedef list<
-  type_<8, bool>,
-  type_<8, uint16_t>,
-  type_<8, int16_t>,
-  type_<8, uint32_t>,
-  type_<8, int32_t>,
-  type_<8, intmax_t>,
-  type_<8, float>,
-  type_<8, double>
+  type_<6, bool>,    type_<6, uint16_t>, type_<6, int16_t>, type_<6, uint32_t>,
+  type_<6, int32_t>, type_<6, intmax_t>, type_<6, float>,   type_<6, double>
 > numbers;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(numeric_ctor, T, numbers) {

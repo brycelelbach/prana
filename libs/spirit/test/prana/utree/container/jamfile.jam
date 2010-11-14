@@ -7,20 +7,7 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-import testing ;
+project spirit_prana_test/adt/sequence ;
 
-project spirit_prana_test :
-  requirements
-    <toolset>clang:<cxxflags>-Wno-unused
-    <toolset>clang:<cxxflags>-Wno-tautological-compare
-    <include>./
-    <include>../../../../
-    <source>/boost//unit_test_framework
-    <testing.launcher>valgrind
-  ;
-
-for i in 32 64 {
-  alias adt_$(i)   : adt   : <address-model>$(i) ;
-  alias utree_$(i) : utree : <address-model>$(i) ;
-}
+for i in [ glob ./*.cpp ] { run $(i) ; }
 

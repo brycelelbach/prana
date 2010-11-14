@@ -22,8 +22,8 @@ using namespace boost::spirit::prana::test;
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
 typedef list<
-  string<8, 2>,  string<8, 4>,  string<8, 6>,  string<8, 8>,
-  string<8, 16>, string<8, 24>, string<8, 32>, string<8, 64>
+  string<4, 0>,  string<4, 4>,  string<4, 16>,  string<4, 32>,
+  string<8, 0>,  string<8, 4>,  string<8, 16>,  string<8, 32>
 > strings;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(std_string_ctor, T, strings) {

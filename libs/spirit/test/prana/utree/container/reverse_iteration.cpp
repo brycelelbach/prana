@@ -7,11 +7,11 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#define BOOST_TEST_MODULE prana_adt_sequence
+#define BOOST_TEST_MODULE prana_utree
 
 #include <fixture.hpp>
 
-#include <boost/spirit/home/prana/adt/sequence.hpp>
+#include <boost/spirit/home/prana/utree.hpp>
 
 using namespace boost::spirit::prana;
 using namespace boost::spirit::prana::test;
@@ -19,54 +19,44 @@ using namespace boost::spirit::prana::test;
 BOOST_FIXTURE_TEST_SUITE(unit_tests, fixture)
 
 typedef list<
-  integer<2>,   floating<2>,   string<2, 4>,   string<2, 24>,
-  integer<4>,   floating<4>,   string<4, 4>,   string<4, 24>,
-  integer<6>,   floating<6>,   string<6, 4>,   string<6, 24>,
-  integer<8>,   floating<8>,   string<8, 4>,   string<8, 24>
+  integer<0>,   floating<0>,    string<0, 4>,    string<0, 24>,
+  integer<4>,   floating<4>,    string<4, 4>,    string<4, 24>,
+  integer<8>,   floating<8>,    string<8, 4>,    string<8, 24>,
+  integer<16>,  floating<16>,   string<16, 4>,   string<16, 24>
 > elements;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(back_removal, T, elements) {
-  typedef sequence<typename T::type> sequence_type;
-
+BOOST_AUTO_TEST_CASE_TEMPLATE(reverse_iteration, T, elements) {
+  utree s;
   typename T::container c;
-  sequence_type s;
-
-  BOOST_TEST_MESSAGE("default constructing sequence");
-  s.default_construct();
 
   BOOST_TEST_MESSAGE(
-    "filling sequence with " << T::elements::value << " elements"
+    "filling utree with " << T::elements::value << " elements"
   );
   for (std::size_t i = 0; i < T::elements::value; ++i) {
-    typename T::type t = generator.get<T>();
-    s.push_back(t);
-    c.push_back(t);
-    BOOST_TEST_MESSAGE("element " << i << " is " << c.back()); 
-    BOOST_CHECK_EQUAL(*--s.end(), t); 
-    BOOST_CHECK_EQUAL(*--c.end(), t); 
-  }
-  
-  BOOST_TEST_MESSAGE("removing last element (pop_back)");
-  s.pop_back();
-  c.pop_back();
+    typename T::type v = generator.get<T>();
+    utree t(v);
 
-  BOOST_TEST_MESSAGE("removing last element (erase)");
-  s.erase(--s.end()); 
-  c.erase(--c.end()); 
-  
+    s.push_back(t);
+    c.push_back(t.template get<typename T::type>());
+    BOOST_TEST_MESSAGE("element " << i << " is " << c.back()); 
+
+    //BOOST_CHECK(*--s.end() == t); 
+    //BOOST_CHECK_EQUAL(*--c.end(), t.template get<typename T::type>()); 
+  }
+
   BOOST_TEST_MESSAGE("retrieving iterators");
-  typename sequence_type::const_iterator sit = s.begin(), send = s.end();
+  typename utree::const_iterator sit = s.begin(), send = s.end();
   typename T::container::const_iterator cit = c.begin(), cend = c.end();
 
   BOOST_TEST_MESSAGE("verifying retrieved iterators");
   while ((sit != send) && (cit != cend)) {
-    BOOST_CHECK_EQUAL(*cit, *sit); ++cit; ++sit;
+    BOOST_CHECK_EQUAL(*--cend, (*--send).template get<typename T::type>()); 
   }
-  
+
   BOOST_CHECK(sit == send);
   BOOST_CHECK(cit == cend);
 
-  BOOST_TEST_MESSAGE("clearing sequence");
+  BOOST_TEST_MESSAGE("clearing utree");
   s.clear();
 }
 

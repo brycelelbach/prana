@@ -39,9 +39,9 @@ struct alias {
 
   void default_construct (void);
 
-  void copy (alias const&);
+  void assign (alias const&);
   template<typename Pointer>
-    void copy (Pointer);
+    void assign (Pointer);
 
   void clear (void);
 
@@ -73,14 +73,14 @@ inline void alias<Data>::default_construct (void) {
 }
 
 template<typename Data>
-inline void alias<Data>::copy (alias const& other_) {
+inline void alias<Data>::assign (alias const& other_) {
   if (*this != other_) 
     _data = other_._data;
 }
 
 template<typename Data>
 template<typename Pointer>
-inline void alias<Data>::copy (Pointer ptr_) {
+inline void alias<Data>::assign (Pointer ptr_) {
   if (_data._pointer != ptr_)
     _data._pointer = ptr_;
 }
