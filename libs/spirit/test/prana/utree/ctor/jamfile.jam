@@ -10,4 +10,3 @@
 project spirit_prana_test/utree/ctor ;
 
 for i in [ glob ./*.cpp ] { run $(i) ; }
-
