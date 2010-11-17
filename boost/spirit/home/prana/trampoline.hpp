@@ -19,11 +19,12 @@
 #include <boost/mpl/begin.hpp>
 #include <boost/mpl/deref.hpp>
 
-#include <boost/utility/result_of.hpp>
-
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/config/limits.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
+
+#include <boost/spirit/home/prana/dispatch_bind.hpp>
 
 #ifndef BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT
   #define BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT 32
@@ -53,27 +54,43 @@ template<class Registry, class X, class Y>
 struct trampoline<0, Registry, X, Y> {
   template<class> struct result;
 
-  template<class This, class F, class X>
-  struct result<This(F, X&)> { 
-    typedef typename result_of<F(X&)>::type type;
+  template<
+    template<std::size_t, class, class class> This,
+    class ThisRegistry, class ThisX
+  >
+  struct result<
+    This<0, ThisRegistry, ThisX, ThisX>(F, ThisX&)
+  > {
+    typedef typename result_of<
+      typename ThisRegistry::default(ThisX&)
+    >::type type;
   };  
 
-  template<class This, class F, class X, class Y>
-  struct result<This(F, X&, Y&)> {
-    typedef typename result_of<F(X&, Y&)>::type type;
-  }; 
+  template<
+    template<std::size_t, class, class class> This,
+    class ThisRegistry, class ThisX, class ThisY
+  >
+  struct result<
+    This<0, ThisRegistry, ThisX, ThisY>(F, ThisX&, ThisY&)
+  > {
+    typedef typename result_of<
+      typename ThisRegistry::default(ThisX&, ThisY&)
+    >::type type;
+  };  
   
   // EXPLAIN (djowel) Single dispatch.
   template<class F> 
-  typename result<Registry::default(X&)>::type
-  operator() (F f, X& x) const { 
+  typename result_of<
+    Registry::default(X&)
+  >::type operator() (F f, X& x) const { 
     return Registry::default()(x);
   }
 
   // EXPLAIN (djowel): Double dispatch.
   template<class F>
-  typename result<Registry::default(X&, Y&)>::type
-  operator() (F f, X& x, Y& y) const {
+  typename result_of<
+    Registry::default(X&, Y&)
+  >::type operator() (F f, X& x, Y& y) const {
     return Registry::default()(x, y);
   }
 };
@@ -89,9 +106,9 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(hash, n)::value:                                          \
     if (!Registry::fallthrough::value)                                        \
-      return f(x, BOOST_PP_CAT(hash, n)::value);                              \
+      return f(x, BOOST_PP_CAT(hash, n)());                                   \
     else                                                                      \
-      f(x, BOOST_PP_CAT(hash, n)::value);                                     \
+      f(x, BOOST_PP_CAT(hash, n)());                                          \
   /***/
 
 #define BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH(z, n, _)                       \
@@ -105,37 +122,27 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(hash, n)::value:                                          \
     if (!Registry::fallthrough::value)                                        \
-      return f(x, BOOST_PP_CAT(hash, n)::value);                              \
+      return f(x, BOOST_PP_CAT(hash, n)());                                   \
     else                                                                      \
-      (*this)(light_bind(f, x, BOOST_PP_CAT(hash, n)::value), y);             \
+      (*this)(dispatch_bind(f, x, BOOST_PP_CAT(hash, n)()), y);               \
   /***/
 
 #define BOOST_SPIRIT_PRANA_DEF_TRAMPOLINE(z, n, _)                            \
   template<class Registry, class X, class Y>                                  \
   struct trampoline<n, Registry, X, Y> {                                      \
-    template<class> struct result;                                            \
-                                                                              \
-    template<class This, class F, class X>                                    \
-    struct result<This(F, X&)> {                                              \
-      typedef typename result_of<F(X&)>::type type;                           \
-    };                                                                        \
-                                                                              \
-    template<class This, class F, class X, class Y>                           \
-    struct result<This(F, X&, Y&)> {                                          \
-      typedef typename result_of<F(X&, Y&)>::type type;                       \
-    };                                                                        \
+    typedef typename F::result_type result_type;                              \
                                                                               \
     template<class F>                                                         \
-    typename result<F(X&)>::type operator() (F f, X& x) const {               \
-      switch (x.which()) {                                                    \
+    result_type operator() (F f, X& x) const {                                \
+      switch (Registry::which()(x)) {                                         \
         BOOST_PP_REPEAT_ ## z (n, BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH, _)  \
         default: return Registry::default()(x);                               \
       }                                                                       \
     }                                                                         \
                                                                               \
     template<class F>                                                         \
-    typename result<F(X&, Y&)>::type operator() (F f, X& x, Y& y) const {     \
-      switch (x.which()) {                                                    \
+    result_type operator() (F f, X& x, Y& y) const {                          \
+      switch (Registry::which()(x)) {                                         \
         BOOST_PP_REPEAT_ ## z (n, BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH, _)  \
         default: return Registry::default()(x, y);                            \
       }                                                                       \
@@ -153,50 +160,56 @@ struct trampoline<0, Registry, X, Y> {
 #undef BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH
 
 template<class Registry, class F, class X>
-typename result_of<F(X&)>::type
-dispatch (F f, X& x) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X 
+>::type dispatch (F f, X& x) {
   return trampoline<
     mpl::size<Registry>::value, Registry, X
-  >()(f, x, y);
+  >()(f, x);
 }
 
 template<class Registry, class F, class X>
-typename result_of<F(X const&)>::type
-dispatch (F f, X const& x) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X const
+>::type dispatch (F f, X const& x) {
   return trampoline<
     mpl::size<Registry>::value, Registry, X const
-  >()(f, x, y);
+  >()(f, x);
 }
 
 template<class Registry, class F, class X, class Y>
-typename result_of<F(X const&, Y const&)>::type
-dispatch (F f, X const& x, Y const& y) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X const, Y const
+>::type dispatch (F f, X const& x, Y const& y) {
   return trampoline<
-    mpl::size<Registry>::value, Registry, X, Y
+    mpl::size<Registry>::value, Registry, X const, Y const
   >()(f, x, y);
 }
 
 template<class Registry, class F, class X, class Y>
-typename result_of<F(X const&, Y&)>::type
-dispatch (F f, X const& x, Y& y) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X const, Y
+>::type dispatch (F f, X const& x, Y& y) {
   return trampoline<
     mpl::size<Registry>::value, Registry, X const, Y
   >()(f, x, y);
 }
 
 template<class Registry, class F, class X, class Y>
-typename result_of<F(X&, Y const&)>::type
-dispatch (F f, X x, Y const& y) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X, Y const
+>::type dispatch (F f, X x, Y const& y) {
   return trampoline<
     mpl::size<Registry>::value, Registry, X, Y const
   >()(f, x, y);
 }
 
 template<class Registry, class F, class X, class Y>
-typename result_of<F(X&, Y&)>::type
-dispatch (F f, X& x, Y& y) {
+typename result_of<trampoline<
+  mpl::size<Registry>::value, Registry, X, Y 
+>::type dispatch (F f, X& x, Y& y) {
   return trampoline<
-    mpl::size<Registry>::value, Registry, X const, Y const
+    mpl::size<Registry>::value, Registry, X, Y 
   >()(f, x, y);
 }
 
