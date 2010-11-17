@@ -11,24 +11,15 @@
 #define BOOST_SPIRIT_PRANA_SEXPR_HPP
 
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-struct nil_type { };
-
 struct sexpr {
   std::size_t typeinfo;
-
-  union atom {
-    long      integer;
-    double    floating;
-    sexpr*    pair;
-    void*     pointer;
-    nil_type  nil;
-  } car;
-
+  void* car;
   sexpr* cdr;
 };
 
