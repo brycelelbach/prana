@@ -23,51 +23,31 @@ class dispatch_binder {
  private:
   F f;
   X& x; /* EXPLAIN (djowel): Always by reference. */
-  TagX tagx; /* EXPLAIN (wash): This is constructed in place in the trampoline,
-                and should be small enough to be based by value. */
 
  public:
-  template<class> struct result;
+  typedef typename F::result_type result_type;
 
-  template<class This, class Y, class TagY>
-  struct result<This(Y&, TagY)> {
-    typedef typename result_of<
-      F(X&, TagX, Y&, TagY)
-    >::type type;
-  };
-  
-  template<class This, class Y, class TagY>
-  struct result<This(Y const&, TagY)> {
-    typedef typename result_of<
-      F(X&, TagX, Y const&, TagY)
-    >::type type;
-  };
+  dispatch_binder (F f_, X& x_): f(f_), x(x_) { }
 
-  dispatch_binder (F f_, X& x_, TagX tagx_): f(f_), x(x_), tagx(tagx_) { }
-
-  template<typename Y, typename TagY>
-  typename result_of<
-    F(X&, TagX, Y&, TagY)
-  >::type operator() (Y& y, TagY tagy) const {
-    return f(x, tagx, y, tagy);
+  template<typename TagY, typename Y>
+  typename F::result_type operator() (Y& y) const {
+    return f.template operator()<TagX, TagY>(x, y);
   }
 
-  template<typename Y, typename TagY>
-  typename result_of<
-    F(X&, TagX, Y const&, TagY)
-  >::type operator() (Y const& y, TagY tagy) const {
-    return f(x, tagx, y, tagy);
+  template<typename TagY, typename Y>
+  typename F::result_type operator() (Y const& y) const {
+    return f.template operator()<TagX, TagY>(x, y);
   }
 };
 
-template<typename F, typename X, typename TagX>
-dispatch_binder<F, X const> dispatch_bind(F f, X const& x, TagX tagx) {
-  return dispatch_binder<F, X const, TagX>(f, x, tagx);
+template<typename TagX, typename F, typename X>
+dispatch_binder<F, X const, TagX> dispatch_bind(F f, X const& x) {
+  return dispatch_binder<F, X const, TagX>(f, x);
 }
 
-template<typename F, typename X, typename TagX>
-dispatch_binder<F, X> dispatch_bind(F f, X& x, TagX tagx) {
-  return dispatch_binder<F, X, TagX>(f, x, tagx);
+template<typename TagX, typename F, typename X>
+dispatch_binder<F, X, TagX> dispatch_bind(F f, X& x) {
+  return dispatch_binder<F, X, TagX>(f, x);
 }
 
 } // prana
