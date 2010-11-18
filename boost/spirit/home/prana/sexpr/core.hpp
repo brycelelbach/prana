@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_CORE_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_CORE_HPP
 
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
@@ -16,41 +16,42 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/registry.hpp>
-#include <boost/spirit/home/prana/support/intern_pool.hpp>
+#include <boost/spirit/home/prana/adt/intern_pool.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
+template<typename Iterator>
 struct sexpr {
-  BOOST_SPIRIT_PRANA_TAGS(
+  BOOST_SPIRIT_PRANA_TYPES(
     std::size_t,
-    ((nil)      (void*))
-    ((empty)    (void*))
     ((boolean)  (bool))
     ((integer)  (boost::intmax_t))
     ((floating) (double))
-    ((symbol)   (intern_pool<char const*>::iterator))
-    ((string)   (iterator_range<std::string::const_iterator>*))
     ((pointer)  (sexpr*))
+    ((symbol)   (typename intern_pool<Iterator>::pointer))
+    ((string)   (typename intern_pool<Iterator>::pointer))
+    ((nil)      (void*))
+    ((empty)    (void*))
     ((cons)     (sexpr*))
     ((tuple)    (sexpr*)))
 
-  BOOST_SPIRIT_PRANA_REGISTRY_SET(
-    special_objects,
+  BOOST_SPIRIT_PRANA_TEMP_REGISTRY_SET(
+    numeric_types, 
+    (boolean)(integer)(floating)(pointer))
+
+  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
+    pod_types, string_types, numeric_types,
+    (symbol)(string))
+  
+  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
+    atom_types, special_types, pod_types, 
     (nil)(empty))
 
-  BOOST_SPIRIT_PRANA_EXTEND_REGISTRY_SET(
-    numeric_tower, special_objects,
-    (boolean)(integer)(floating))
-
-  BOOST_SPIRIT_PRANA_EXTEND_REGISTRY_SET(
-    string_objects, numeric_tower
-    (symbol)(string))
-
-  BOOST_SPIRIT_PRANA_EXTEND_REGISTRY_SET(
-    core_types, string_objects,
-    (pointer)(cons)(tuple))
+  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
+    core_types, recursive_types, atom_types,
+    (cons)(tuple))
 
   typedef basic_registry<core_types> registry;
 
@@ -61,21 +62,21 @@ struct sexpr {
   sexpr*   cdr;
 };
 
-BOOST_SPIRIT_PRANA_INIT_TAGS(
-  sexpr::core_types,
-  (sexpr::nil)
-  (sexpr::empty)
-  (sexpr::boolean)
-  (sexpr::integer)
-  (sexpr::floating)
-  (sexpr::symbol)
-  (sexpr::string)
-  (sexpr::pointer)
-  (sexpr::cons)
-  (sexpr::tuple))
+BOOST_SPIRIT_PRANA_TEMP_INIT_TYPES(
+  sexpr, (Iterator), core_types, 
+  (nil)
+  (empty)
+  (boolean)
+  (integer)
+  (floating)
+  (symbol)
+  (string)
+  (pointer)
+  (cons)
+  (tuple))
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SEXPR_HPP
+#endif // BOOST_SPIRIT_PRANA_SEXPR_CORE_HPP

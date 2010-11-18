@@ -17,14 +17,13 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-template<class Char>
+template<class Iterator>
 struct intern_node: private noncopyable {
-  typedef Char char_type;
-  typedef Char const* id_type;
+  typedef Iterator id_type;
   
-  typedef iterator_range<Char const*> value_type;
-  typedef iterator_range<Char const*>* pointer;
-  typedef iterator_range<Char const*> const* const_pointer;
+  typedef iterator_range<Iterator> value_type;
+  typedef iterator_range<Iterator>* pointer;
+  typedef iterator_range<Iterator> const* const_pointer;
   
   intern_node (id_type);
 
@@ -38,28 +37,30 @@ struct intern_node: private noncopyable {
   struct find {
     typedef pointer result_type;
 
-    template<class Iterator>
-    pointer operator() (intern_node*, Iterator&, Iterator) const;
+    template<class InputIterator>
+    pointer operator() (intern_node*, InputIterator&, InputIterator) const;
     
-    template<class Iterator>
-    const_pointer operator() (intern_node const*, Iterator&, Iterator) const;
+    template<class InputIterator>
+    const_pointer operator() (intern_node const*, InputIterator&,
+                              InputIterator) const;
     
-    template<class Pointer, class Node, class Iterator>
-    Pointer operator() (Node, Iterator&, Iterator) const;
+    template<class Pointer, class Node, class InputIterator>
+    Pointer operator() (Node, InputIterator&, InputIterator) const;
   };
 
   struct insert {
     typedef pointer result_type;
 
-    template<class Iterator, class Alloc>
-    pointer operator() (intern_node*&, Iterator, Iterator, Alloc*) const;
+    template<class InputIterator, class Alloc>
+    pointer operator() (intern_node*&, InputIterator, InputIterator,
+                        Alloc*) const;
   };
 
   struct erase {
     typedef pointer result_type;
 
-    template<class Iterator, class Alloc>
-    void operator() (intern_node*&, Iterator, Iterator, Alloc*) const;
+    template<class InputIterator, class Alloc>
+    void operator() (intern_node*&, InputIterator, InputIterator, Alloc*) const;
   };
 
   id_type id;        /* The node's identity character. */
@@ -69,13 +70,13 @@ struct intern_node: private noncopyable {
   intern_node* gt;   /* Right pointer. */
 };
 
-template<class Char>
-intern_node<Char>::intern_node (id_type id_):
+template<class Iterator>
+intern_node<Iterator>::intern_node (id_type id_):
   id(id_), data(0), lt(0), eq(0), gt(0) { }
 
-template<class Char>
+template<class Iterator>
 template<class Alloc>
-inline void intern_node<Char>::destruct::operator() (
+inline void intern_node<Iterator>::destruct::operator() (
   intern_node* p, Alloc* alloc
 ) const {
   if (p) {
@@ -88,43 +89,43 @@ inline void intern_node<Char>::destruct::operator() (
     alloc->delete_node(p);
   }
 }
-template<class Char>
 template<class Iterator>
-inline typename intern_node<Char>::pointer
-intern_node<Char>::find::operator() (
-  intern_node* start, Iterator& first, Iterator last
+template<class InputIterator>
+inline typename intern_node<Iterator>::pointer
+intern_node<Iterator>::find::operator() (
+  intern_node* start, InputIterator& first, InputIterator last
 ) const {
   return (*this).operator()<
     pointer, intern_node*
   >(start, first, last);
 }
 
-template<class Char>
 template<class Iterator>
-inline typename intern_node<Char>::const_pointer
-intern_node<Char>::find::operator() (
-  intern_node const* start, Iterator& first, Iterator last
+template<class InputIterator>
+inline typename intern_node<Iterator>::const_pointer
+intern_node<Iterator>::find::operator() (
+  intern_node const* start, InputIterator& first, InputIterator last
 ) const {
   return (*this).operator()<
     const_pointer, intern_node const*
   >(start, first, last);
 }
 
-template<class Char>
-template<class Pointer, class Node, class Iterator>
-inline Pointer intern_node<Char>::find::operator() (
-  Node start, Iterator& first, Iterator last
+template<class Iterator>
+template<class Pointer, class Node, class InputIterator>
+inline Pointer intern_node<Iterator>::find::operator() (
+  Node start, InputIterator& first, InputIterator last
 ) const {
   if (first == last)
-    return false;
+    return 0;
 
-  Iterator i = first;
-  Iterator latest = first;
+  InputIterator i = first;
+  InputIterator latest = first;
   Node p = start;
   Pointer found = 0;
 
   while (p && i != last) {
-    typename boost::detail::iterator_traits<Iterator>::value_type c = *i; 
+    typename boost::detail::iterator_traits<InputIterator>::value_type c = *i; 
 
     if (c == *p->id) {
       if (p->data) {
@@ -149,20 +150,20 @@ inline Pointer intern_node<Char>::find::operator() (
   return found;
 }
 
-template<class Char>
-template<class Iterator, class Alloc>
-inline typename intern_node<Char>::pointer
-intern_node<Char>::insert::operator() (
-  intern_node*& start, Iterator first, Iterator last, Alloc* alloc
+template<class Iterator>
+template<class InputIterator, class Alloc>
+inline typename intern_node<Iterator>::pointer
+intern_node<Iterator>::insert::operator() (
+  intern_node*& start, InputIterator first, InputIterator last, Alloc* alloc
 ) const {
   if (first == last)
     return 0;
 
-  Iterator it = first;
+  InputIterator it = first;
   intern_node** pp = &start;
 
   for (;;) {
-    typename boost::detail::iterator_traits<Iterator>::value_type c = *it;
+    typename boost::detail::iterator_traits<InputIterator>::value_type c = *it;
 
     if (*pp == 0)
       *pp = alloc->new_node(it);
@@ -188,15 +189,15 @@ intern_node<Char>::insert::operator() (
   }
 }
 
-template<class Char>
-template<class Iterator, class Alloc>
-inline void intern_node<Char>::erase::operator() (
-  intern_node*& p, Iterator first, Iterator last, Alloc* alloc
+template<class Iterator>
+template<class InputIterator, class Alloc>
+inline void intern_node<Iterator>::erase::operator() (
+  intern_node*& p, InputIterator first, InputIterator last, Alloc* alloc
 ) const {
   if (p == 0 || first == last)
     return;
 
-  typename boost::detail::iterator_traits<Iterator>::value_type c = *first;
+  typename boost::detail::iterator_traits<InputIterator>::value_type c = *first;
 
   if (c == *p->id) {
     if (++first == last) {
@@ -206,14 +207,14 @@ inline void intern_node<Char>::erase::operator() (
       }
     }
 
-    erase(p->eq, first, last, alloc);
+    (*this)(p->eq, first, last, alloc);
   }
 
   else if (c < *p->id)
-    erase(p->lt, first, last, alloc);
+    (*this)(p->lt, first, last, alloc);
   
   else
-    erase(p->gt, first, last, alloc);
+    (*this)(p->gt, first, last, alloc);
 
   if (p->data == 0 && p->lt == 0 && p->eq == 0 && p->gt == 0) {
     alloc->delete_node(p);
