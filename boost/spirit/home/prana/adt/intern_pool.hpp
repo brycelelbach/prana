@@ -1,137 +1,134 @@
 /*=============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-==============================================================================*/
-#if !defined(BOOST_SPIRIT_TST_JUNE_03_2007_1031AM)
-#define BOOST_SPIRIT_TST_JUNE_03_2007_1031AM
+=============================================================================*/
 
-#if defined(_MSC_VER)
-#pragma once
-#endif
+#if !defined(BOOST_SPIRIT_PRANA_INTERN_POOL_HPP)
+#define BOOST_SPIRIT_PRANA_INTERN_POOL_HPP
 
-#include <boost/spirit/home/qi/string/detail/tst.hpp>
+#include <boost/spirit/home/prana/adt/intern_node.hpp>
 
-namespace boost { namespace spirit { namespace qi
-{
-    struct tst_pass_through
-    {
-        template <typename Char>
-        Char operator()(Char ch) const
-        {
-            return ch;
-        }
-    };
+namespace boost {
+namespace spirit {
+namespace prana {
 
-    template <typename Char, typename T>
-    struct tst
-    {
-        typedef Char char_type; // the character type
-        typedef T value_type; // the value associated with each entry
-        typedef detail::tst_node<Char, T> node;
+template<class Char>
+class intern_pool: private noncopyable {
+ public:
+  typedef Char char_type;
+  typedef Char const* id_type;
+  
+  typedef iterator_range<Char const*> value_type;
+  typedef iterator_range<Char const*>* pointer;
+  typedef iterator_range<Char const*> const* const_pointer;
 
-        tst()
-          : root(0)
-        {
-        }
+  typedef intern_node<Char> node;
 
-        ~tst()
-        {
-            clear();
-        }
+  intern_pool (void);
 
-        tst(tst const& rhs)
-          : root(0)
-        {
-            copy(rhs);
-        }
+  ~intern_pool (void);
 
-        tst& operator=(tst const& rhs)
-        {
-            return assign(rhs);
-        }
+  template<class Iterator>
+    pointer find (Iterator&, Iterator);
+  template<class Iterator>
+    const_pointer find (Iterator&, Iterator) const;
 
-        template <typename Iterator, typename Filter>
-        T* find(Iterator& first, Iterator last, Filter filter) const
-        {
-            return node::find(root, first, last, filter);
-        }
+  template<class Iterator>
+    pointer insert (Iterator, Iterator);
 
-        template <typename Iterator>
-        T* find(Iterator& first, Iterator last) const
-        {
-            return find(first, last, tst_pass_through());
-        }
+  template<class Iterator>
+    void erase (Iterator, Iterator);
 
-        template <typename Iterator>
-        T* add(
-            Iterator first
-          , Iterator last
-          , typename boost::call_traits<T>::param_type val)
-        {
-            return node::add(root, first, last, val, this);
-        }
+  void clear (void);
 
-        template <typename Iterator>
-        void remove(Iterator first, Iterator last)
-        {
-            node::remove(root, first, last, this);
-        }
+ protected:
+  friend struct intern_node<Char>;
 
-        void clear()
-        {
-            node::destruct_node(root, this);
-            root = 0;
-        }
+  node* new_node (id_type);
 
-        template <typename F>
-        void for_each(F f) const
-        {
-            node::for_each(root, std::basic_string<Char>(), f);
-        }
+  template<class Iterator>
+    pointer new_data (Iterator, Iterator);
 
-    private:
+  void delete_node (node*);
 
-        friend struct detail::tst_node<Char, T>;
+  void delete_data (pointer);
 
-        void copy(tst const& rhs)
-        {
-            root = node::clone_node(rhs.root, this);
-        }
+ private:
+  node* root;
+};
 
-        tst& assign(tst const& rhs)
-        {
-            if (this != &rhs)
-            {
-                clear();
-                copy(rhs);
-            }
-            return *this;
-        }
+template<class Char>
+intern_pool<Char>::intern_pool (void): root(0) { }
 
-        node* root;
+template<class Char>
+intern_pool<Char>::~intern_pool (void) {
+  clear();
+}
 
-        node* new_node(Char id)
-        {
-            return new node(id);
-        }
+template<class Char>
+template<class Iterator>
+typename intern_pool<Char>::pointer
+intern_pool<Char>::find (Iterator& first, Iterator last) {
+  return (root ? typename node::find()(root, first, last) : 0);
+}
 
-        T* new_data(typename boost::call_traits<T>::param_type val)
-        {
-            return new T(val);
-        }
+template<class Char>
+template<class Iterator>
+typename intern_pool<Char>::const_pointer
+intern_pool<Char>::find (Iterator& first, Iterator last) const {
+  return (root ? typename node::find()(root, first, last) : 0);
+}
 
-        void delete_node(node* p)
-        {
-            delete p;
-        }
+template<class Char>
+template<class Iterator>
+typename intern_pool<Char>::pointer
+intern_pool<Char>::insert (Iterator first, Iterator last) {
+  return typename node::insert()(root, first, last, this);
+}
 
-        void delete_data(T* p)
-        {
-            delete p;
-        }
-    };
-}}}
+template<class Char>
+template<class Iterator>
+void intern_pool<Char>::erase (Iterator first, Iterator last) {
+  return typename node::erase()(root, first, last, this);
+}
 
-#endif
+template<class Char>
+void intern_pool<Char>::clear (void) {
+  if (root) {
+    typename node::destruct()(root, this);
+    root = 0;
+  }
+}
+template<class Char>
+typename intern_pool<Char>::node* intern_pool<Char>::new_node (id_type id) {
+  return new node(id);
+}
+
+template<class Char>
+template<class Iterator>
+typename intern_pool<Char>::pointer
+intern_pool<Char>::new_data (Iterator first, Iterator last) {
+  return new value_type(first, last);
+}
+
+template<class Char>
+void intern_pool<Char>::delete_node (node* p) {
+  if (p)
+    delete p;
+}
+
+template<class Char>
+void intern_pool<Char>::delete_data (pointer p) {
+  if (p)
+    delete p;
+}
+
+} // prana
+} // spirit
+} // boost
+
+#endif // BOOST_SPIRIT_PRANA_INTERN_POOL_HPP
+
