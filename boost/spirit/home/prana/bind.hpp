@@ -34,7 +34,7 @@ class tag_binder<1, F, TagX, TagY> {
   }
 
   template<typename X>
-  typename F::result_type operator() (X& x) const {
+  typename F::result_type operator() (X const& x) const {
     return f.template operator()<TagX, TagY>(x);
   }
 };
@@ -51,12 +51,12 @@ class tag_binder<1, F, TagX, TagX> {
 
   template<typename X>
   typename F::result_type operator() (X& x) const {
-    return f.template operator()<TagX>(x, y);
+    return f.template operator()<TagX>(x);
   }
 
   template<typename X>
-  typename F::result_type operator() (X& x) const {
-    return f.template operator()<TagX>(x, y);
+  typename F::result_type operator() (X const& x) const {
+    return f.template operator()<TagX>(x);
   }
 };
 
@@ -133,7 +133,7 @@ class lhs_binder {
  public:
   typedef typename F::result_type result_type;
 
-  binder (F f_, X& x_): f(f_), x(x_) { }
+  lhs_binder (F f_, X& x_): f(f_), x(x_) { }
   
   template<typename Y>
   typename F::result_type operator() (Y& y) const {
@@ -155,7 +155,7 @@ class rhs_binder {
  public:
   typedef typename F::result_type result_type;
 
-  binder (F f_, Y& y_): f(f_), y(y_) { }
+  rhs_binder (F f_, Y& y_): f(f_), y(y_) { }
   
   template<typename X>
   typename F::result_type operator() (X& x) const {
@@ -173,13 +173,13 @@ class rhs_binder {
 
 /* F<TagX>(X) -> F(X) */
 template<typename TagX, typename F>
-tag_binder<F, TagX> unary_tag_bind (F f) {
+tag_binder<1, F, TagX> unary_tag_bind (F f) {
   return tag_binder<1, F, TagX>(f);
 }
 
 /* F<TagX, TagY>(X) -> F(X) */
 template<typename TagX, typename TagY, typename F>
-tag_binder<F, TagX, TagY> unary_tag_bind (F f) {
+tag_binder<1, F, TagX, TagY> unary_tag_bind (F f) {
   return tag_binder<1, F, TagX, TagY>(f);
 }
 
@@ -189,13 +189,13 @@ tag_binder<F, TagX, TagY> unary_tag_bind (F f) {
 
 /* F<TagX>(X, Y) -> F(X, Y) */
 template<typename TagX, typename F>
-tag_binder<F, TagX> binary_tag_bind (F f) {
+tag_binder<2, F, TagX> binary_tag_bind (F f) {
   return tag_binder<2, F, TagX>(f);
 }
 
 /* F<TagX, TagY>(X, Y) -> F(X, Y) */
 template<typename TagX, typename TagY, typename F>
-tag_binder<F, TagX, TagY> binary_tag_bind (F f) {
+tag_binder<2, F, TagX, TagY> binary_tag_bind (F f) {
   return tag_binder<2, F, TagX, TagY>(f);
 }
 
@@ -251,7 +251,7 @@ rhs_binder<F, Y const> rhs_bind(F f, Y const& y) {
 
 /* F(X, Y) -> F(X) */
 template<typename F, typename Y>
-rhs_binder<F, Y> rhs_bind(F f, X& y) {
+rhs_binder<F, Y> rhs_bind(F f, Y& y) {
   return rhs_binder<F, Y>(f, y);
 }
 

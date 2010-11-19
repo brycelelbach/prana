@@ -12,6 +12,7 @@
 #define BOOST_SPIRIT_PRANA_TRAMPOLINE_HPP
 
 #include <boost/config.hpp>
+#include <boost/utility/result_of.hpp>
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
@@ -24,7 +25,7 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
 
-#include <boost/spirit/home/prana/dispatch_bind.hpp>
+#include <boost/spirit/home/prana/bind.hpp>
 
 #ifndef BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT
   #define BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT 32
