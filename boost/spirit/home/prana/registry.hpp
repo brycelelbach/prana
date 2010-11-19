@@ -16,6 +16,8 @@
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/order.hpp>
 #include <boost/mpl/insert.hpp>
+#include <boost/mpl/find_if.hpp>
+#include <boost/mpl/if.hpp>
 
 #include <boost/preprocessor/seq.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -148,7 +150,7 @@
   struct BOOST_PP_SEQ_ELEM(0, elem) {                                         \
     typedef v value_type;                                                     \
     static value_type const value;                                            \
-    typedef BOOST_PP_SEQ_ELEM(1, elem) type;                                  \
+    typedef BOOST_PP_SEQ_ELEM(1, elem) visitable_type;                        \
   };                                                                          \
   /***/
 
@@ -188,7 +190,7 @@ struct basic_registry: RegistrySet {
     };
   };
 
-  template<class TagX, class TagY = TagX>
+  template<class TagX>
   struct fallthrough: mpl::bool_<false> { }; 
 };
 

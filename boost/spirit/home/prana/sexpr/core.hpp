@@ -53,6 +53,8 @@ struct sexpr {
     core_types, recursive_types, atom_types,
     (cons)(tuple))
 
+  struct visitable;
+
   typedef basic_registry<core_types> registry;
 
   typedef boost::uintmax_t typeinfo;

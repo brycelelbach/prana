@@ -74,13 +74,6 @@ struct trampoline<0, Registry, X, Y> {
   operator() (F f, X& x) const { 
     return typename Registry::template default_<X>()(f, x);
   }
-  
-  // EXPLAIN (wash) Double dispatch, single parameter.
-  template<class F, class TagY> 
-  typename result_of<typename Registry::template default_<X, TagY>(X&)>::type
-  operator() (F f, X& x) const { 
-    return typename Registry::template default_<X, TagY>()(f, x);
-  }
 
   // EXPLAIN (djowel): Double dispatch.
   template<class F>
@@ -89,21 +82,6 @@ struct trampoline<0, Registry, X, Y> {
     return typename Registry::template default_<X, Y>()(f, x, y);
   }
 };
-
-#define BOOST_SPIRIT_PRANA_DEF_TAG_DISPATCH(z, n, _)                          \
-  typedef typename BOOST_PP_IF(n,                                             \
-    mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(n, 1))>::type,                  \
-    mpl::begin<Registry>::type) BOOST_PP_CAT(iter, n);                        \
-                                                                              \
-  typedef typename mpl::deref<BOOST_PP_CAT(iter, n)>::type                    \
-    BOOST_PP_CAT(tag, n);                                                     \
-                                                                              \
-  case BOOST_PP_CAT(tag, n)::value:                                           \
-    if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n), tagy>::value)   \
-      return f.template operator()<BOOST_PP_CAT(tag, n), tagy>(x);            \
-    else                                                                      \
-      f.template operator()<BOOST_PP_CAT(tag, n), tagy>(x);                   \
-  /***/
 
 #define BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH(z, n, _)                       \
   typedef typename BOOST_PP_IF(n,                                             \
@@ -115,9 +93,9 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(tag, n)::value:                                           \
     if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return f.template operator()<BOOST_PP_CAT(tag, n)>(x);                  \
+      return f(x);                                                            \
     else                                                                      \
-      f.template operator()<BOOST_PP_CAT(tag, n)>(x);                         \
+      f(x);                                                                   \
   /***/
 
 #define BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH(z, n, _)                       \
@@ -130,9 +108,9 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(tag, n)::value:                                           \
     if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f, x), y);           \
+      return (*this)(lhs_bind(f, x), y);                                      \
     else                                                                      \
-      (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f, x), y);                  \
+      (*this)(lhs_bind(f, x), y);                                             \
   /***/
 
 #define BOOST_SPIRIT_PRANA_DEF_TRAMPOLINE(z, n, _)                            \
@@ -159,19 +137,10 @@ struct trampoline<0, Registry, X, Y> {
       }                                                                       \
     }                                                                         \
                                                                               \
-    template<class F, class TagY>                                             \
-    typename F::result_type operator() (F f, X& x, TagY tagy) const {         \
-      switch (typename Registry::template which<X>()(x)) {                    \
-        BOOST_PP_REPEAT_##z (n, BOOST_SPIRIT_PRANA_DEF_TAG_DISPATCH, _)       \
-        default:                                                              \
-          return typename Registry::template default_<X, TagY>()(f, x);       \
-      }                                                                       \
-    }                                                                         \
-                                                                              \
     template<class F>                                                         \
     typename F::result_type operator() (F f, X& x, Y& y) const {              \
       switch (typename Registry::template which<X>()(x)) {                    \
-        BOOST_PP_REPEAT_ ## z (n, BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH, _)  \
+        BOOST_PP_REPEAT_##z (n, BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH, _)    \
         default:                                                              \
           return typename Registry::template default_<X, Y>()(f, x, y);       \
       }                                                                       \
@@ -188,7 +157,7 @@ struct trampoline<0, Registry, X, Y> {
 #undef BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH
 #undef BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH
 
-// EXPLAIN (wash): Single dispatch.
+/* EXPLAIN (wash): Single dispatch. */
 
 template<class Registry, class F, class X>
 typename result_of<
@@ -212,31 +181,7 @@ typename result_of<
   >()(f, x);
 }
 
-// EXPLAIN (wash): Double dispatch, single parameter.
-
-template<class Registry, class TagY, class F, class X>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X, X
-  >(F, X&)
->::type dispatch (F f, X& x) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X, X
-  >()(f, x, TagY());
-}
-
-template<class Registry, class TagY, class F, class X>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X const, X const
-  >(F, X const&)
->::type dispatch (F f, X const& x) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X const, X const
-  >()(f, x, TagY());
-}
-
-// EXPLAIN (wash): Double dispatch.
+/* EXPLAIN (wash): Double dispatch. */
 
 template<class Registry, class F, class X, class Y>
 typename result_of<
