@@ -150,7 +150,7 @@
   struct BOOST_PP_SEQ_ELEM(0, elem) {                                         \
     typedef v value_type;                                                     \
     static value_type const value;                                            \
-    typedef BOOST_PP_SEQ_ELEM(1, elem) visitable_type;                        \
+    typedef BOOST_PP_SEQ_ELEM(1, elem) type_definition;                       \
   };                                                                          \
   /***/
 
@@ -166,6 +166,8 @@ namespace prana {
 
 template<typename RegistrySet>
 struct basic_registry: RegistrySet {
+  struct type_registry;
+
   template<class X>
   struct which {
     typedef typename X::typeinfo result_type;

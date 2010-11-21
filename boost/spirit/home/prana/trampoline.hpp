@@ -43,48 +43,15 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-/* EXPLAIN (wash): My strategy here is based on the original visit
-   implementation for utree and Steven Watanabe's switch_ and case_
-   implementation (available in the Boost sandbox). */
+///  EXPLAIN (wash): My strategy here is based on the original visit
+/// implementation for utree and Steven Watanabe's switch_ and case_
+/// implementation (available in the Boost sandbox). Joel Falcou's NT2 functor
+/// code was also a major source of inspiration.
 
-template<std::size_t Size, class Registry, class X, class Y = X>
+template<std::size_t Size, class Registry, class F, class X, class Y = X>
 struct trampoline;
 
-/* EXPLAIN (wash): We do the 0 specialization here to avoid warnings. */
-template<class Registry, class X, class Y>
-struct trampoline<0, Registry, X, Y> {
-  template<class> struct result;
-
-  template<class This, class F>
-  struct result<This(F, X&)> {
-    typedef typename result_of<
-      typename Registry::template default_<X>(X&)
-    >::type type;
-  };  
-
-  template<class This, class F>
-  struct result<This(F, X&, Y&)> {
-    typedef typename result_of<
-      typename Registry::template default_<X, Y>(X&, Y&)
-    >::type type;
-  };  
-  
-  // EXPLAIN (djowel) Single dispatch.
-  template<class F> 
-  typename result_of<typename Registry::template default_<X>(X&)>::type
-  operator() (F f, X& x) const { 
-    return typename Registry::template default_<X>()(f, x);
-  }
-
-  // EXPLAIN (djowel): Double dispatch.
-  template<class F>
-  typename result_of<typename Registry::template default_<X, Y>(X&, Y&)>::type
-  operator() (F f, X& x, Y& y) const {
-    return typename Registry::template default_<X, Y>()(f, x, y);
-  }
-};
-
-#define BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH(z, n, _)                       \
+#define BSP_SINGLE_DISPATCH(z, n, _)                                          \
   typedef typename BOOST_PP_IF(n,                                             \
     mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(n, 1))>::type,                  \
     mpl::begin<Registry>::type) BOOST_PP_CAT(iter, n);                        \
@@ -94,12 +61,12 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(tag, n)::value:                                           \
     if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return f(x);                                                            \
+      return f(BOOST_PP_CAT(tag, n)());                                       \
     else                                                                      \
-      f(x);                                                                   \
+      f(BOOST_PP_CAT(tag, n)());                                              \
   /***/
 
-#define BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH(z, n, _)                       \
+#define BSP_DOUBLE_DISPATCH(z, n, _)                                          \
   typedef typename BOOST_PP_IF(n,                                             \
     mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(n, 1))>::type,                  \
     mpl::begin<Registry>::type) BOOST_PP_CAT(iter, n);                        \
@@ -109,124 +76,50 @@ struct trampoline<0, Registry, X, Y> {
                                                                               \
   case BOOST_PP_CAT(tag, n)::value:                                           \
     if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return (*this)(lhs_bind(f, x), y);                                      \
+      return (*this)(dispatch_bind(f, BOOST_PP_CAT(tag, n)()), y);            \
     else                                                                      \
-      (*this)(lhs_bind(f, x), y);                                             \
+      (*this)(dispatch_bind(f, BOOST_PP_CAT(tag, n)()), y);                   \
   /***/
 
-#define BOOST_SPIRIT_PRANA_DEF_TRAMPOLINE(z, n, _)                            \
-  template<class Registry, class X, class Y>                                  \
-  struct trampoline<n, Registry, X, Y> {                                      \
+#define BSP_TRAMPOLINE(z, n, _)                                               \
+  template<class Registry, class F, class X, class Y>                         \
+  struct trampoline<n, Registry, F, X, Y> {                                   \
     template<class> struct result;                                            \
                                                                               \
-    template<class This, class F>                                             \
-    struct result<This(F, X&)> {                                              \
+    template<class This>                                                      \
+    struct result<This(F&, X&)> {                                             \
       typedef typename F::result_type type;                                   \
     };                                                                        \
                                                                               \
-    template<class This, class F>                                             \
-    struct result<This(F, X&, Y&)> {                                          \
+    template<class This>                                                      \
+    struct result<This(F&, X&, Y&)> {                                         \
       typedef typename F::result_type type;                                   \
     };                                                                        \
                                                                               \
-    template<class F>                                                         \
-    typename F::result_type operator() (F f, X& x) const {                    \
-      switch (typename Registry::template which<X>()(x)) {                    \
-        BOOST_PP_REPEAT_##z (n, BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH, _)    \
-        default:                                                              \
-          return typename Registry::template default_<X>()(f, x);             \
+    typename F::result_type operator() (F& f, X& x) const {                   \
+      switch (typename Registry::which()(x)) {                                \
+        BOOST_PP_REPEAT_##z (n, BSP_SINGLE_DISPATCH, _)                       \
+        default: return typename Registry::default_()(f, x);                  \
       }                                                                       \
     }                                                                         \
                                                                               \
-    template<class F>                                                         \
-    typename F::result_type operator() (F f, X& x, Y& y) const {              \
-      switch (typename Registry::template which<X>()(x)) {                    \
-        BOOST_PP_REPEAT_##z (n, BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH, _)    \
-        default:                                                              \
-          return typename Registry::template default_<X, Y>()(f, x, y);       \
+    typename F::result_type operator() (F& f, X& x, Y& y) const {             \
+      switch (typename Registry::which()(x)) {                                \
+        BOOST_PP_REPEAT_##z (n, BSP_DOUBLE_DISPATCH, _)                       \
+        default: return typename Registry::default_()(f, x, y);               \
       }                                                                       \
     }                                                                         \
   };                                                                          \
   /***/
 
 #define BOOST_PP_LOCAL_LIMITS (1, BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT)
-#define BOOST_PP_LOCAL_MACRO(n) BOOST_SPIRIT_PRANA_DEF_TRAMPOLINE(1, n, _)
+#define BOOST_PP_LOCAL_MACRO(n) BSP_TRAMPOLINE(1, n, _)
 
 #include BOOST_PP_LOCAL_ITERATE()
 
-#undef BOOST_SPIRIT_PRANA_DEF_TRAMPOLINE
-#undef BOOST_SPIRIT_PRANA_DEF_SINGLE_DISPATCH
-#undef BOOST_SPIRIT_PRANA_DEF_DOUBLE_DISPATCH
-
-/* EXPLAIN (wash): Single dispatch. */
-
-template<class Registry, class F, class X>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X, X
-  >(F, X&)
->::type dispatch (F f, X& x) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X, X
-  >()(f, x);
-}
-
-template<class Registry, class F, class X>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X const, X const
-  >(F, X const&)
->::type dispatch (F f, X const& x) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X const, X const
-  >()(f, x);
-}
-
-/* EXPLAIN (wash): Double dispatch. */
-
-template<class Registry, class F, class X, class Y>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X const, Y const
-  >(F, X const&, Y const&)
->::type dispatch (F f, X const& x, Y const& y) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X const, Y const
-  >()(f, x, y);
-}
-
-template<class Registry, class F, class X, class Y>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X const, Y 
-  >(F, X const&, Y&)
->::type dispatch (F f, X const& x, Y& y) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X const, Y
-  >()(f, x, y);
-}
-
-template<class Registry, class F, class X, class Y>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X, Y const
-  >(F, X&, Y const&)
->::type dispatch (F f, X x, Y const& y) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X, Y const
-  >()(f, x, y);
-}
-
-template<class Registry, class F, class X, class Y>
-typename result_of<
-  trampoline<
-    mpl::size<Registry>::value, Registry, X, Y
-  >(F, X&, Y&)
->::type dispatch (F f, X& x, Y& y) {
-  return trampoline<
-    mpl::size<Registry>::value, Registry, X, Y 
-  >()(f, x, y);
-}
+#undef BSP_SINGLE_DISPATCH
+#undef BSP_DOUBLE_DISPATCH
+#undef BSP_TRAMPOLINE
 
 } // prana
 } // spirit

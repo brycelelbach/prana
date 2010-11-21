@@ -24,6 +24,8 @@ namespace prana {
 
 template<typename Iterator>
 struct sexpr {
+  struct symbolic_expression; /* indicates sexpr fulfills SymbolicExpression */
+
   BOOST_SPIRIT_PRANA_TYPES(
     std::size_t,
     ((boolean)  (bool))
@@ -34,7 +36,7 @@ struct sexpr {
     ((string)   (typename intern_pool<Iterator>::pointer))
     ((nil)      (void*))
     ((empty)    (void*))
-    ((cons)     (sexpr*))
+    ((pair)     (sexpr*))
     ((tuple)    (sexpr*)))
 
   BOOST_SPIRIT_PRANA_TEMP_REGISTRY_SET(
@@ -51,9 +53,7 @@ struct sexpr {
 
   BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
     core_types, recursive_types, atom_types,
-    (cons)(tuple))
-
-  struct visitable;
+    (pair)(tuple))
 
   typedef basic_registry<core_types> registry;
 
@@ -66,15 +66,15 @@ struct sexpr {
 
 BOOST_SPIRIT_PRANA_TEMP_INIT_TYPES(
   sexpr, (Iterator), core_types, 
-  (nil)
-  (empty)
   (boolean)
   (integer)
   (floating)
   (symbol)
   (string)
+  (nil)
+  (empty)
   (pointer)
-  (cons)
+  (pair)
   (tuple))
 
 } // prana

@@ -7,280 +7,282 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_BIND_HPP)
-#define BOOST_SPIRIT_PRANA_BIND_HPP
+#if !BOOST_PP_IS_ITERATING
+  #if !defined(BOOST_SPIRIT_PRANA_BIND_HPP)
+  #define BOOST_SPIRIT_PRANA_BIND_HPP
 
-namespace boost {
-namespace spirit {
-namespace prana {
+  #include <boost/utility/enable_if.hpp>
+  #include <boost/utility/result_of.hpp>
 
-/* EXPLAIN (wash): Tag binder for binding a templated operator() */
-template<unsigned arity, class F, class TagX, class TagY = TagX>
-class tag_binder;
+  #include <boost/fusion/container/vector.hpp>
+  #include <boost/fusion/include/vector.hpp>
+  #include <boost/fusion/container/vector/vector_fwd.hpp>
+  #include <boost/fusion/include/vector_fwd.hpp>
+  #include <boost/fusion/sequence/intrinsic/at_c.hpp>
+  #include <boost/fusion/include/at_c.hpp>
 
-template<class F, class TagX, class TagY>
-class tag_binder<1, F, TagX, TagY> {
- private:
-  F f;
+  #include <boost/preprocessor/iteration/iterate.hpp>
+  #include <boost/preprocessor/seq.hpp>
 
- public:
-  typedef typename F::result_type result_type;
+  namespace boost {
+  namespace spirit {
+  namespace prana {
 
-  tag_binder (F f_): f(f_) { }
+  #define BSP_LEFTMOST  0
+  #define BSP_RIGHTMOST 1
+ 
+  #define BSP_PRE(r, data, elem)                          \
+    data elem                                             \
+    /***/
 
-  template<typename X>
-  typename F::result_type operator() (X& x) const {
-    return f.template operator()<TagX, TagY>(x);
-  }
+  #define BSP_POST(r, data, elem)                         \
+    elem data                                             \
+    /***/
 
-  template<typename X>
-  typename F::result_type operator() (X const& x) const {
-    return f.template operator()<TagX, TagY>(x);
-  }
-};
+  #define BSP_DECL(r, data, elem)                         \
+    elem& BOOST_PP_CAT(data, elem);                       \
+    /***/
 
-template<class F, class TagX>
-class tag_binder<1, F, TagX, TagX> {
- private:
-  F f;
-
- public:
-  typedef typename F::result_type result_type;
-
-  tag_binder (F f_): f(f_) { }
-
-  template<typename X>
-  typename F::result_type operator() (X& x) const {
-    return f.template operator()<TagX>(x);
-  }
-
-  template<typename X>
-  typename F::result_type operator() (X const& x) const {
-    return f.template operator()<TagX>(x);
-  }
-};
-
-template<class F, class TagX, class TagY>
-class tag_binder<2, F, TagX, TagY> {
- private:
-  F f;
-
- public:
-  typedef typename F::result_type result_type;
-
-  tag_binder (F f_): f(f_) { }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X& x, Y& y) const {
-    return f.template operator()<TagX, TagY>(x, y);
-  }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X& x, Y const& y) const {
-    return f.template operator()<TagX, TagY>(x, y);
-  }
+  #define BSP_PARAMS(r, data, elem)                       \
+    elem& BOOST_PP_CAT(elem, data)                        \
+    /***/
   
-  template<typename X, typename Y>
-  typename F::result_type operator() (X const& x, Y& y) const {
-    return f.template operator()<TagX, TagY>(x, y);
-  }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X const& x, Y const& y) const {
-    return f.template operator()<TagX, TagY>(x, y);
-  }
-};
-
-template<class F, class TagX>
-class tag_binder<2, F, TagX, TagX> {
- private:
-  F f;
-
- public:
-  typedef typename F::result_type result_type;
-
-  tag_binder (F f_): f(f_) { }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X& x, Y& y) const {
-    return f.template operator()<TagX>(x, y);
-  }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X& x, Y const& y) const {
-    return f.template operator()<TagX>(x, y);
-  }
+  #define BSP_ARGS(r, data, i, elem)                               \
+    BOOST_PP_COMMA_IF(i)                                           \
+    BOOST_PP_SEQ_FOR_EACH_R(r, BSP_POST, BOOST_PP_EMPTY(), elem) & \
+    BOOST_PP_CAT(data, i)                                          \
+    /***/
   
-  template<typename X, typename Y>
-  typename F::result_type operator() (X const& x, Y& y) const {
-    return f.template operator()<TagX>(x, y);
-  }
-
-  template<typename X, typename Y>
-  typename F::result_type operator() (X const& x, Y const& y) const {
-    return f.template operator()<TagX>(x, y);
-  }
-};
-
-/* EXPLAIN (djowel): Simple binder for binary visitation (we don't want to bring
-   in the big guns). */
-template<class F, class X>
-class lhs_binder {
- private:
-  F f;
-  X& x; /* EXPLAIN (djowel): Always by reference. */
-
- public:
-  typedef typename F::result_type result_type;
-
-  lhs_binder (F f_, X& x_): f(f_), x(x_) { }
+  #define BSP_ALL(r, data, elem)                                   \
+    BOOST_PP_SEQ_FOR_EACH_R(r, BSP_POST, BOOST_PP_EMPTY(), elem)   \
+    /***/
   
-  template<typename Y>
-  typename F::result_type operator() (Y& y) const {
-    return f(x, y);
-  }
+  #define BSP_FIRST(r, data, elem)                        \
+    BOOST_PP_SEQ_HEAD(elem)                               \
+    /***/
 
-  template<typename Y>
-  typename F::result_type operator() (Y const& y) const {
-    return f(x, y);
-  }
-};
+  #define BSP_INIT(r, data, elem)                         \
+    BOOST_PP_CAT(data, elem) ( BOOST_PP_CAT(elem, data) ) \
+    /***/
 
-template<class F, class Y>
-class rhs_binder {
- private:
-  F f;
-  Y& y; 
+  #define BSP_CALL(r, data, i, elem)                      \
+    BOOST_PP_COMMA_IF(i)                                  \
+    fusion::at_c<i>(value)                                \
+    /***/
 
- public:
-  typedef typename F::result_type result_type;
+  #define BSP_GET(r, data, i, elem)                                         \
+    template<std::size_t N>                                                 \
+    typename enable_if_c<N == i, elem&>::type get (void) {                  \
+      return fusion::at_c<N>(value);                                        \
+    }                                                                       \
+                                                                            \
+    template<std::size_t N>                                                 \
+    typename enable_if_c<N == i, elem const&>::type get (void) const {      \
+      return fusion::at_c<N>(value);                                        \
+    }                                                                       \
+    /***/
+ 
+  #define BSP_BINDER(name, actors, num_tags, bound_side)                      \
+    template<                                                                 \
+      BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(num_tags, 1), class Tag),             \
+      template<class, class> class F,                                         \
+      BOOST_PP_SEQ_ENUM(                                                      \
+        BOOST_PP_SEQ_TRANSFORM(BSP_PRE, class,                                \
+          BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                      \
+    >                                                                         \
+    class name {                                                              \
+     public:                                                                  \
+      typedef fusion::BOOST_PP_CAT(vector, BOOST_PP_SEQ_SIZE(actors))<        \
+        BOOST_PP_SEQ_ENUM(                                                    \
+          BOOST_PP_SEQ_TRANSFORM(BSP_POST, &,                                 \
+            BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                    \
+      > value_type;                                                           \
+                                                                              \
+     private:                                                                 \
+      value_type value;                                                       \
+                                                                              \
+     public:                                                                  \
+      BOOST_PP_SEQ_FOR_EACH_I(BSP_GET, _,                                     \
+        BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors))                         \
+                                                                              \
+      template<class> struct result;                                          \
+                                                                              \
+      template<                                                               \
+        class This, class                                                     \
+        BOOST_PP_IIF(BOOST_PP_BOOL(bound_side), Leftmost, Rightmost)          \
+      >                                                                       \
+      struct result<                                                          \
+        This(BOOST_PP_IIF(BOOST_PP_BOOL(bound_side), Leftmost, Rightmost))    \
+      > {                                                                     \
+        typedef typename result_of<                                           \
+          F<                                                                  \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              Leftmost BOOST_PP_COMMA, BOOST_PP_EMPTY)()                      \
+            BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(num_tags, 1), Tag)              \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              BOOST_PP_EMPTY, BOOST_PP_COMMA)()                               \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              BOOST_PP_EMPTY(), Rightmost)                                    \
+          >(                                                                  \
+            BOOST_PP_SEQ_ENUM(                                                \
+              BOOST_PP_SEQ_TRANSFORM(BSP_POST, &,                             \
+                BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                \
+          )                                                                   \
+        >::type type;                                                         \
+      };                                                                      \
+                                                                              \
+      name (BOOST_PP_SEQ_ENUM(                                                \
+        BOOST_PP_SEQ_TRANSFORM(BSP_PARAMS, _,                                 \
+          BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))):                    \
+            value(BOOST_PP_SEQ_ENUM(                                          \
+              BOOST_PP_SEQ_TRANSFORM(BSP_INIT, _,                             \
+                BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))) { }           \
+                                                                              \
+      template<class BOOST_PP_IIF(                                            \
+        BOOST_PP_BOOL(bound_side), Leftmost, Rightmost)>                      \
+      typename result_of<name(BOOST_PP_IIF(                                   \
+        BOOST_PP_BOOL(bound_side), Leftmost, Rightmost)                       \
+      )>::type operator() (                                                   \
+        BOOST_PP_IIF(BOOST_PP_BOOL(bound_side), Leftmost, Rightmost)          \
+      ) const {                                                               \
+        return F<                                                             \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              Leftmost BOOST_PP_COMMA, BOOST_PP_EMPTY)()                      \
+            BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(num_tags, 1), Tag)              \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              BOOST_PP_EMPTY, BOOST_PP_COMMA)()                               \
+            BOOST_PP_IIF(BOOST_PP_BOOL(bound_side),                           \
+              BOOST_PP_EMPTY(), Rightmost)                                    \
+          >()(                                                                \
+            BOOST_PP_SEQ_FOR_EACH_I(BSP_CALL, _,                              \
+              BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors))                   \
+          );                                                                  \
+      }                                                                       \
+    };                                                                        \
+    /***/
 
-  rhs_binder (F f_, Y& y_): f(f_), y(y_) { }
+  #define BSP_FN(name, actors, binder)                                        \
+    template<                                                                 \
+      class Tag, template<class, class> class F,                              \
+      BOOST_PP_SEQ_ENUM(                                                      \
+        BOOST_PP_SEQ_TRANSFORM(BSP_PRE, class,                                \
+          BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                      \
+    >                                                                         \
+    inline binder<Tag, F, BOOST_PP_SEQ_ENUM(                                  \
+      BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors)                              \
+    )> name (                                                                 \
+      BOOST_PP_SEQ_FOR_EACH_I(BSP_ARGS, a, actors)                            \
+    ) {                                                                       \
+      return binder<Tag, F, BOOST_PP_SEQ_ENUM(                                \
+        BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors)                            \
+      )>(                                                                     \
+        BOOST_PP_ENUM_PARAMS(BOOST_PP_SEQ_SIZE(actors), a)                    \
+      );                                                                      \
+    }                                                                         \
+    /***/
+
+  #define BOOST_PP_ITERATION_PARAMS_1               \
+    (3, (1, 5, <boost/spirit/home/prana/bind.hpp>)) \
+    /***/
+
+  #include BOOST_PP_ITERATE()
+
+  #undef BSP_LEFTMOST
+  #undef BSP_RIGHTMOST
+  #undef BSP_PRE
+  #undef BSP_POST
+  #undef BSP_DECL
+  #undef BSP_PARAMS
+  #undef BSP_ARGS
+  #undef BSP_ALL
+  #undef BSP_FIRST
+  #undef BSP_INIT 
+  #undef BSP_CALL
+  #undef BSP_GET
+  #undef BSP_BINDER
+  #undef BSP_FN
+
+  } /// prana
+  } /// spirit
+  } /// boost
+
+  #endif /// BOOST_SPIRIT_PRANA_BIND_HPP
+
+#elif BOOST_PP_ITERATION() == 1
+  BSP_BINDER(lhs_unary_tag_binder, ((A0)), 2, BSP_LEFTMOST)
   
-  template<typename X>
-  typename F::result_type operator() (X& x) const {
-    return f(x, y);
+  BSP_FN(bind_lhs_tag, ((A0)),        lhs_unary_tag_binder)
+  BSP_FN(bind_lhs_tag, ((A0)(const)), lhs_unary_tag_binder)
+
+#elif BOOST_PP_ITERATION() == 2
+  BSP_BINDER(rhs_unary_tag_binder, ((A0)), 2, BSP_RIGHTMOST)
+  
+  BSP_FN(bind_rhs_tag, ((A0)),        rhs_unary_tag_binder)
+  BSP_FN(bind_rhs_tag, ((A0)(const)), rhs_unary_tag_binder)
+
+#elif BOOST_PP_ITERATION() == 3
+  BSP_BINDER(lhs_binary_tag_binder, ((A0))((A1)), 2, BSP_LEFTMOST)
+
+  BSP_FN(bind_lhs_tag, ((A0))        ((A1)),        lhs_binary_tag_binder)
+  BSP_FN(bind_lhs_tag, ((A0)(const)) ((A1)),        lhs_binary_tag_binder)
+  BSP_FN(bind_lhs_tag, ((A0))        ((A1)(const)), lhs_binary_tag_binder)
+  BSP_FN(bind_lhs_tag, ((A0)(const)) ((A1)(const)), lhs_binary_tag_binder)
+  
+#elif BOOST_PP_ITERATION() == 4
+  BSP_BINDER(rhs_binary_tag_binder, ((A0))((A1)), 2, BSP_RIGHTMOST)
+  
+  BSP_FN(bind_rhs_tag, ((A0))        ((A1)),        rhs_binary_tag_binder)
+  BSP_FN(bind_rhs_tag, ((A0)(const)) ((A1)),        rhs_binary_tag_binder)
+  BSP_FN(bind_rhs_tag, ((A0))        ((A1)(const)), rhs_binary_tag_binder)
+  BSP_FN(bind_rhs_tag, ((A0)(const)) ((A1)(const)), rhs_binary_tag_binder)
+
+#elif BOOST_PP_ITERATION() == 5
+  /// EXPLAIN (djowel): Simple binder for binary visitation (we don't want to
+  /// bring in the big guns). 
+  template<class F, class X>
+  class dispatch_binder {
+   private:
+    F& f; /// EXPLAIN (wash): We must take a reference to the tag binder.  
+    X& x; /// EXPLAIN (djowel): Always by reference.
+
+   public:
+    template<class> struct result;
+
+    template<class This, class Y>
+    struct result<This(Y&)> {
+      typedef typename result_of<F(X&, Y&)>::type type;
+    };
+    
+    template<class This, class Y>
+    struct result<This(Y const&)> {
+      typedef typename result_of<F(X&, Y const&)>::type type;
+    };
+
+    dispatch_binder (F f_, X& x_): f(f_), x(x_) { }
+
+    template<typename Y>
+    typename result_of<F(X&, Y const&)>::type operator() (Y& y) const {
+      return f(x, y);
+    }
+
+    template<typename Y>
+    typename result_of<F(X&, Y const&)>::type operator() (Y const& y) const {
+      return f(x, y);
+    }
+  };
+
+  template<typename F, typename X>
+  dispatch_binder<F, X const> dispatch_bind(F f, X const& x) {
+    return dispatch_binder<F, X const>(f, x);
   }
 
-  template<typename X>
-  typename F::result_type operator() (X const& x) const {
-    return f(x, y);
+  template<typename F, typename X>
+  dispatch_binder<F, X> dispatch_bind(F f, X& x) {
+    return dispatch_binder<F, X>(f, x);
   }
-};
 
-/* EXPLAIN (wash): unary_tag_bind binds an unary operator() method with one or
-   two template parameters; the resulting binder can be invoked as F(X) */
+#else
+  /// shouldn't happen
 
-/* F<TagX>(X) -> F(X) */
-template<typename TagX, typename F>
-tag_binder<1, F, TagX> unary_tag_bind (F f) {
-  return tag_binder<1, F, TagX>(f);
-}
+#endif /// BOOST_PP_IS_ITERATING
 
-/* F<TagX, TagY>(X) -> F(X) */
-template<typename TagX, typename TagY, typename F>
-tag_binder<1, F, TagX, TagY> unary_tag_bind (F f) {
-  return tag_binder<1, F, TagX, TagY>(f);
-}
-
-/* EXPLAIN (wash): binary_tag_bind works like unary_tag_bind; the only
-   difference is the function call arity of the operator() bound. Invocation
-   of the produced binder is F(X, Y). */
-
-/* F<TagX>(X, Y) -> F(X, Y) */
-template<typename TagX, typename F>
-tag_binder<2, F, TagX> binary_tag_bind (F f) {
-  return tag_binder<2, F, TagX>(f);
-}
-
-/* F<TagX, TagY>(X, Y) -> F(X, Y) */
-template<typename TagX, typename TagY, typename F>
-tag_binder<2, F, TagX, TagY> binary_tag_bind (F f) {
-  return tag_binder<2, F, TagX, TagY>(f);
-}
-
-/* EXPLAIN (wash): lhs_bind binds binary functions; both arguments and
-   template parameters can be bound. The return value is a binder that can be
-   invoked with F(Y). */
-
-/* F(X, Y) -> F(Y) */
-template<typename F, typename X>
-lhs_binder<F, X const> lhs_bind(F f, X const& x) {
-  return lhs_binder<F, X const>(f, x);
-}
-
-/* F(X, Y) -> F(Y) */
-template<typename F, typename X>
-lhs_binder<F, X> lhs_bind(F f, X& x) {
-  return lhs_binder<F, X>(f, x);
-}
-
-/* F<TagX>(X, Y) -> F(Y) */
-template<typename TagX, typename F, typename X>
-lhs_binder<F, X const> lhs_bind(F f, X const& x) {
-  return lhs_binder<F, X const>(binary_tag_bind<TagX>(f), x);
-}
-
-/* F<TagX>(X, Y) -> F(Y) */
-template<typename TagX, typename F, typename X>
-lhs_binder<F, X> lhs_bind(F f, X& x) {
-  return lhs_binder<F, X>(binary_tag_bind<TagX>(f), x);
-}
-
-/* F<TagX, TagY>(X, Y) -> F(Y) */
-template<typename TagX, typename TagY, typename F, typename X>
-lhs_binder<F, X const> lhs_bind(F f, X const& x) {
-  return lhs_binder<F, X const>(binary_tag_bind<TagX, TagY>(f), x);
-}
-
-/* F<TagX, TagY>(X, Y) -> F(Y) */
-template<typename TagX, typename TagY, typename F, typename X>
-lhs_binder<F, X> lhs_bind(F f, X& x) {
-  return lhs_binder<F, X>(binary_tag_bind<TagX, TagY>(f), x);
-}
-
-/* EXPLAIN (wash): rhs_bind binds the right hand side, aka the second parameter,
-   of an operator() method. Template parameters can be bound as well. The
-   resulting binder can be invoked with F(X). */
-
-/* F(X, Y) -> F(X) */
-template<typename F, typename Y>
-rhs_binder<F, Y const> rhs_bind(F f, Y const& y) {
-  return rhs_binder<F, Y const>(f, y);
-}
-
-/* F(X, Y) -> F(X) */
-template<typename F, typename Y>
-rhs_binder<F, Y> rhs_bind(F f, Y& y) {
-  return rhs_binder<F, Y>(f, y);
-}
-
-/* F<TagX>(X, Y) -> F(X) */
-template<typename TagX, typename F, typename Y>
-rhs_binder<F, Y const> rhs_bind(F f, Y const& y) {
-  return rhs_binder<F, Y const>(binary_tag_bind<TagX>(f), y);
-}
-
-/* F<TagX>(X, Y) -> F(X) */
-template<typename TagX, typename F, typename Y>
-rhs_binder<F, Y> rhs_bind(F f, Y& y) {
-  return rhs_binder<F, Y>(binary_tag_bind<TagX>(f), y);
-}
-
-/* F<TagX, TagY>(X, Y) -> F(X) */
-template<typename TagX, typename TagY, typename F, typename Y>
-rhs_binder<F, Y const> rhs_bind(F f, Y const& y) {
-  return rhs_binder<F, Y const>(binary_tag_bind<TagX, TagY>(f), y);
-}
-
-/* F<TagX, TagY>(X, Y) -> F(X) */
-template<typename TagX, typename TagY, typename F, typename Y>
-rhs_binder<F, Y> rhs_bind(F f, Y& y) {
-  return rhs_binder<F, Y>(binary_tag_bind<TagX, TagY>(f), y);
-}
-
-} // prana
-} // spirit
-} // boost
-
-#endif // BOOST_SPIRIT_PRANA_BIND_HPP
