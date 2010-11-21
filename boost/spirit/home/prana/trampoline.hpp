@@ -13,6 +13,7 @@
 
 #include <boost/config.hpp>
 #include <boost/utility/result_of.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
@@ -43,12 +44,12 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-///  EXPLAIN (wash): My strategy here is based on the original visit
+/// EXPLAIN (wash): My strategy here is based on the original visit
 /// implementation for utree and Steven Watanabe's switch_ and case_
 /// implementation (available in the Boost sandbox). Joel Falcou's NT2 functor
 /// code was also a major source of inspiration.
 
-template<std::size_t Size, class Registry, class F, class X, class Y = X>
+template<std::size_t Size, class Registry, class F>
 struct trampoline;
 
 #define BSP_SINGLE_DISPATCH(z, n, _)                                          \
@@ -76,37 +77,35 @@ struct trampoline;
                                                                               \
   case BOOST_PP_CAT(tag, n)::value:                                           \
     if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return (*this)(dispatch_bind(f, BOOST_PP_CAT(tag, n)()), y);            \
+      return (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f), f);              \
     else                                                                      \
-      (*this)(dispatch_bind(f, BOOST_PP_CAT(tag, n)()), y);                   \
+      (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f), f);                     \
   /***/
 
 #define BSP_TRAMPOLINE(z, n, _)                                               \
-  template<class Registry, class F, class X, class Y>                         \
-  struct trampoline<n, Registry, F, X, Y> {                                   \
-    template<class> struct result;                                            \
+  template<class Registry, class F>                                           \
+  struct trampoline<n, Registry, F> {                                         \
+    typedef F& result_type;                                                   \
                                                                               \
-    template<class This>                                                      \
-    struct result<This(F&, X&)> {                                             \
-      typedef typename F::result_type type;                                   \
-    };                                                                        \
-                                                                              \
-    template<class This>                                                      \
-    struct result<This(F&, X&, Y&)> {                                         \
-      typedef typename F::result_type type;                                   \
-    };                                                                        \
-                                                                              \
-    typename F::result_type operator() (F& f, X& x) const {                   \
-      switch (typename Registry::which()(x)) {                                \
+    F& operator() (                                                           \
+      F& f, typename enable_if_c<                                             \
+        F::tag_binder::value == 1, mpl::size_t<1>                             \
+      >::type size = mpl::size_t<1>()                                         \
+    ) const {                                                                 \
+      switch (typename Registry::template which<F>()(f)) {                    \
         BOOST_PP_REPEAT_##z (n, BSP_SINGLE_DISPATCH, _)                       \
-        default: return typename Registry::default_()(f, x);                  \
+        default: return typename Registry::template default_<F>()(f);         \
       }                                                                       \
     }                                                                         \
                                                                               \
-    typename F::result_type operator() (F& f, X& x, Y& y) const {             \
-      switch (typename Registry::which()(x)) {                                \
+    F& operator() (                                                           \
+      F& f, typename enable_if_c<                                             \
+        F::tag_binder::value == 2, mpl::size_t<2>                             \
+      >::type size = mpl::size_t<2>()                                         \
+    ) const {                                                                 \
+      switch (typename Registry::template which<F>()(f)) {                    \
         BOOST_PP_REPEAT_##z (n, BSP_DOUBLE_DISPATCH, _)                       \
-        default: return typename Registry::default_()(f, x, y);               \
+        default: return typename Registry::template default_<F>()(f);         \
       }                                                                       \
     }                                                                         \
   };                                                                          \

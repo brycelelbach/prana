@@ -31,6 +31,7 @@ BOOST_SPIRIT_PRANA_DEF_TRAITS(false,
   ((symbolic_expression)     (is_symbolic_expression)) 
   ((type_definition)         (is_type_definition)) 
   ((type_registry)           (is_type_registry))
+  ((tag_binder)              (is_tag_binder)) 
   ((implementation_functor)  (is_implementation_functor)) 
   ((interface_functor)       (is_interface_functor)))
 

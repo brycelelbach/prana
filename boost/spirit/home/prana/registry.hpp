@@ -12,6 +12,7 @@
 
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/order.hpp>
@@ -22,6 +23,8 @@
 #include <boost/preprocessor/seq.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/arithmetic/sub.hpp>
+
+#include <boost/spirit/home/prana/traits.hpp>
 
 /* INIT_TYPES and TEMP_INIT_TYPES implementation */
 
@@ -166,29 +169,29 @@ namespace prana {
 
 template<typename RegistrySet>
 struct basic_registry: RegistrySet {
-  struct type_registry;
-
-  template<class X>
+  template<class F>
   struct which {
-    typedef typename X::typeinfo result_type;
+    typedef std::size_t result_type;
 
-    result_type operator() (X& x) const {
+    typename enable_if<is_tag_binder<F>, std::size_t>::type
+    operator() (F const& f) const {
+      return (*this)(f.template get<0>());
+    }
+   
+    template<class X> 
+    typename enable_if<is_type_definition<X>, std::size_t>::type
+    operator() (X const& x) const {
       return x.type;
     }
   };
 
-  template<class X, class Y = X>
+  template<class F>
   struct default_ {
-    typedef void result_type;
+    typedef F& result_type;
 
-    template<class F>
-    void operator() (F, X&) const {
+    F& operator() (F const& f) const {
       BOOST_ASSERT(!"(error (\"invalid type information\"))");
-    };
-    
-    template<class F>
-    void operator() (F, X&, Y&) const {
-      BOOST_ASSERT(!"(error (\"invalid type information\"))");
+      return f;
     };
   };
 

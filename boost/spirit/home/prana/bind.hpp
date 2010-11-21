@@ -14,6 +14,8 @@
   #include <boost/utility/enable_if.hpp>
   #include <boost/utility/result_of.hpp>
 
+  #include <boost/mpl/size_t.hpp>
+
   #include <boost/fusion/container/vector.hpp>
   #include <boost/fusion/include/vector.hpp>
   #include <boost/fusion/container/vector/vector_fwd.hpp>
@@ -102,6 +104,8 @@
       value_type value;                                                       \
                                                                               \
      public:                                                                  \
+      typedef mpl::size_t<BOOST_PP_SEQ_SIZE(actors)>::type tag_binder;        \
+                                                                              \
       BOOST_PP_SEQ_FOR_EACH_I(BSP_GET, _,                                     \
         BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors))                         \
                                                                               \
@@ -239,46 +243,35 @@
 #elif BOOST_PP_ITERATION() == 5
   /// EXPLAIN (djowel): Simple binder for binary visitation (we don't want to
   /// bring in the big guns). 
-  template<class F, class X>
+  template<class TagX, class F>
   class dispatch_binder {
    private:
     F& f; /// EXPLAIN (wash): We must take a reference to the tag binder.  
-    X& x; /// EXPLAIN (djowel): Always by reference.
 
    public:
     template<class> struct result;
 
-    template<class This, class Y>
-    struct result<This(Y&)> {
-      typedef typename result_of<F(X&, Y&)>::type type;
+    template<class This, class TagY>
+    struct result<This(TagY)> {
+      typedef typename result_of<F(TagX, TagY)>::type type;
     };
     
-    template<class This, class Y>
-    struct result<This(Y const&)> {
-      typedef typename result_of<F(X&, Y const&)>::type type;
-    };
+    dispatch_binder (F& f_): f(f_) { }
 
-    dispatch_binder (F f_, X& x_): f(f_), x(x_) { }
-
-    template<typename Y>
-    typename result_of<F(X&, Y const&)>::type operator() (Y& y) const {
-      return f(x, y);
-    }
-
-    template<typename Y>
-    typename result_of<F(X&, Y const&)>::type operator() (Y const& y) const {
-      return f(x, y);
+    template<class TagY>
+    typename result_of<F(TagX, TagY)>::type operator() (TagY tagy) const {
+      return f(TagX(), tagy);
     }
   };
 
-  template<typename F, typename X>
-  dispatch_binder<F, X const> dispatch_bind(F f, X const& x) {
-    return dispatch_binder<F, X const>(f, x);
+  template<class TagX, class F>
+  dispatch_binder<TagX, F> dispatch_bind(F& f) {
+    return dispatch_binder<TagX, F>(f);
   }
-
-  template<typename F, typename X>
-  dispatch_binder<F, X> dispatch_bind(F f, X& x) {
-    return dispatch_binder<F, X>(f, x);
+  
+  template<class TagX, class F>
+  dispatch_binder<TagX, F> dispatch_bind(F const& f) {
+    return dispatch_binder<TagX, F const>(f);
   }
 
 #else
