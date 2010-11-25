@@ -21,6 +21,5 @@ project spirit_prana_test :
 
 for i in 32 64 {
   alias adt_$(i)   : adt   : <address-model>$(i) ;
-  alias utree_$(i) : utree : <address-model>$(i) ;
 }
 
