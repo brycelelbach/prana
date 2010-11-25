@@ -16,7 +16,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/registry.hpp>
-#include <boost/spirit/home/prana/adt/intern_pool.hpp>
+#include <boost/spirit/home/prana/adt/symbol_table.hpp>
 
 namespace boost {
 namespace spirit {
@@ -28,16 +28,17 @@ struct sexpr {
 
   BOOST_SPIRIT_PRANA_TYPES(
     std::size_t, core_types,
-    ((boolean)  (bool))
-    ((integer)  (boost::intmax_t))
-    ((floating) (double))
-    ((pointer)  (sexpr*))
-    ((symbol)   (typename intern_pool<Iterator>::pointer))
-    ((string)   (typename intern_pool<Iterator>::pointer))
-    ((nil)      (void*))
-    ((empty)    (void*))
-    ((pair)     (sexpr*))
-    ((tuple)    (sexpr*)))
+    ((boolean)        (bool))
+    ((integer)        (boost::intmax_t))
+    ((floating)       (double))
+    ((pointer)        (sexpr*))
+    ((symbol)         (iterator_range<Iterator>*))
+    ((string)         (iterator_range<Iterator>*))
+    ((nil)            (void*))
+    ((empty)          (void*))
+    ((pair)           (sexpr*))
+    ((proper_list)    (sexpr*))
+    ((circular_list)  (sexpr*)))
 
   typedef basic_registry<core_types> registry;
 
