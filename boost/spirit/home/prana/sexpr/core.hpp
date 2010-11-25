@@ -27,7 +27,7 @@ struct sexpr {
   struct symbolic_expression; /* indicates sexpr fulfills SymbolicExpression */
 
   BOOST_SPIRIT_PRANA_TYPES(
-    std::size_t,
+    std::size_t, core_types,
     ((boolean)  (bool))
     ((integer)  (boost::intmax_t))
     ((floating) (double))
@@ -39,22 +39,6 @@ struct sexpr {
     ((pair)     (sexpr*))
     ((tuple)    (sexpr*)))
 
-  BOOST_SPIRIT_PRANA_TEMP_REGISTRY_SET(
-    numeric_types, 
-    (boolean)(integer)(floating)(pointer))
-
-  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
-    pod_types, string_types, numeric_types,
-    (symbol)(string))
-  
-  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
-    atom_types, special_types, pod_types, 
-    (nil)(empty))
-
-  BOOST_SPIRIT_PRANA_TEMP_EXTEND_REGISTRY_SET(
-    core_types, recursive_types, atom_types,
-    (pair)(tuple))
-
   typedef basic_registry<core_types> registry;
 
   typedef boost::uintmax_t typeinfo;
@@ -63,19 +47,6 @@ struct sexpr {
   void*    car;
   sexpr*   cdr;
 };
-
-BOOST_SPIRIT_PRANA_TEMP_INIT_TYPES(
-  sexpr, (Iterator), core_types, 
-  (boolean)
-  (integer)
-  (floating)
-  (symbol)
-  (string)
-  (nil)
-  (empty)
-  (pointer)
-  (pair)
-  (tuple))
 
 } // prana
 } // spirit
