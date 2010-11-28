@@ -15,6 +15,8 @@
 #include <boost/utility/result_of.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <boost/mpl/size_t.hpp>
+#include <boost/mpl/logical.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/next.hpp>
@@ -27,6 +29,7 @@
 #include <boost/preprocessor/iteration/local.hpp>
 
 #include <boost/spirit/home/prana/bind.hpp>
+#include <boost/spirit/home/prana/domain.hpp>
 
 #ifndef BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT
   #define BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT 32
@@ -49,63 +52,73 @@ namespace prana {
 /// implementation (available in the Boost sandbox). Joel Falcou's NT2 functor
 /// code was also a major source of inspiration.
 
-template<std::size_t Size, class Registry, class F>
+template<
+  std::size_t Size, class Registry, class Result, class F, class Dummy
+>
 struct trampoline;
 
-#define BSP_SINGLE_DISPATCH(z, n, _)                                          \
-  typedef typename BOOST_PP_IF(n,                                             \
-    mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(n, 1))>::type,                  \
-    mpl::begin<Registry>::type) BOOST_PP_CAT(iter, n);                        \
+#define BSP_SINGLE_DISPATCH(z, m, n)                                          \
+  typedef typename BOOST_PP_IF(m,                                             \
+    mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(m, 1))>::type,                  \
+    mpl::begin<Registry>::type) BOOST_PP_CAT(iter, m);                        \
                                                                               \
-  typedef typename mpl::deref<BOOST_PP_CAT(iter, n)>::type                    \
-    BOOST_PP_CAT(tag, n);                                                     \
+  typedef typename mpl::deref<BOOST_PP_CAT(iter, m)>::type                    \
+    BOOST_PP_CAT(tag, m);                                                     \
                                                                               \
-  case BOOST_PP_CAT(tag, n)::value:                                           \
-    if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return f(BOOST_PP_CAT(tag, n)());                                       \
-    else                                                                      \
-      f(BOOST_PP_CAT(tag, n)());                                              \
+  case BOOST_PP_CAT(tag, m)::value:                                           \
+    return f(BOOST_PP_CAT(tag, m)());                                         \
   /***/
 
-#define BSP_DOUBLE_DISPATCH(z, n, _)                                          \
-  typedef typename BOOST_PP_IF(n,                                             \
-    mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(n, 1))>::type,                  \
-    mpl::begin<Registry>::type) BOOST_PP_CAT(iter, n);                        \
+#define BSP_DOUBLE_DISPATCH(z, m, n)                                          \
+  typedef typename BOOST_PP_IF(m,                                             \
+    mpl::next<BOOST_PP_CAT(iter, BOOST_PP_SUB(m, 1))>::type,                  \
+    mpl::begin<Registry>::type) BOOST_PP_CAT(iter, m);                        \
                                                                               \
-  typedef typename mpl::deref<BOOST_PP_CAT(iter, n)>::type                    \
-    BOOST_PP_CAT(tag, n);                                                     \
+  typedef typename mpl::deref<BOOST_PP_CAT(iter, m)>::type                    \
+    BOOST_PP_CAT(tag, m);                                                     \
                                                                               \
-  case BOOST_PP_CAT(tag, n)::value:                                           \
-    if (!Registry::template fallthrough<BOOST_PP_CAT(tag, n)>::value)         \
-      return (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f), f);              \
-    else                                                                      \
-      (*this)(dispatch_bind<BOOST_PP_CAT(tag, n)>(f), f);                     \
+  case BOOST_PP_CAT(tag, m)::value: {                                         \
+    dispatch_binder<BOOST_PP_CAT(tag, m), F> fd(f);                           \
+    return trampoline<                                                        \
+      n, Registry, Result, dispatch_binder<BOOST_PP_CAT(tag, m), F>,          \
+      mpl::size_t<1>                                                          \
+    >()(fd);                                                                  \
+  }                                                                           \
   /***/
 
 #define BSP_TRAMPOLINE(z, n, _)                                               \
-  template<class Registry, class F>                                           \
-  struct trampoline<n, Registry, F> {                                         \
-    typedef F& result_type;                                                   \
+  template<class Registry, class Result, class F>                             \
+  struct trampoline<                                                          \
+    n, Registry, Result, F,                                                   \
+    typename enable_if_c<                                                     \
+      F::tag_binder::value == 1,                                              \
+      mpl::size_t<1>                                                          \
+    >::type                                                                   \
+  > {                                                                         \
+    typedef Result result_type;                                               \
                                                                               \
-    F& operator() (                                                           \
-      F& f, typename enable_if_c<                                             \
-        F::tag_binder::value == 1, mpl::size_t<1>                             \
-      >::type size = mpl::size_t<1>()                                         \
-    ) const {                                                                 \
-      switch (typename Registry::template which<F>()(f)) {                    \
-        BOOST_PP_REPEAT_##z (n, BSP_SINGLE_DISPATCH, _)                       \
-        default: return typename Registry::template default_<F>()(f);         \
+    result_type operator() (F& f) const {                                     \
+      switch (typename Registry::which()(f)) {                                \
+        BOOST_PP_REPEAT_##z (n, BSP_SINGLE_DISPATCH, n)                       \
+        default: return typename Registry::template default_<Result>()(f);    \
       }                                                                       \
     }                                                                         \
+  };                                                                          \
                                                                               \
-    F& operator() (                                                           \
-      F& f, typename enable_if_c<                                             \
-        F::tag_binder::value == 2, mpl::size_t<2>                             \
-      >::type size = mpl::size_t<2>()                                         \
-    ) const {                                                                 \
-      switch (typename Registry::template which<F>()(f)) {                    \
-        BOOST_PP_REPEAT_##z (n, BSP_DOUBLE_DISPATCH, _)                       \
-        default: return typename Registry::template default_<F>()(f);         \
+  template<class Registry, class Result, class F>                             \
+  struct trampoline<                                                          \
+    n, Registry, Result, F,                                                   \
+    typename enable_if_c<                                                     \
+      F::tag_binder::value == 2,                                              \
+      mpl::size_t<2>                                                          \
+    >::type                                                                   \
+  > {                                                                         \
+    typedef Result result_type;                                               \
+                                                                              \
+    result_type operator() (F& f) const {                                     \
+      switch (typename Registry::which()(f)) {                                \
+        BOOST_PP_REPEAT_##z (n, BSP_DOUBLE_DISPATCH, n)                       \
+        default: return typename Registry::template default_<Result>()(f);    \
       }                                                                       \
     }                                                                         \
   };                                                                          \
@@ -115,10 +128,94 @@ struct trampoline;
 #define BOOST_PP_LOCAL_MACRO(n) BSP_TRAMPOLINE(1, n, _)
 
 #include BOOST_PP_LOCAL_ITERATE()
+  
+#define BSP_PRE(r, data, elem)                          \
+  data elem                                             \
+  /***/
+
+#define BSP_POST(r, data, elem)                         \
+  elem data                                             \
+  /***/
+
+#define BSP_FIRST(r, data, elem)                        \
+  BOOST_PP_SEQ_HEAD(elem)                               \
+  /***/
+
+#define BSP_ARGS(r, data, i, elem)                               \
+  BOOST_PP_COMMA_IF(i)                                           \
+  BOOST_PP_SEQ_FOR_EACH_R(r, BSP_POST, BOOST_PP_EMPTY(), elem) & \
+  BOOST_PP_CAT(data, i)                                          \
+  /***/
+
+#define BSP_ALL(r, data, elem)                                   \
+  BOOST_PP_SEQ_FOR_EACH_R(r, BSP_POST, BOOST_PP_EMPTY(), elem)   \
+  /***/
+
+#define BSP_FN(name, actors, num_tags)                                      \
+  template<                                                                 \
+    class Registry, template<                                               \
+      BOOST_PP_ENUM_PARAMS(                                                 \
+        BOOST_PP_ADD(num_tags, 1), class BOOST_PP_INTERCEPT)                \
+    > class F,                                                              \
+    BOOST_PP_SEQ_ENUM(                                                      \
+      BOOST_PP_SEQ_TRANSFORM(BSP_PRE, class,                                \
+        BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                      \
+  >                                                                         \
+  inline typename F<                                                        \
+    BOOST_PP_ENUM_PARAMS(                                                   \
+      BOOST_PP_ADD(num_tags, 1), prana::unused_type BOOST_PP_INTERCEPT)     \
+  >::result_type name (                                                     \
+    BOOST_PP_SEQ_FOR_EACH_I(BSP_ARGS, a, actors)                            \
+  ) {                                                                       \
+    BOOST_PP_CAT(bind_,                                                     \
+      BOOST_PP_CAT(BOOST_PP_SEQ_SIZE(actors),                               \
+        BOOST_PP_CAT(x,                                                     \
+          BOOST_PP_CAT(num_tags, _tag_fn))))<                               \
+      F, BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors))      \
+    > fd(bind_tag_fn<F>(                                                    \
+      BOOST_PP_ENUM_PARAMS(BOOST_PP_SEQ_SIZE(actors), a)                    \
+    ));                                                                     \
+    return trampoline<                                                      \
+      mpl::size<Registry>::value, Registry,                                 \
+      typename F<                                                           \
+        BOOST_PP_ENUM_PARAMS(                                               \
+          BOOST_PP_ADD(num_tags, 1), prana::unused_type BOOST_PP_INTERCEPT) \
+      >::result_type,                                                       \
+      BOOST_PP_CAT(bind_,                                                   \
+        BOOST_PP_CAT(BOOST_PP_SEQ_SIZE(actors),                             \
+          BOOST_PP_CAT(x,                                                   \
+            BOOST_PP_CAT(num_tags, _tag_fn))))<                             \
+        F, BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors))    \
+      >,                                                                    \
+      mpl::size_t<num_tags>                                                 \
+    >()(fd);                                                                \
+  }                                                                         \
+  /***/
+
+BSP_FN(dispatch, ((A0)),        1);
+BSP_FN(dispatch, ((A0)(const)), 1);
+
+BSP_FN(dispatch, ((A0)),        2);
+BSP_FN(dispatch, ((A0)(const)), 2);
+
+BSP_FN(dispatch, ((A0))        ((A1)),        1);
+BSP_FN(dispatch, ((A0)(const)) ((A1)),        1);
+BSP_FN(dispatch, ((A0))        ((A1)(const)), 1);
+BSP_FN(dispatch, ((A0)(const)) ((A1)(const)), 1);
+
+BSP_FN(dispatch, ((A0))        ((A1)),        2);
+BSP_FN(dispatch, ((A0)(const)) ((A1)),        2);
+BSP_FN(dispatch, ((A0))        ((A1)(const)), 2);
+BSP_FN(dispatch, ((A0)(const)) ((A1)(const)), 2);
 
 #undef BSP_SINGLE_DISPATCH
 #undef BSP_DOUBLE_DISPATCH
 #undef BSP_TRAMPOLINE
+#undef BSP_PRE
+#undef BSP_POST
+#undef BSP_FIRST
+#undef BSP_ARGS
+#undef BSP_FN
 
 } // prana
 } // spirit
