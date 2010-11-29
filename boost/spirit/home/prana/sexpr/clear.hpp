@@ -43,7 +43,7 @@ template<class TagX>
 struct clear<
   TagX,
   typename enable_if<
-    is_heap_allocated_type<TagX>, prana::unused_type
+    prana::is_heap_allocated_type<TagX>, prana::unused_type
   >::type
 > {
   typedef void result_type;
@@ -68,3 +68,4 @@ inline void clear (X& x) {
 } // boost
 
 #endif // BOOST_SPIRIT_PRANA_CLEAR_HPP
+
