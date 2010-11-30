@@ -34,20 +34,19 @@ namespace prana {
 #define BSP_LEFTMOST  0
 #define BSP_RIGHTMOST 1
 
-#define BSP_PRE(r, data, elem)                          \
-  data elem                                             \
+#define BSP_EMPTY(x, y) 
+#define BSP_PRE(r, data, elem)     data elem
+#define BSP_POST(r, data, elem)    elem data                        
+#define BSP_DECL(r, data, elem)    elem& BOOST_PP_CAT(data, elem);  
+#define BSP_PARAMS(r, data, elem)  elem& BOOST_PP_CAT(elem, data)   
+#define BSP_FIRST(r, data, elem)   BOOST_PP_SEQ_HEAD(elem)          
+
+#define BSP_INIT(r, data, i, elem)              \
+  BOOST_PP_COMMA_IF(i) BOOST_PP_CAT(elem, data) \
   /***/
 
-#define BSP_POST(r, data, elem)                         \
-  elem data                                             \
-  /***/
-
-#define BSP_DECL(r, data, elem)                         \
-  elem& BOOST_PP_CAT(data, elem);                       \
-  /***/
-
-#define BSP_PARAMS(r, data, elem)                       \
-  elem& BOOST_PP_CAT(elem, data)                        \
+#define BSP_CALL(r, data, i, elem)              \
+  BOOST_PP_COMMA_IF(i) fusion::at_c<i>(value)   \
   /***/
 
 #define BSP_ARGS(r, data, i, elem)                               \
@@ -58,22 +57,6 @@ namespace prana {
 
 #define BSP_ALL(r, data, elem)                                   \
   BOOST_PP_SEQ_FOR_EACH_R(r, BSP_POST, BOOST_PP_EMPTY(), elem)   \
-  /***/
-
-#define BSP_FIRST(r, data, elem)                        \
-  BOOST_PP_SEQ_HEAD(elem)                               \
-  /***/
-
-#define BSP_INIT(r, data, i, elem)                      \
-  BOOST_PP_COMMA_IF(i) BOOST_PP_CAT(elem, data)         \
-  /***/
-
-#define BSP_CALL(r, data, i, elem)                      \
-  BOOST_PP_COMMA_IF(i)                                  \
-  fusion::at_c<i>(value)                                \
-  /***/
-
-#define BSP_EMPTY(x, y) \
   /***/
 
 #define BSP_GET(r, data, i, elem)                                         \
@@ -120,15 +103,11 @@ namespace prana {
       BOOST_PP_ENUM_PARAMS(num_tags, class Tag)                             \
     >                                                                       \
     struct result<                                                          \
-      This(                                                                 \
-        BOOST_PP_ENUM_BINARY_PARAMS(num_tags,                               \
-          Tag, const& BOOST_PP_INTERCEPT)                                   \
-      )                                                                     \
+      This(BOOST_PP_ENUM_PARAMS(num_tags, Tag))                             \
     > {                                                                     \
       typedef typename result_of<                                           \
         F<                                                                  \
-          BOOST_PP_ENUM_BINARY_PARAMS(num_tags,                             \
-            Tag, const& BOOST_PP_INTERCEPT),                                \
+          BOOST_PP_ENUM_PARAMS(num_tags, Tag),                              \
             prana::unused_type                                              \
         >(                                                                  \
           BOOST_PP_SEQ_ENUM(                                                \
@@ -146,13 +125,12 @@ namespace prana {
                                                                             \
     template<BOOST_PP_ENUM_PARAMS(num_tags, class Tag)>                     \
     typename result_of<name(                                                \
-      BOOST_PP_ENUM_BINARY_PARAMS(num_tags, Tag, const& BOOST_PP_INTERCEPT) \
+      BOOST_PP_ENUM_PARAMS(num_tags, Tag)                                   \
     )>::type operator() (                                                   \
-      BOOST_PP_ENUM_BINARY_PARAMS(num_tags, Tag, const& BOOST_PP_INTERCEPT) \
+      BOOST_PP_ENUM_PARAMS(num_tags, Tag)                                   \
     ) const {                                                               \
       return F<                                                             \
-        BOOST_PP_ENUM_BINARY_PARAMS(num_tags,                               \
-          Tag, const& BOOST_PP_INTERCEPT),                                  \
+        BOOST_PP_ENUM_PARAMS(num_tags, Tag),                                \
           prana::unused_type                                                \
       >()(                                                                  \
         BOOST_PP_SEQ_FOR_EACH_I(BSP_CALL, _,                                \
@@ -184,11 +162,8 @@ namespace prana {
   /***/
 
 BSP_BINDER(bind_1x1_tag_fn, ((A0)),       1)
-
 BSP_BINDER(bind_1x2_tag_fn, ((A0)),       2)
-
 BSP_BINDER(bind_2x1_tag_fn, ((A0))((A1)), 1)
-
 BSP_BINDER(bind_2x2_tag_fn, ((A0))((A1)), 2)
 
 BSP_FN(bind_tag_fn, ((A0)),        1, bind_1x1_tag_fn)
@@ -264,5 +239,4 @@ dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
 } /// boost
 
 #endif /// BOOST_SPIRIT_PRANA_BIND_HPP
-
 

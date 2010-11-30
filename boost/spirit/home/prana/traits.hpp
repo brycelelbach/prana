@@ -36,8 +36,7 @@ BOOST_SPIRIT_PRANA_DEFINE_TRAITS(
   ((type_definition)         (is_type_definition)) 
   ((type_registry)           (is_type_registry))
   ((tag_binder)              (is_tag_binder)) 
-  ((implementation_functor)  (is_implementation_functor)) 
-  ((interface_functor)       (is_interface_functor)))
+  ((implementation_functor)  (is_implementation_functor))) 
 
 template<class Definition, class T>
 struct is_convertible_to_data_definition:

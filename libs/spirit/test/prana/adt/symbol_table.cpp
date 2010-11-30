@@ -27,9 +27,9 @@ typedef list<
 > elements;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(symbol_std_string, T, elements) {
-  typedef symbol_table<std::string::iterator, typename T::type> pool;
+  typedef symbol_table<std::string::iterator, typename T::type> table;
   
-  pool p;
+  table p;
 
   for (std::size_t i = 0; i < T::elements::value; ++i) {
     std::string str(generator.get<string<1, T::elements::value> >());
@@ -50,12 +50,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(symbol_std_string, T, elements) {
 
     it = str.begin();
 
-    typename pool::pointer r = 0;
+    typename table::pointer r = 0;
 
     BOOST_CHECK(bool(r = p.find(it, str.end())) == true);
     BOOST_CHECK(*fusion::at_c<0>(*r).begin() == *str.begin());
     BOOST_CHECK(*fusion::at_c<0>(*r).end() == *it);
-    BOOST_CHECK(fusion::at_c<1>(*r) == data);
+    BOOST_CHECK(*fusion::at_c<1>(*r) == data);
     BOOST_CHECK(*it == *(str.begin() + 2));
   }
 }

@@ -9,11 +9,8 @@
 #if !defined(BOOST_SPIRIT_PRANA_SYMBOL_TABLE_HPP)
 #define BOOST_SPIRIT_PRANA_SYMBOL_TABLE_HPP
 
-#include <boost/fusion/container/vector.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/container/vector/vector_fwd.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
 #include <boost/call_traits.hpp>
@@ -21,16 +18,21 @@
 #include <boost/detail/iterator.hpp>
 #include <boost/range/iterator_range.hpp>
 
+#include <boost/spirit/home/prana/adt/function_node.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
 
+template<class> struct sexpr;
+
+//[symbol_node
 template<class Iterator, class Data>
 struct symbol_node: private noncopyable {
   typedef Iterator id_type;
 
   typedef iterator_range<Iterator> key_type;
-  typedef Data mapped_type;
+  typedef Data* mapped_type;
   typedef fusion::vector2<key_type, mapped_type> value_type;
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
@@ -73,12 +75,13 @@ struct symbol_node: private noncopyable {
     void operator() (symbol_node*&, InputIterator, InputIterator, Alloc*) const;
   };
 
-  id_type id;        /* The node's identity character. */
-  pointer data;      /* Optional data, a string. */
-  symbol_node* lt;   /* Left pointer. */
-  symbol_node* eq;   /* Middle pointer. */
-  symbol_node* gt;   /* Right pointer. */
+  id_type id;        /*< The node's identity character. >*/
+  pointer data;      /*< Optional data, a string. >*/
+  symbol_node* lt;   /*< Left pointer. >*/
+  symbol_node* eq;   /*< Middle pointer. >*/
+  symbol_node* gt;   /*< Right pointer. >*/
 };
+//]
 
 template<class Iterator, class Data>
 symbol_node<Iterator, Data>::symbol_node (id_type id_):
@@ -229,13 +232,13 @@ inline void symbol_node<Iterator, Data>::erase::operator() (
   }
 }
 
-template<class Iterator, class Data>
+template<class Iterator, class Data = function_node<sexpr<Iterator> > > 
 class symbol_table: private noncopyable {
  public:
   typedef Iterator id_type;
   
   typedef iterator_range<Iterator> key_type;
-  typedef Data mapped_type;
+  typedef Data* mapped_type;
   typedef fusion::vector2<key_type, mapped_type> value_type;
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
@@ -293,7 +296,8 @@ symbol_table<Iterator, Data>::find (InputIterator& first, InputIterator last) {
 template<class Iterator, class Data>
 template<class InputIterator>
 typename symbol_table<Iterator, Data>::const_pointer
-symbol_table<Iterator, Data>::find (InputIterator& first, InputIterator last) const {
+symbol_table<Iterator, Data>::find (InputIterator& first,
+                                    InputIterator last) const {
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
@@ -307,7 +311,8 @@ symbol_table<Iterator, Data>::insert (InputIterator first, InputIterator last,
 
 template<class Iterator, class Data>
 template<class InputIterator>
-void symbol_table<Iterator, Data>::erase (InputIterator first, InputIterator last) {
+void symbol_table<Iterator, Data>::erase (InputIterator first,
+                                          InputIterator last) {
   return typename node::erase()(root, first, last, this);
 }
 
@@ -329,19 +334,22 @@ template<class InputIterator, class Value>
 typename symbol_table<Iterator, Data>::pointer
 symbol_table<Iterator, Data>::new_data (InputIterator first, InputIterator last,
                                         Value const& val) {
-  return new value_type(key_type(first, last), val);
+  return new value_type(key_type(first, last), new Value(val));
 }
 
 template<class Iterator, class Data>
 void symbol_table<Iterator, Data>::delete_node (node* p) {
-  if (p)
+  if (p) 
     delete p;
 }
 
 template<class Iterator, class Data>
 void symbol_table<Iterator, Data>::delete_data (pointer p) {
-  if (p)
+  if (p) {
+    if (fusion::at_c<1>(*p))
+      delete fusion::at_c<1>(*p);
     delete p;
+  }
 }
 
 } // prana
