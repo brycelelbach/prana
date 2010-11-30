@@ -20,8 +20,8 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-//[ sexpr_traits
-BOOST_SPIRIT_PRANA_DEFINE_TRAITS(
+//[sexpr_traits
+BOOST_SPIRIT_PRANA_TRAITS(
   false,
   ((arithmetic_type) (is_arithmetic_type)) /*< These types represent numeric
                                                data, e.g. integers, floating
@@ -38,7 +38,7 @@ BOOST_SPIRIT_PRANA_DEFINE_TRAITS(
   ((container_type)  (is_container_type))) /*< Abstract data structures. >*/
 //]
 
-//[ is_stack_allocated_type
+//[is_stack_allocated_type
 template<class T>
 struct is_stack_allocated_type:
   mpl::or_<
@@ -48,7 +48,7 @@ struct is_stack_allocated_type:
   > { };
 //]
 
-//[ is_heap_allocated_type
+//[is_heap_allocated_type
 template<class T>
 struct is_heap_allocated_type:
   mpl::or_<

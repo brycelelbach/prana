@@ -1,14 +1,14 @@
-/*=============================================================================
+/*<-============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
     Copyright (c) 2001-2010 Hartmut Kaiser
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_LINE_POS_ITERATOR_HPP)
-#define BOOST_SPIRIT_PRANA_LINE_POS_ITERATOR_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_LINE_POS_ITERATOR_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_LINE_POS_ITERATOR_HPP
 
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -17,13 +17,8 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-/// line_pos_iterator: a lighweight line position iterator. This iterator
-/// adapter only stores the current line number, nothing else. Unlike
-/// spirit classic's position_iterator, it does not store the column
-/// number and does not need an end iterator. The current column can be
-/// computed, if needed. Some line oriented utilities are provided
-/// including computation of the current column.
-template<typename Iterator>
+//[line_pos_iterator
+template<class Iterator>
 class line_pos_iterator: public iterator_adaptor<
   line_pos_iterator<Iterator>, Iterator, use_default, forward_traversal_tag
 > {
@@ -42,6 +37,7 @@ class line_pos_iterator: public iterator_adaptor<
   std::size_t line;
   typename std::iterator_traits<Iterator>::value_type prev;
 };
+//]
 
 template<class Iterator>
 line_pos_iterator<Iterator>::line_pos_iterator (void):
@@ -77,20 +73,20 @@ void line_pos_iterator<Iterator>::increment (void) {
   ++this->base_reference();
 }
 
-/// Get the line for a given iterator.
-
-template<class Iterator>
+//[get_line
+template<class Iterator /*< Any iterator. >*/>
 inline std::size_t get_line (Iterator const& i) {
   return -1;
 }
 
-template<class Iterator>
+template<class Iterator /*< line_pos_iterator version. >*/>
 inline std::size_t get_line (line_pos_iterator<Iterator> const& i) {
   return i.position();
 }
+//]
 
-/// Get an iterator to the beginning of the line. Applicable to any iterator.
-template<class Iterator>
+//[get_line_start
+template<class Iterator /*< Applicable to any iterator. >*/>
 inline Iterator get_line_start (Iterator lower_bound, Iterator current) {
   Iterator latest = lower_bound;
 
@@ -104,13 +100,13 @@ inline Iterator get_line_start (Iterator lower_bound, Iterator current) {
 
   return latest;
 }
+//]
 
-/// Get the iterator range containing the current line. Applicable to
-/// any iterator.
-template<class Iterator>
-inline iterator_range<Iterator> get_current_line (
-  Iterator lower_bound, Iterator current, Iterator upper_bound
-) {
+//[get_current_line
+template<class Iterator /*< Applicable to any iterator. >*/>
+inline iterator_range<Iterator>
+get_current_line (Iterator lower_bound, Iterator current,
+                  Iterator upper_bound) {
   Iterator first = get_line_start(lower_bound, current);
   Iterator last = get_line_start(current, upper_bound);
 
@@ -119,12 +115,12 @@ inline iterator_range<Iterator> get_current_line (
 
   return iterator_range<Iterator>(first, last);
 }
+//]
 
-/// Get the current column. Applicable to any iterator.
-template<class Iterator>
-inline std::size_t get_column (
-  Iterator lower_bound, Iterator current, int tabs = 2
-) {
+//[get_column
+template<class Iterator /*< Applicable to any iterator. >*/>
+inline std::size_t
+get_column (Iterator lower_bound, Iterator current, int tabs = 2) {
   std::size_t column = 1;
   Iterator first = get_line_start(lower_bound, current);
 
@@ -140,10 +136,11 @@ inline std::size_t get_column (
 
   return column;
 }
+//]
 
-} // prana
-} // spirit
-} // boost
+} /*<- prana ->*/
+} /*<- spirit ->*/
+} /*<- boost ->*/
 
-#endif // BOOST_SPIRIT_PRANA_LINE_POS_ITERATOR_HPP
+#endif /*<- BOOST_SPIRIT_PRANA_ADT_LINE_POS_ITERATOR_HPP ->*/
 

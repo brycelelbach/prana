@@ -1,13 +1,13 @@
-/*==============================================================================
+/*<-============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SYMBOL_TABLE_HPP)
-#define BOOST_SPIRIT_PRANA_SYMBOL_TABLE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP
 
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
@@ -39,14 +39,14 @@ struct symbol_node: private noncopyable {
   
   symbol_node (id_type);
 
-  struct destruct {
+  struct destruct { /*< Destruction functor. >*/
     typedef void result_type;
 
     template<class Alloc>
     void operator() (symbol_node*, Alloc*) const;
   };
 
-  struct find {
+  struct find { /*< Lookup functor. >*/
     typedef pointer result_type;
 
     template<class InputIterator>
@@ -60,7 +60,7 @@ struct symbol_node: private noncopyable {
     Pointer operator() (Node, InputIterator&, InputIterator) const;
   };
 
-  struct insert {
+  struct insert { /*< Insertion functor. >*/
     typedef pointer result_type;
 
     template<class InputIterator, class Value, class Alloc>
@@ -68,7 +68,7 @@ struct symbol_node: private noncopyable {
                         Value const&, Alloc*) const;
   };
 
-  struct erase {
+  struct erase { /*< Removal functor. >*/
     typedef pointer result_type;
 
     template<class InputIterator, class Alloc>
@@ -87,6 +87,7 @@ template<class Iterator, class Data>
 symbol_node<Iterator, Data>::symbol_node (id_type id_):
   id(id_), data(0), lt(0), eq(0), gt(0) { }
 
+//[symbol_node_destruct_algorithm
 template<class Iterator, class Data>
 template<class Alloc>
 inline void symbol_node<Iterator, Data>::destruct::operator() (
@@ -102,6 +103,8 @@ inline void symbol_node<Iterator, Data>::destruct::operator() (
     alloc->delete_node(p);
   }
 }
+//]
+
 template<class Iterator, class Data>
 template<class InputIterator>
 inline typename symbol_node<Iterator, Data>::pointer
@@ -120,6 +123,7 @@ symbol_node<Iterator, Data>::find::operator() (
   return (*this).operator()<const_pointer, symbol_node const*>(root, it, end);
 }
 
+//[symbol_node_lookup_algorithm
 template<class Iterator, class Data>
 template<class Pointer, class Node, class InputIterator>
 inline Pointer symbol_node<Iterator, Data>::find::operator() (
@@ -154,11 +158,13 @@ inline Pointer symbol_node<Iterator, Data>::find::operator() (
   }
 
   if (found)
-    it = ++latest; /* one past the end matching char */
+    it = ++latest; /*< one past the end matching char >*/
 
   return found;
 }
+//]
 
+//[symbol_node_insertion_algorithm
 template<class Iterator, class Data>
 template<class InputIterator, class Value, class Alloc>
 inline typename symbol_node<Iterator, Data>::pointer
@@ -198,7 +204,9 @@ symbol_node<Iterator, Data>::insert::operator() (
       pp = &p->gt;
   }
 }
+//]
 
+//[symbol_node_erasure_algorithm
 template<class Iterator, class Data>
 template<class InputIterator, class Alloc>
 inline void symbol_node<Iterator, Data>::erase::operator() (
@@ -231,7 +239,9 @@ inline void symbol_node<Iterator, Data>::erase::operator() (
     p = 0;
   }
 }
+//]
 
+//[symbol_table
 template<class Iterator, class Data = function_node<sexpr<Iterator> > > 
 class symbol_table: private noncopyable {
  public:
@@ -277,6 +287,7 @@ class symbol_table: private noncopyable {
  private:
   node* root;
 };
+//]
 
 template<class Iterator, class Data>
 symbol_table<Iterator, Data>::symbol_table (void): root(0) { }
@@ -352,9 +363,9 @@ void symbol_table<Iterator, Data>::delete_data (pointer p) {
   }
 }
 
-} // prana
-} // spirit
-} // boost
+} /*<- prana ->*/
+} /*<- spirit ->*/
+} /*<- boost ->*/
 
-#endif // BOOST_SPIRIT_PRANA_SYMBOL_TABLE_HPP
+#endif /*<- BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP ->*/
 

@@ -10,9 +10,6 @@
 #if !defined(BOOST_SPIRIT_PRANA_SEXPR_CLEAR_HPP)
 #define BOOST_SPIRIT_PRANA_SEXPR_CLEAR_HPP
 
-#include <boost/mpl/or.hpp>
-
-#include <boost/utility/result_of.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <boost/spirit/home/prana/trampoline.hpp>
@@ -24,19 +21,19 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-//[sexpr_clear_interface_declaration
+//[clear_declaration
 template<class X>
 inline void clear (X& x);
 //]
 
 namespace functor {
 
-//[sexpr_clear_implementation_declaration
+//[functor_clear_declaration
 template<class TagX, class Dummy = prana::unused_type>
 struct clear;
 //]
 
-//[sexpr_clear_implementation_definition
+//[functor_clear_definition
 template<class TagX, class Dummy>
 struct clear {
   struct implementation_functor; /*<- This incomplete type is a has_xxx
@@ -58,9 +55,7 @@ struct clear {
     }
   }
 };
-//]
 
-//[sexpr_clear_implementation_specialization
 template<class TagX>
 struct clear<
   TagX, typename enable_if<
@@ -77,7 +72,7 @@ struct clear<
   typedef void result_type;
 
   template<class X>
-  void operator() (X& x) const {
+  result_type operator() (X& x) const {
     x.type = X::nil::value;
 
     typename TagX::data_type* p = cast_car<TagX>(x); /*<- cast_car transforms
@@ -102,7 +97,7 @@ struct clear<
 
 } /*<- functor ->*/
 
-//[sexpr_clear_interface_definition
+//[clear_definition
 template<class X>
 inline void clear (X& x) {
   return dispatch<typename X::registry, functor::clear, X>(x);

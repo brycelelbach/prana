@@ -1,14 +1,14 @@
-/*=============================================================================
+/*<-============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
     Copyright (c) 2001-2010 Hartmut Kaiser
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_CAST_CAR_HPP)
-#define BOOST_SPIRIT_PRANA_CAST_CAR_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_CAST_CAR_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_CAST_CAR_HPP
 
 #include <boost/type_traits/is_pointer.hpp>
 
@@ -18,9 +18,20 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
+//[caster_declaration
 template<class TagX, class Member, Member Ptr, class Dummy = prana::unused_type>
 struct caster;
+//]
 
+//[cast_car_declaration
+template<class TagX, class X>
+inline typename TagX::data_type* cast_car (X& x);
+
+template<class TagX, class X>
+inline typename TagX::data_type const* cast_car (X const& x);
+//]
+
+//[caster_definition
 template<class TagX, class Object, class Type, Type Object::*Ptr>
 struct caster<TagX, Type Object::*, Ptr, prana::unused_type> {
   template<class> struct result;
@@ -43,7 +54,9 @@ struct caster<TagX, Type Object::*, Ptr, prana::unused_type> {
     return reinterpret_cast<typename TagX::data_type const*>(&(obj.*Ptr));
   }
 };
+//]
 
+//[cast_car_definition
 template<class TagX, class X>
 inline typename TagX::data_type* cast_car (X& x) {
   return caster<TagX, void* X::*, &X::car>()(x);
@@ -53,10 +66,11 @@ template<class TagX, class X>
 inline typename TagX::data_type const* cast_car (X const& x) {
   return caster<TagX, void* X::*, &X::car>()(x);
 }
+//]
 
-} // prana
-} // spirit
-} // boost
+} /*<- prana ->*/
+} /*<- spirit ->*/
+} /*<- boost ->*/
 
-#endif // BOOST_SPIRIT_PRANA_CAST_CAR_HPP
+#endif /*<- BOOST_SPIRIT_PRANA_ADT_CAST_CAR_HPP ->*/
 

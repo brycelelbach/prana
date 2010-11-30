@@ -1,11 +1,11 @@
-/*=============================================================================
+/*<-============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
     Copyright (c) 2001-2010 Hartmut Kaiser
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+============================================================================->*/
 
 #if !defined(BOOST_SPIRIT_PRANA_BIND_HPP)
 #define BOOST_SPIRIT_PRANA_BIND_HPP
@@ -15,14 +15,10 @@
 
 #include <boost/mpl/size_t.hpp>
 
-#include <boost/fusion/container/vector.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/container/vector/vector_fwd.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
-#include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor.hpp>
 
 #include <boost/spirit/home/prana/domain.hpp>
@@ -182,12 +178,11 @@ BSP_FN(bind_tag_fn, ((A0)(const)) ((A1)),        2, bind_2x2_tag_fn)
 BSP_FN(bind_tag_fn, ((A0))        ((A1)(const)), 2, bind_2x2_tag_fn)
 BSP_FN(bind_tag_fn, ((A0)(const)) ((A1)(const)), 2, bind_2x2_tag_fn)
 
-/// EXPLAIN (djowel): Simple binder for binary visitation (we don't want to
-/// bring in the big guns). 
+//[dispatch_binder
 template<class TagX, class F, class Dummy = prana::unused_type>
 class dispatch_binder {
  private:
-  F& f; /// EXPLAIN (wash): We must take a reference to the tag binder.  
+  F& f; /*< We must take a reference to the tag binder. >*/
 
  public:
   typedef mpl::size_t<1>::type tag_binder;
@@ -207,7 +202,9 @@ class dispatch_binder {
     return f(TagX(), tagy);
   }
 };
+//]
 
+//[dispatch_bind
 template<class TagX, class F>
 dispatch_binder<TagX, F> dispatch_bind (F& f) {
   return dispatch_binder<TagX, F>(f);
@@ -217,6 +214,7 @@ template<class TagX, class F>
 dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
   return dispatch_binder<TagX, F const>(f);
 }
+//]
 
 #undef BSP_LEFTMOST
 #undef BSP_RIGHTMOST
@@ -234,9 +232,9 @@ dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
 #undef BSP_BINDER
 #undef BSP_FN
 
-} /// prana
-} /// spirit
-} /// boost
+} /*<- prana ->*/
+} /*<- spirit ->*/
+} /*<- boost ->*/
 
-#endif /// BOOST_SPIRIT_PRANA_BIND_HPP
+#endif /*<- BOOST_SPIRIT_PRANA_BIND_HPP ->*/
 

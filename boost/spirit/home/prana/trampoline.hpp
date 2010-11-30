@@ -1,4 +1,4 @@
-/*=============================================================================
+/*<-============================================================================
     Copyright (c) 2001-2010 Joel de Guzman
     Copyright (c) 2001-2010 Hartmut Kaiser
     Copyright (c) 2006-2008 Steven Watanabe
@@ -6,7 +6,7 @@
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+============================================================================->*/
 
 #if !defined(BOOST_SPIRIT_PRANA_TRAMPOLINE_HPP)
 #define BOOST_SPIRIT_PRANA_TRAMPOLINE_HPP
@@ -47,15 +47,16 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-/// EXPLAIN (wash): My strategy here is based on the original visit
-/// implementation for utree and Steven Watanabe's switch_ and case_
-/// implementation (available in the Boost sandbox). Joel Falcou's NT2 functor
-/// code was also a major source of inspiration.
+//[trampoline
 
-template<
-  std::size_t Size, class Registry, class Result, class F, class Dummy
->
+// My strategy here is based on the original visit implementation for utree and
+// Steven Watanabe's switch_ and case_ mplementation (available in the Boost
+// sandbox). Joel Falcou's NT2 functor code was also a major source of
+// inspiration.
+
+template<std::size_t Size, class Registry, class Result, class F, class Dummy>
 struct trampoline;
+//]
 
 #define BSP_SINGLE_DISPATCH(z, m, n)                                          \
   typedef typename BOOST_PP_IF(m,                                             \
@@ -129,17 +130,9 @@ struct trampoline;
 
 #include BOOST_PP_LOCAL_ITERATE()
   
-#define BSP_PRE(r, data, elem)                          \
-  data elem                                             \
-  /***/
-
-#define BSP_POST(r, data, elem)                         \
-  elem data                                             \
-  /***/
-
-#define BSP_FIRST(r, data, elem)                        \
-  BOOST_PP_SEQ_HEAD(elem)                               \
-  /***/
+#define BSP_PRE(r, data, elem)    data elem 
+#define BSP_POST(r, data, elem)   elem data
+#define BSP_FIRST(r, data, elem)  BOOST_PP_SEQ_HEAD(elem)
 
 #define BSP_ARGS(r, data, i, elem)                               \
   BOOST_PP_COMMA_IF(i)                                           \
@@ -217,9 +210,9 @@ BSP_FN(dispatch, ((A0)(const)) ((A1)(const)), 2);
 #undef BSP_ARGS
 #undef BSP_FN
 
-} // prana
-} // spirit
-} // boost
+} /*<- prana ->*/
+} /*<- spirit ->*/
+} /*<- boost ->*/
 
-#endif // BOOST_SPIRIT_PRANA_TRAMPOLINE_HPP
+#endif /*<- BOOST_SPIRIT_PRANA_TRAMPOLINE_HPP ->*/
 
