@@ -194,6 +194,18 @@ class dispatch_binder {
     typedef typename result_of<F(TagX const&, TagY const&)>::type type;
   };
   
+  template<std::size_t N>
+  typename fusion::result_of::at_c<typename F::value_type, N>::type 
+  get (void) {
+    return f.template get<N>();
+  }
+  
+  template<std::size_t N>
+  typename fusion::result_of::at_c<typename F::value_type, N>::type const
+  get (void) const {
+    return f.template get<N>();
+  }
+  
   dispatch_binder (F& f_): f(f_) { }
 
   template<class TagY>

@@ -122,6 +122,14 @@ struct trampoline;
         default: return typename Registry::template default_<Result>()(f);    \
       }                                                                       \
     }                                                                         \
+                                                                              \
+    template<class Tag>                                                       \
+    result_type operator() (F& f, Tag) const {                                \
+      dispatch_binder<Tag, F> fd(f);                                          \
+      return trampoline<                                                      \
+        n, Registry, Result, dispatch_binder<Tag, F>, mpl::size_t<1>          \
+      >()(fd);                                                                \
+    }                                                                         \
   };                                                                          \
   /***/
 
@@ -133,6 +141,9 @@ struct trampoline;
 #define BSP_PRE(r, data, elem)    data elem 
 #define BSP_POST(r, data, elem)   elem data
 #define BSP_FIRST(r, data, elem)  BOOST_PP_SEQ_HEAD(elem)
+
+#define BSP_EMPTY_PARAMS(x, y)  
+#define BSP_EMPTY_BINARY_PARAMS(x, y, z)
 
 #define BSP_ARGS(r, data, i, elem)                               \
   BOOST_PP_COMMA_IF(i)                                           \
@@ -150,6 +161,10 @@ struct trampoline;
       BOOST_PP_ENUM_PARAMS(                                                 \
         BOOST_PP_ADD(num_tags, 1), class BOOST_PP_INTERCEPT)                \
     > class F,                                                              \
+    BOOST_PP_IIF(BOOST_PP_LESS(BOOST_PP_SEQ_SIZE(actors), num_tags),        \
+      BOOST_PP_ENUM_PARAMS, BSP_EMPTY_PARAMS)                               \
+      (BOOST_PP_SUB(num_tags, BOOST_PP_SEQ_SIZE(actors)), class Tag)        \
+    BOOST_PP_COMMA_IF(BOOST_PP_LESS(BOOST_PP_SEQ_SIZE(actors), num_tags))   \
     BOOST_PP_SEQ_ENUM(                                                      \
       BOOST_PP_SEQ_TRANSFORM(BSP_PRE, class,                                \
         BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                      \
@@ -181,7 +196,13 @@ struct trampoline;
         F, BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors))    \
       >,                                                                    \
       mpl::size_t<num_tags>                                                 \
-    >()(fd);                                                                \
+    >()(fd                                                                  \
+      BOOST_PP_COMMA_IF(BOOST_PP_LESS(BOOST_PP_SEQ_SIZE(actors), num_tags)) \
+      BOOST_PP_IIF(BOOST_PP_LESS(BOOST_PP_SEQ_SIZE(actors), num_tags),      \
+        BOOST_PP_ENUM_BINARY_PARAMS, BSP_EMPTY_BINARY_PARAMS)               \
+      (BOOST_PP_SUB(num_tags, BOOST_PP_SEQ_SIZE(actors)),                   \
+        Tag, () BOOST_PP_INTERCEPT)                                         \
+    );                                                                      \
   }                                                                         \
   /***/
 

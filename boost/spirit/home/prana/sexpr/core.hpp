@@ -16,6 +16,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/registry.hpp>
+#include <boost/spirit/home/prana/support/fltptr_t.hpp>
 #include <boost/spirit/home/prana/adt/symbol_table.hpp>
 #include <boost/spirit/home/prana/adt/function_node.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
@@ -37,9 +38,9 @@ struct sexpr {
     size_type,        /*< The value_type for each TypeDefinition. >*/
     type_definitions, /*< The name for the RegistrySet. >*/
 
-    ((boolean)  (bool)            (arithmetic_type))
-    ((integer)  (boost::intmax_t) (arithmetic_type))
-    ((floating) (double)          (arithmetic_type))
+    ((boolean)  (bool)     (arithmetic_type))
+    ((integer)  (intmax_t) (arithmetic_type))
+    ((floating) (fltptr_t) (arithmetic_type))
 
     ((nil)        (nil_type)        (sentinel_type))
     ((empty_list) (empty_list_type) (sentinel_type))
@@ -78,7 +79,7 @@ struct sexpr {
 
 template<class Iterator>
 sexpr<Iterator>::sexpr (void):
-  type(nil_type::value), car(0), cdr(0) { }
+  type(nil::value), car(0), cdr(0) { }
 
 template<class Iterator>
 sexpr<Iterator>::~sexpr (void) {

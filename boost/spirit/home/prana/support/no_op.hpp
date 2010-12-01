@@ -5,8 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_NO_OP_HPP)
-#define BOOST_SPIRIT_PRANA_NO_OP_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP)
+#define BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP
 
 #include <boost/spirit/home/prana/domain.hpp>
 
@@ -54,5 +54,5 @@ struct binary_no_op_with_return {
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_NO_OP_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP ->*/
 

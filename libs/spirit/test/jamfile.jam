@@ -7,11 +7,19 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project spirit_prana_test/adt ;
+import testing ;
+
+project spirit_prana_test :
+  requirements
+    <toolset>clang:<cxxflags>-Wno-unused
+    <toolset>clang:<cxxflags>-Wno-tautological-compare
+    <include>./
+    <include>../../../
+    <testing.launcher>valgrind
+  ;
 
 for address in 32 64 {
-  for tests in [ glob ./*.cpp ] {
+  for tests in [ glob ./prana/*.cpp ] {
     run $(tests) : : : <address-model>$(address) : $(tests:B)_$(address) ;
   }
 }
-

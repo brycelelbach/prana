@@ -15,4 +15,4 @@ project prana : build-dir bin ;
 
 using testing ;
 
-build-project libs/spirit/test/prana ;
+build-project libs/spirit/test ;

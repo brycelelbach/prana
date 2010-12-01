@@ -10,6 +10,9 @@
 #if !defined(BOOST_SPIRIT_PRANA_SEXPR_BECOME_HPP)
 #define BOOST_SPIRIT_PRANA_SEXPR_BECOME_HPP
 
+#include <iostream>
+#include <typeinfo>
+
 #include <boost/type_traits/is_same.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -32,13 +35,13 @@ inline void become (X& x);
 namespace functor {
 
 //[functor_become_declaration
-template<class TagX, class Dummy = prana::unused_type>
+template<class To, class From, class Dummy = prana::unused_type>
 struct become;
 //]
 
 //[functor_become_definition
-template<class To, class From>
-struct clear {
+template<class To, class From, class Dummy>
+struct become {
   struct implementation_functor; 
 
   typedef void result_type;
@@ -46,12 +49,12 @@ struct clear {
   template<class X>
   result_type operator() (X& x) const {
     prana::clear(x);
-    // TODO (wash): implement 
+    x.type = To::value; 
   }
 };
 
 template<class To, class From>
-struct clear<
+struct become<
   To, From, typename enable_if<
     is_same<To, From>, 
     prana::unused_type
@@ -72,8 +75,7 @@ struct clear<
 //[become_definition
 template<class To, class X>
 inline void become (X& x) {
-  // TODO (wash): implement
-  return dispatch<typename X::registry, functor::clear, X>(x);
+  return dispatch<typename X::registry, functor::become, To, X>(x);
 }
 //]
 
