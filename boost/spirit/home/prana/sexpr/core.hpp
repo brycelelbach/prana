@@ -20,14 +20,13 @@
 #include <boost/spirit/home/prana/adt/symbol_table.hpp>
 #include <boost/spirit/home/prana/adt/function_node.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
-#include <boost/spirit/home/prana/sexpr/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/procedure/clear.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 //[sexpr
-template<class Iterator>
 struct sexpr {
   struct universal_tree; /*< Indicates that sexpr fulfills UniversalTree. >*/
 
@@ -45,18 +44,17 @@ struct sexpr {
     ((nil)        (nil_type)        (sentinel_type))
     ((empty_list) (empty_list_type) (sentinel_type))
 
-    ((symbol) (typename symbol_table<Iterator>::pointer) (symbol_type))
+    ((symbol) (symbol_table<char>::pointer) (symbol_type))
 
-    ((ascii) (iterator_range<Iterator>*)  (text_type))
-    ((utf8) (iterator_range<Iterator>*)   (text_type))
-    ((binary) (iterator_range<Iterator>*) (text_type))
+    ((ascii_char) (char) (character_type))
+
+    ((ascii_string) (std::basic_string<char>*) (string_type))
     
     ((function) (function_node<sexpr>*) (function_type))
 
     ((pair)          (sexpr*) (container_type))
     ((proper_list)   (sexpr*) (container_type))
     ((circular_list) (sexpr*) (container_type))
-    ((vector)        (sexpr*) (container_type))
     //]
   )
 
@@ -77,12 +75,10 @@ struct sexpr {
 };
 //]
 
-template<class Iterator>
-sexpr<Iterator>::sexpr (void):
+sexpr::sexpr (void):
   type(nil::value), car(0), cdr(0) { }
 
-template<class Iterator>
-sexpr<Iterator>::~sexpr (void) {
+sexpr::~sexpr (void) {
   clear(*this);
 }
 

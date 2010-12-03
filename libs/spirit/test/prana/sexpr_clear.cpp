@@ -10,69 +10,69 @@
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/support/no_op.hpp>
 #include <boost/spirit/home/prana/adt/function_node.hpp>
-#include <boost/spirit/home/prana/sexpr/clear.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
+#include <boost/spirit/home/prana/sexpr/procedure/clear.hpp>
 
 int main (void) {
   using namespace boost;
   using namespace boost::spirit;
 
-  typedef std::string::iterator iterator;
-  typedef prana::sexpr<iterator> sexpr_type;
-  typedef prana::scope<sexpr_type> scope_type;
-  typedef prana::unary_no_op_with_return<sexpr_type, scope_type> no_op_type;
-  typedef prana::stored_function<sexpr_type, no_op_type> function_type;
-  typedef prana::symbol_table<iterator> symbol_table_type;
+  using prana::sexpr;
+
+  typedef prana::scope<sexpr> scope_type;
+  typedef prana::unary_no_op_with_return<sexpr, scope_type> no_op_type;
+  typedef prana::stored_function<sexpr, no_op_type> function_type;
+  typedef prana::symbol_table<char> symbol_table_type;
 
   { //[boolean
-    sexpr_type s;
+    sexpr s;
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::boolean::value;
-    *prana::cast_car<sexpr_type::boolean>(s) = true;
+    s.type = sexpr::boolean::value;
+    *prana::cast_car<sexpr::boolean>(s) = true;
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]
   }
 
   { //[integer
-    sexpr_type s;
+    sexpr s;
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::integer::value;
-    *prana::cast_car<sexpr_type::integer>(s) = 42;
+    s.type = sexpr::integer::value;
+    *prana::cast_car<sexpr::integer>(s) = 42;
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]
   }
 
   { //[floating
-    sexpr_type s;
+    sexpr s;
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::floating::value;
-    *prana::cast_car<sexpr_type::floating>(s) = 17.5;
+    s.type = sexpr::floating::value;
+    *prana::cast_car<sexpr::floating>(s) = 17.5;
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]
@@ -82,58 +82,55 @@ int main (void) {
     std::string str = "fizzbuzz";
     symbol_table_type symtab;
 
-    sexpr_type s;
+    sexpr s;
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::symbol::value;
-    *prana::cast_car<sexpr_type::symbol>(s) =
+    s.type = sexpr::symbol::value;
+    *prana::cast_car<sexpr::symbol>(s) =
       symtab.insert(str.begin(), str.end(), function_type());
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]
   }
 
   { //[function
-    sexpr_type s;
+    sexpr s;
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::function::value;
-    *prana::cast_car<sexpr_type::function>(s) = new function_type();
+    s.type = sexpr::function::value;
+    *prana::cast_car<sexpr::function>(s) = new function_type();
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]
   }
   
-  { //[ascii
-    std::string str = "foobar";
+  { //[ascii_string
+    sexpr s;
 
-    sexpr_type s;
-
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
 
-    s.type = sexpr_type::ascii::value;
-    *prana::cast_car<sexpr_type::ascii>(s) = 
-      new boost::iterator_range<std::string::iterator>(str.begin(), str.end());
+    s.type = sexpr::ascii_string::value;
+    *prana::cast_car<sexpr::ascii_string>(s) = new std::string("foobar"); 
 
     prana::clear(s);
 
-    BOOST_TEST(s.type == sexpr_type::nil::value);
+    BOOST_TEST(s.type == sexpr::nil::value);
     BOOST_TEST(s.car == 0);
     BOOST_TEST(s.cdr == 0);
     //]

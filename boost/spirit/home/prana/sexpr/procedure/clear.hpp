@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_CLEAR_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_CLEAR_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_CLEAR_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_CLEAR_HPP
 
 #include <boost/utility/enable_if.hpp>
 
@@ -26,17 +26,17 @@ template<class X>
 inline void clear (X& x);
 //]
 
-namespace functor {
+namespace procedure {
 
-//[functor_clear_declaration
+//[procedure_clear_declaration
 template<class TagX, class Dummy = prana::unused_type>
 struct clear;
 //]
 
-//[functor_clear_definition
+//[procedure_clear_definition
 template<class TagX, class Dummy>
 struct clear {
-  struct implementation_functor; /*<- This incomplete type is a has_xxx
+  struct procedure; /*<- This incomplete type is a has_xxx
                                       detection member. ->*/
 
   typedef void result_type; /*<- The result_type typedef provides result_of
@@ -67,7 +67,7 @@ struct clear<
     prana::unused_type
   >::type
 > {
-  struct implementation_functor;
+  struct procedure;
 
   typedef void result_type;
 
@@ -95,12 +95,12 @@ struct clear<
 };
 //]
 
-} /*<- functor ->*/
+} /*<- procedure ->*/
 
 //[clear_definition
 template<class X>
 inline void clear (X& x) {
-  return dispatch<typename X::registry, functor::clear, X>(x);
+  return dispatch<typename X::registry, procedure::clear, X>(x);
 }
 //]
 
@@ -108,5 +108,5 @@ inline void clear (X& x) {
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_CLEAR_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_CLEAR_HPP ->*/
 

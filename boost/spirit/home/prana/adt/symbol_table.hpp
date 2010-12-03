@@ -13,10 +13,8 @@
 #include <boost/fusion/include/vector_fwd.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
-#include <boost/call_traits.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/detail/iterator.hpp>
-#include <boost/range/iterator_range.hpp>
 
 #include <boost/spirit/home/prana/adt/function_node.hpp>
 
@@ -24,14 +22,14 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-template<class> struct sexpr;
+struct sexpr;
 
 //[symbol_node
-template<class Iterator, class Data>
+template<class Char, class Data>
 struct symbol_node: private noncopyable {
-  typedef Iterator id_type;
+  typedef Char id_type;
 
-  typedef iterator_range<Iterator> key_type;
+  typedef std::basic_string<Char>* key_type;
   typedef Data* mapped_type;
   typedef fusion::vector2<key_type, mapped_type> value_type;
   typedef value_type* pointer;
@@ -49,48 +47,48 @@ struct symbol_node: private noncopyable {
   struct find { /*< Lookup functor. >*/
     typedef pointer result_type;
 
-    template<class InputIterator>
-    pointer operator() (symbol_node*, InputIterator&, InputIterator) const;
+    template<class Iterator>
+    pointer operator() (symbol_node*, Iterator&, Iterator) const;
     
-    template<class InputIterator>
-    const_pointer operator() (symbol_node const*, InputIterator&,
-                              InputIterator) const;
+    template<class Iterator>
+    const_pointer operator() (symbol_node const*, Iterator&,
+                              Iterator) const;
     
-    template<class Pointer, class Node, class InputIterator>
-    Pointer operator() (Node, InputIterator&, InputIterator) const;
+    template<class Pointer, class Node, class Iterator>
+    Pointer operator() (Node, Iterator&, Iterator) const;
   };
 
   struct insert { /*< Insertion functor. >*/
     typedef pointer result_type;
 
-    template<class InputIterator, class Value, class Alloc>
-    pointer operator() (symbol_node*&, InputIterator, InputIterator,
+    template<class Iterator, class Value, class Alloc>
+    pointer operator() (symbol_node*&, Iterator, Iterator,
                         Value const&, Alloc*) const;
   };
 
   struct erase { /*< Removal functor. >*/
     typedef pointer result_type;
 
-    template<class InputIterator, class Alloc>
-    void operator() (symbol_node*&, InputIterator, InputIterator, Alloc*) const;
+    template<class Iterator, class Alloc>
+    void operator() (symbol_node*&, Iterator, Iterator, Alloc*) const;
   };
 
   id_type id;        /*< The node's identity character. >*/
-  pointer data;      /*< Optional data, a string. >*/
+  pointer data;      /*< Optional data. >*/
   symbol_node* lt;   /*< Left pointer. >*/
   symbol_node* eq;   /*< Middle pointer. >*/
   symbol_node* gt;   /*< Right pointer. >*/
 };
 //]
 
-template<class Iterator, class Data>
-symbol_node<Iterator, Data>::symbol_node (id_type id_):
+template<class Char, class Data>
+symbol_node<Char, Data>::symbol_node (id_type id_):
   id(id_), data(0), lt(0), eq(0), gt(0) { }
 
 //[symbol_node_destruct_algorithm
-template<class Iterator, class Data>
+template<class Char, class Data>
 template<class Alloc>
-inline void symbol_node<Iterator, Data>::destruct::operator() (
+inline void symbol_node<Char, Data>::destruct::operator() (
   symbol_node* p, Alloc* alloc
 ) const {
   if (p) {
@@ -105,42 +103,42 @@ inline void symbol_node<Iterator, Data>::destruct::operator() (
 }
 //]
 
-template<class Iterator, class Data>
-template<class InputIterator>
-inline typename symbol_node<Iterator, Data>::pointer
-symbol_node<Iterator, Data>::find::operator() (
-  symbol_node* root, InputIterator& it, InputIterator end
+template<class Char, class Data>
+template<class Iterator>
+inline typename symbol_node<Char, Data>::pointer
+symbol_node<Char, Data>::find::operator() (
+  symbol_node* root, Iterator& it, Iterator end
 ) const {
   return (*this).operator()<pointer, symbol_node*>(root, it, end);
 }
 
-template<class Iterator, class Data>
-template<class InputIterator>
-inline typename symbol_node<Iterator, Data>::const_pointer
-symbol_node<Iterator, Data>::find::operator() (
-  symbol_node const* root, InputIterator& it, InputIterator end
+template<class Char, class Data>
+template<class Iterator>
+inline typename symbol_node<Char, Data>::const_pointer
+symbol_node<Char, Data>::find::operator() (
+  symbol_node const* root, Iterator& it, Iterator end
 ) const {
   return (*this).operator()<const_pointer, symbol_node const*>(root, it, end);
 }
 
 //[symbol_node_lookup_algorithm
-template<class Iterator, class Data>
-template<class Pointer, class Node, class InputIterator>
-inline Pointer symbol_node<Iterator, Data>::find::operator() (
-  Node root, InputIterator& it, InputIterator end
+template<class Char, class Data>
+template<class Pointer, class Node, class Iterator>
+inline Pointer symbol_node<Char, Data>::find::operator() (
+  Node root, Iterator& it, Iterator end
 ) const {
   if (it == end)
     return 0;
 
-  InputIterator i = it;
-  InputIterator latest = it;
+  Iterator i = it;
+  Iterator latest = it;
   Node p = root;
   Pointer found = 0;
 
   while (p && i != end) {
-    typename detail::iterator_traits<InputIterator>::value_type c = *i; 
+    typename detail::iterator_traits<Iterator>::value_type c = *i; 
 
-    if (c == *p->id) {
+    if (c == p->id) {
       if (p->data) {
         found = p->data;
         latest = i;
@@ -150,7 +148,7 @@ inline Pointer symbol_node<Iterator, Data>::find::operator() (
       i++;
     }
 
-    else if (c < *p->id) 
+    else if (c < p->id) 
       p = p->lt;
 
     else
@@ -165,28 +163,29 @@ inline Pointer symbol_node<Iterator, Data>::find::operator() (
 //]
 
 //[symbol_node_insertion_algorithm
-template<class Iterator, class Data>
-template<class InputIterator, class Value, class Alloc>
-inline typename symbol_node<Iterator, Data>::pointer
-symbol_node<Iterator, Data>::insert::operator() (
-  symbol_node*& root, InputIterator first, InputIterator last,
-  Value const& val, Alloc* alloc
+template<class Char, class Data>
+template<class Iterator, class Value, class Alloc>
+inline typename symbol_node<Char, Data>::pointer
+symbol_node<Char, Data>::insert::operator() (
+  symbol_node*& root, Iterator first, Iterator last, Value const& val,
+  Alloc* alloc
 ) const {
   if (first == last)
     return 0;
 
-  InputIterator it = first;
+  Iterator it = first;
+
   symbol_node** pp = &root;
 
   for (;;) {
-    typename detail::iterator_traits<InputIterator>::value_type c = *it;
+    typename detail::iterator_traits<Iterator>::value_type c = *it;
 
     if (*pp == 0)
-      *pp = alloc->new_node(it);
+      *pp = alloc->new_node(*it);
 
     symbol_node* p = *pp;
 
-    if (c == *p->id) {
+    if (c == p->id) {
       if (++it == last) {
         if (p->data == 0)
           p->data = alloc->new_data(first, last, val);
@@ -197,7 +196,7 @@ symbol_node<Iterator, Data>::insert::operator() (
       pp = &p->eq;
     }
 
-    else if (c < *p->id)
+    else if (c < p->id)
       pp = &p->lt;
 
     else
@@ -207,17 +206,17 @@ symbol_node<Iterator, Data>::insert::operator() (
 //]
 
 //[symbol_node_erasure_algorithm
-template<class Iterator, class Data>
-template<class InputIterator, class Alloc>
-inline void symbol_node<Iterator, Data>::erase::operator() (
-  symbol_node*& p, InputIterator first, InputIterator last, Alloc* alloc
+template<class Char, class Data>
+template<class Iterator, class Alloc>
+inline void symbol_node<Char, Data>::erase::operator() (
+  symbol_node*& p, Iterator first, Iterator last, Alloc* alloc
 ) const {
   if (p == 0 || first == last)
     return;
 
-  typename detail::iterator_traits<InputIterator>::value_type c = *first;
-
-  if (c == *p->id) {
+  typename detail::iterator_traits<Iterator>::value_type c = *first;
+  
+  if (c == p->id) {
     if (++first == last) {
       if (p->data) {
         alloc->delete_data(p->data);
@@ -228,7 +227,7 @@ inline void symbol_node<Iterator, Data>::erase::operator() (
     (*this)(p->eq, first, last, alloc);
   }
 
-  else if (c < *p->id)
+  else if (c < p->id)
     (*this)(p->lt, first, last, alloc);
   
   else
@@ -242,43 +241,43 @@ inline void symbol_node<Iterator, Data>::erase::operator() (
 //]
 
 //[symbol_table
-template<class Iterator, class Data = function_node<sexpr<Iterator> > > 
+template<class Char, class Data = function_node<sexpr> > 
 class symbol_table: private noncopyable {
  public:
-  typedef Iterator id_type;
+  typedef Char id_type;
   
-  typedef iterator_range<Iterator> key_type;
+  typedef std::basic_string<char>* key_type;
   typedef Data* mapped_type;
   typedef fusion::vector2<key_type, mapped_type> value_type;
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
 
-  typedef symbol_node<Iterator, Data> node;
+  typedef symbol_node<Char, Data> node;
 
   symbol_table (void);
 
   ~symbol_table (void);
 
-  template<class InputIterator>
-    pointer find (InputIterator&, InputIterator);
-  template<class InputIterator>
-    const_pointer find (InputIterator&, InputIterator) const;
+  template<class Iterator>
+    pointer find (Iterator&, Iterator);
+  template<class Iterator>
+    const_pointer find (Iterator&, Iterator) const;
 
-  template<class InputIterator, class Value>
-    pointer insert (InputIterator, InputIterator, Value const&);
+  template<class Iterator, class Value>
+    pointer insert (Iterator, Iterator, Value const&);
 
-  template<class InputIterator>
-    void erase (InputIterator, InputIterator);
+  template<class Iterator>
+    void erase (Iterator, Iterator);
 
   void clear (void);
 
  protected:
-  friend struct symbol_node<Iterator, Data>;
+  friend struct symbol_node<Char, Data>;
 
   node* new_node (id_type);
 
-  template<class InputIterator, class Value>
-    pointer new_data (InputIterator, InputIterator, Value const&);
+  template<class Iterator, class Value>
+    pointer new_data (Iterator, Iterator, Value const&);
 
   void delete_node (node*);
 
@@ -289,76 +288,82 @@ class symbol_table: private noncopyable {
 };
 //]
 
-template<class Iterator, class Data>
-symbol_table<Iterator, Data>::symbol_table (void): root(0) { }
+template<class Char, class Data>
+symbol_table<Char, Data>::symbol_table (void): root(0) { }
 
-template<class Iterator, class Data>
-symbol_table<Iterator, Data>::~symbol_table (void) {
+template<class Char, class Data>
+symbol_table<Char, Data>::~symbol_table (void) {
   clear();
 }
 
-template<class Iterator, class Data>
-template<class InputIterator>
-typename symbol_table<Iterator, Data>::pointer
-symbol_table<Iterator, Data>::find (InputIterator& first, InputIterator last) {
+template<class Char, class Data>
+template<class Iterator>
+typename symbol_table<Char, Data>::pointer
+symbol_table<Char, Data>::find (Iterator& first, Iterator last) {
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
-template<class Iterator, class Data>
-template<class InputIterator>
-typename symbol_table<Iterator, Data>::const_pointer
-symbol_table<Iterator, Data>::find (InputIterator& first,
-                                    InputIterator last) const {
+template<class Char, class Data>
+template<class Iterator>
+typename symbol_table<Char, Data>::const_pointer
+symbol_table<Char, Data>::find (Iterator& first,
+                                    Iterator last) const {
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
-template<class Iterator, class Data>
-template<class InputIterator, class Value>
-typename symbol_table<Iterator, Data>::pointer
-symbol_table<Iterator, Data>::insert (InputIterator first, InputIterator last,
-                                      Value const& val) {
+template<class Char, class Data>
+template<class Iterator, class Value>
+typename symbol_table<Char, Data>::pointer
+symbol_table<Char, Data>::insert (Iterator first, Iterator last,
+                                  Value const& val) {
   return typename node::insert()(root, first, last, val, this);
 }
 
-template<class Iterator, class Data>
-template<class InputIterator>
-void symbol_table<Iterator, Data>::erase (InputIterator first,
-                                          InputIterator last) {
+template<class Char, class Data>
+template<class Iterator>
+void symbol_table<Char, Data>::erase (Iterator first, Iterator last) {
   return typename node::erase()(root, first, last, this);
 }
 
-template<class Iterator, class Data>
-void symbol_table<Iterator, Data>::clear (void) {
+template<class Char, class Data>
+void symbol_table<Char, Data>::clear (void) {
   if (root) {
     typename node::destruct()(root, this);
     root = 0;
   }
 }
-template<class Iterator, class Data>
-typename symbol_table<Iterator, Data>::node*
-symbol_table<Iterator, Data>::new_node (id_type id) {
+
+template<class Char, class Data>
+typename symbol_table<Char, Data>::node*
+symbol_table<Char, Data>::new_node (id_type id) {
   return new node(id);
 }
 
-template<class Iterator, class Data>
-template<class InputIterator, class Value>
-typename symbol_table<Iterator, Data>::pointer
-symbol_table<Iterator, Data>::new_data (InputIterator first, InputIterator last,
-                                        Value const& val) {
-  return new value_type(key_type(first, last), new Value(val));
+template<class Char, class Data>
+template<class Iterator, class Value>
+typename symbol_table<Char, Data>::pointer
+symbol_table<Char, Data>::new_data (Iterator first, Iterator last,
+                                    Value const& val) {
+  return new value_type(
+    new std::basic_string<Char>(first, last), new Value(val)
+  );
 }
 
-template<class Iterator, class Data>
-void symbol_table<Iterator, Data>::delete_node (node* p) {
+template<class Char, class Data>
+void symbol_table<Char, Data>::delete_node (node* p) {
   if (p) 
     delete p;
 }
 
-template<class Iterator, class Data>
-void symbol_table<Iterator, Data>::delete_data (pointer p) {
+template<class Char, class Data>
+void symbol_table<Char, Data>::delete_data (pointer p) {
   if (p) {
+    if (fusion::at_c<0>(*p))
+      delete fusion::at_c<0>(*p);
+
     if (fusion::at_c<1>(*p))
       delete fusion::at_c<1>(*p);
+
     delete p;
   }
 }

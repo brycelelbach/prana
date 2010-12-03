@@ -33,11 +33,11 @@ namespace prana {
 //[concept_traits
 BOOST_SPIRIT_PRANA_TRAITS(
   false,
-  ((universal_tree)          (is_universal_tree)) 
-  ((type_definition)         (is_type_definition)) 
-  ((type_registry)           (is_type_registry))
-  ((tag_binder)              (is_tag_binder)) 
-  ((implementation_functor)  (is_implementation_functor))) 
+  ((universal_tree)  (is_universal_tree)) 
+  ((type_definition) (is_type_definition)) 
+  ((type_registry)   (is_type_registry))
+  ((tag_binder)      (is_tag_binder)) 
+  ((procedure)       (is_procedure))) 
 //]
 
 //[is_convertible_to_data_definition

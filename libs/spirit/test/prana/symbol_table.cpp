@@ -5,6 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
+#include <iostream>
+
 #include <boost/detail/lightweight_test.hpp>
 
 #include <boost/spirit/home/prana/adt/symbol_table.hpp> 
@@ -13,8 +15,7 @@ int main (void) {
   using namespace boost;
   using namespace boost::spirit;
 
-  typedef std::string::iterator iterator;
-  typedef prana::symbol_table<iterator, unsigned> table_type;
+  typedef prana::symbol_table<char, unsigned> table_type;
   
   table_type t;
 
@@ -28,7 +29,7 @@ int main (void) {
   //]
 
   //[find_foo
-  iterator it = foo.begin();
+  std::string::iterator it = foo.begin();
 
   BOOST_TEST(bool(t.find(it, foo.end())) == true);
   BOOST_TEST(it == foo.end());
@@ -68,8 +69,8 @@ int main (void) {
   table_type::pointer r = t.find(it, foo.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*fusion::at_c<0>(*r).begin() == *foo.begin());
-  BOOST_TEST(*fusion::at_c<0>(*r).end() == *it);
+  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foo.begin());
+//  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
   BOOST_TEST(*fusion::at_c<1>(*r) == a);
   BOOST_TEST(*it == *(foo.begin() + 1));
   //]
@@ -80,8 +81,8 @@ int main (void) {
   r = t.find(it, bar.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*fusion::at_c<0>(*r).begin() == *bar.begin());
-  BOOST_TEST(*fusion::at_c<0>(*r).end() == *it);
+  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *bar.begin());
+  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
   BOOST_TEST(*fusion::at_c<1>(*r) == b);
   BOOST_TEST(*it == *bar.end());
   //]
@@ -91,8 +92,8 @@ int main (void) {
   r = t.find(it, foobar.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*fusion::at_c<0>(*r).begin() == *foobar.begin());
-  BOOST_TEST(*fusion::at_c<0>(*r).end() == *it);
+  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foobar.begin());
+//  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
   BOOST_TEST(*fusion::at_c<1>(*r) == c);
   BOOST_TEST(*it == *foobar.end());
   //]

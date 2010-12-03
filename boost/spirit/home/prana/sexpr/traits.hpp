@@ -33,8 +33,10 @@ BOOST_SPIRIT_PRANA_TRAITS(
                                                symbols. >*/
   ((function_type)   (is_function_type))   /*< Functions are represented in
                                                Prana by C++ functors. >*/
-  ((text_type)       (is_text_type))       /*< Atoms representing textual
-                                               data. >*/
+  ((character_type)  (is_character_type))  /*< Atoms representing textual
+                                               data (characters). >*/
+  ((string_type)     (is_string_type))     /*< Atoms representing textual
+                                               data (strings). >*/
   ((container_type)  (is_container_type))) /*< Abstract data structures. >*/
 //]
 
@@ -44,7 +46,8 @@ struct is_stack_allocated_type:
   mpl::or_<
     is_arithmetic_type<T>,
     is_sentinel_type<T>,
-    is_symbol_type<T>
+    is_symbol_type<T>,
+    is_character_type<T>
   > { };
 //]
 
@@ -53,7 +56,7 @@ template<class T>
 struct is_heap_allocated_type:
   mpl::or_<
     is_function_type<T>,
-    is_text_type<T>,
+    is_string_type<T>,
     is_container_type<T>
   > { };
 //]

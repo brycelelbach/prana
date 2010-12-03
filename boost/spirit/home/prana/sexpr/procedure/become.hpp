@@ -7,11 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_BECOME_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_BECOME_HPP
-
-#include <iostream>
-#include <typeinfo>
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_BECOME_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_BECOME_HPP
 
 #include <boost/type_traits/is_same.hpp>
 
@@ -21,7 +18,7 @@
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/cast.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
-#include <boost/spirit/home/prana/sexpr/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/procedure/clear.hpp>
 
 namespace boost {
 namespace spirit {
@@ -32,17 +29,17 @@ template<class To, class X>
 inline void become (X& x);
 //]
 
-namespace functor {
+namespace procedure {
 
-//[functor_become_declaration
+//[procedure_become_declaration
 template<class To, class From, class Dummy = prana::unused_type>
 struct become;
 //]
 
-//[functor_become_definition
+//[procedure_become_definition
 template<class To, class From, class Dummy>
 struct become {
-  struct implementation_functor; 
+  struct procedure; 
 
   typedef void result_type;
   
@@ -60,7 +57,7 @@ struct become<
     prana::unused_type
   >::type
 > {
-  struct implementation_functor;
+  struct procedure;
 
   typedef void result_type;
 
@@ -70,12 +67,12 @@ struct become<
 };
 //]
 
-} /*<- functor ->*/
+} /*<- procedure ->*/
 
 //[become_definition
 template<class To, class X>
 inline void become (X& x) {
-  return dispatch<typename X::registry, functor::become, To, X>(x);
+  return dispatch<typename X::registry, procedure::become, To, X>(x);
 }
 //]
 
@@ -83,5 +80,5 @@ inline void become (X& x) {
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_BECOME_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_BECOME_HPP ->*/
 
