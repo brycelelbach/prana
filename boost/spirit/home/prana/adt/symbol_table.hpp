@@ -136,7 +136,7 @@ inline Pointer symbol_node<Char, Data>::find::operator() (
   Pointer found = 0;
 
   while (p && i != end) {
-    typename detail::iterator_traits<Iterator>::value_type c = *i; 
+    typename boost::detail::iterator_traits<Iterator>::value_type c = *i; 
 
     if (c == p->id) {
       if (p->data) {
@@ -178,7 +178,7 @@ symbol_node<Char, Data>::insert::operator() (
   symbol_node** pp = &root;
 
   for (;;) {
-    typename detail::iterator_traits<Iterator>::value_type c = *it;
+    typename boost::detail::iterator_traits<Iterator>::value_type c = *it;
 
     if (*pp == 0)
       *pp = alloc->new_node(*it);
@@ -214,7 +214,7 @@ inline void symbol_node<Char, Data>::erase::operator() (
   if (p == 0 || first == last)
     return;
 
-  typename detail::iterator_traits<Iterator>::value_type c = *first;
+  typename boost::detail::iterator_traits<Iterator>::value_type c = *first;
   
   if (c == p->id) {
     if (++first == last) {

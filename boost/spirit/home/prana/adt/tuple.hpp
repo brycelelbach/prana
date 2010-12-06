@@ -1,0 +1,91 @@
+/*<-============================================================================
+    Copyright (c) 2010      Bryce Lelbach
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+============================================================================->*/
+
+#if !BOOST_PP_IS_ITERATING
+
+  #if !defined(BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP)
+  #define BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP
+
+  #include <boost/mpl/at.hpp>
+  #include <boost/mpl/vector.hpp>
+  #include <boost/mpl/size_t.hpp>
+
+  #include <boost/preprocessor.hpp>
+
+  namespace boost {
+  namespace spirit {
+  namespace prana {
+
+  #define BOOST_PP_ITERATION_PARAMS_1                    \
+    (3, (1, 8, <boost/spirit/home/prana/adt/tuple.hpp>)) \
+    /***/
+
+  template<std::size_t N, class Tuple>
+  struct type_at:
+    mpl::at_c<typename Tuple::type, N> { };
+
+  template<std::size_t N, class Tuple>
+  struct value_at_impl;
+
+  #include BOOST_PP_ITERATE()
+  
+  template<std::size_t N, class Tuple>
+  inline typename type_at<N, Tuple>::type& value_at (Tuple& t) {
+    return value_at_impl<N, Tuple>()(t);
+  }
+  
+  template<std::size_t N, class Tuple>
+  inline typename type_at<N, Tuple>::type const& value_at (Tuple const& t) {
+    return value_at_impl<N, Tuple const>()(t);
+  }
+
+  } /*<- prana ->*/
+  } /*<- spirit ->*/
+  } /*<- boost ->*/
+
+  #endif /*<- BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP ->*/
+
+#else
+
+  #define BSP_N BOOST_PP_ITERATION()
+  #define BSP_M BOOST_PP_SUB(BSP_N, 1) 
+
+  #define BSP_DECL(z, n, data) T##n data##n;
+
+  template<class Tuple>
+  struct value_at_impl<BSP_M, Tuple> {
+    typedef typename type_at<BSP_M, Tuple>::type& result_type;
+
+    result_type operator() (Tuple& t) const {
+      return t.BOOST_PP_CAT(_, BSP_M);
+    }
+  };
+
+  template<class Tuple>
+  struct value_at_impl<BSP_M, Tuple const> {
+    typedef typename type_at<BSP_M, Tuple>::type const& result_type;
+
+    result_type operator() (Tuple const& t) const {
+      return t.BOOST_PP_CAT(_, BSP_M);
+    }
+  };
+
+  template<BOOST_PP_ENUM_PARAMS(BSP_N, class T)>
+  struct BOOST_PP_CAT(tuple, BSP_N) {
+    typedef mpl::vector<BOOST_PP_ENUM_PARAMS(BSP_N, T)> type;
+
+    typedef mpl::size_t<BSP_N> size;
+
+    BOOST_PP_REPEAT(BSP_N, BSP_DECL, _) 
+  };
+
+  #undef BSP_N
+  #undef BSP_M
+  #undef BSP_DECL
+
+#endif
+

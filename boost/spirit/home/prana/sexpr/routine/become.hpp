@@ -16,30 +16,22 @@
 
 #include <boost/spirit/home/prana/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
+#include <boost/spirit/home/prana/adt/tuple.hpp>
 #include <boost/spirit/home/prana/sexpr/cast.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
-#include <boost/spirit/home/prana/sexpr/procedure/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/routine/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/routine/become_fwd.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[become_declaration
-template<class To, class X>
-inline void become (X& x);
-//]
+namespace routine {
 
-namespace procedure {
-
-//[procedure_become_declaration
-template<class To, class From, class Dummy = prana::unused_type>
-struct become;
-//]
-
-//[procedure_become_definition
+//[routine_become_definition
 template<class To, class From, class Dummy>
 struct become {
-  struct procedure; 
+  struct routine; 
 
   typedef void result_type;
   
@@ -49,30 +41,14 @@ struct become {
     x.type = To::value; 
   }
 };
-
-template<class To, class From>
-struct become<
-  To, From, typename enable_if<
-    is_same<To, From>, 
-    prana::unused_type
-  >::type
-> {
-  struct procedure;
-
-  typedef void result_type;
-
-  template<class X>
-  result_type operator() (X& x) const { } /*<- If To and From are the same type
-                                               definition, do nothing. ->*/
-};
 //]
 
-} /*<- procedure ->*/
+} /*<- routine ->*/
 
 //[become_definition
 template<class To, class X>
 inline void become (X& x) {
-  return dispatch<typename X::registry, procedure::become, To, X>(x);
+  return dispatch<typename X::registry, routine::become, To, X>(x);
 }
 //]
 

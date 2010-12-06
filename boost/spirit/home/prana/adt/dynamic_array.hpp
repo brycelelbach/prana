@@ -27,18 +27,19 @@
 
 #include <boost/spirit/home/support/container.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
+#include <boost/spirit/home/prana/support/half_t.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 //[dynamic_array_declaration
-template<class Data, std::size_t InitialCapacity = 8>
+template<class Data, uinthalf_t InitialCapacity = 8>
 class dynamic_array;
 //]
 
 //[dynamic_array_definition
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 class dynamic_array {
  public:
   typedef Data value_type;
@@ -47,7 +48,7 @@ class dynamic_array {
   typedef Data* pointer;
   typedef Data const* const_pointer;
   typedef ptrdiff_t difference_type;
-  typedef std::size_t size_type;
+  typedef uinthalf_t size_type;
 
   typedef Data* iterator;
   typedef Data const* const_iterator;
@@ -110,34 +111,34 @@ class dynamic_array {
 };
 //]
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>::dynamic_array (void):
   _size(0), _capacity(InitialCapacity), _data(new Data[InitialCapacity]) { }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>::dynamic_array (dynamic_array const& da) {
   copy(da.begin(), da.end());
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Container>
 dynamic_array<Data, InitialCapacity>::dynamic_array (Container const& c) {
   copy(c.begin(), c.end());
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Iterator>
 dynamic_array<Data, InitialCapacity>::dynamic_array (Iterator first,
                                                      Iterator last) {
   copy(first, last);
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>::~dynamic_array (void) {
   delete[] _data;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>&
 dynamic_array<Data, InitialCapacity>::operator= (dynamic_array const& da) {
   if (*this != da)
@@ -145,7 +146,7 @@ dynamic_array<Data, InitialCapacity>::operator= (dynamic_array const& da) {
   return *this;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Container>
 dynamic_array<Data, InitialCapacity>&
 dynamic_array<Data, InitialCapacity>::operator= (Container const& c) {
@@ -154,7 +155,7 @@ dynamic_array<Data, InitialCapacity>::operator= (Container const& c) {
   return *this;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 void dynamic_array<Data, InitialCapacity>::assign (dynamic_array const& da) {
   if (*this != da)
     copy(da.begin(), da.end());
@@ -162,7 +163,7 @@ void dynamic_array<Data, InitialCapacity>::assign (dynamic_array const& da) {
 
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Container>
 void dynamic_array<Data, InitialCapacity>::assign (Container const& c) {
   if (*this != c)
@@ -170,7 +171,7 @@ void dynamic_array<Data, InitialCapacity>::assign (Container const& c) {
   return *this;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Iterator>
 void dynamic_array<Data, InitialCapacity>::assign (Iterator first,
                                                    Iterator last) {
@@ -179,29 +180,29 @@ void dynamic_array<Data, InitialCapacity>::assign (Iterator first,
   return *this;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::size_type
 dynamic_array<Data, InitialCapacity>::size (void) const {
   return _size;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::size_type
 dynamic_array<Data, InitialCapacity>::capacity (void) const {
   return _capacity;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 bool dynamic_array<Data, InitialCapacity>::empty (void) const {
   return _size;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 void dynamic_array<Data, InitialCapacity>::clear (void) {
   std::memset(_data, 0, _size);
 }
 //[dynamic_array_insertion_algorithm
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Value>
 void dynamic_array<Data, InitialCapacity>::push (Value const& val) {
   if (_size == _capacity) {
@@ -218,67 +219,67 @@ void dynamic_array<Data, InitialCapacity>::push (Value const& val) {
   _size += 1;
 } 
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Value>
 void dynamic_array<Data, InitialCapacity>::pop (void) {
   _size -= 1;
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::iterator
 dynamic_array<Data, InitialCapacity>::begin (void) {
   return &_data[0];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::const_iterator
 dynamic_array<Data, InitialCapacity>::begin (void) const {
   return &_data[0];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::iterator
 dynamic_array<Data, InitialCapacity>::end (void) {
   return &_data[_size];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::const_iterator
 dynamic_array<Data, InitialCapacity>::end (void) const {
   return &_data[_size];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::reference
 dynamic_array<Data, InitialCapacity>::front (void) {
   return _data[0];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::const_reference
 dynamic_array<Data, InitialCapacity>::front (void) const {
   return _data[0];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::reference
 dynamic_array<Data, InitialCapacity>::back (void) {
   return _data[_size - 1];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 typename dynamic_array<Data, InitialCapacity>::const_reference
 dynamic_array<Data, InitialCapacity>::back (void) const {
   return _data[_size - 1];
 }
 
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Container>
 Container dynamic_array<Data, InitialCapacity>::get (void) const {
   return Container(begin(), end());
 }
  
-template<class Data, std::size_t InitialCapacity>
+template<class Data, uinthalf_t InitialCapacity>
 template<class Iterator>
 void dynamic_array<Data, InitialCapacity>::copy (Iterator first,
                                                  Iterator last) {

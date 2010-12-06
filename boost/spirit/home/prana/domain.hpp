@@ -30,11 +30,7 @@ struct unused_type: spirit::unused_type /*< Derived from Boost.Fusion's
 //]
 
 //[nil_type
-struct nil_type: prana::unused_type { };
-//]
-
-//[empty_list_type
-struct empty_list_type: prana::unused_type { };
+struct nil_type: spirit::unused_type { };
 //]
 
 static unused_type const unused = unused_type();

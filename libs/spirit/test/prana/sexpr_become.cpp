@@ -8,10 +8,8 @@
 #include <boost/detail/lightweight_test.hpp>
 
 #include <boost/spirit/home/prana/domain.hpp>
-#include <boost/spirit/home/prana/support/no_op.hpp>
-#include <boost/spirit/home/prana/adt/function_node.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
-#include <boost/spirit/home/prana/sexpr/procedure/become.hpp>
+#include <boost/spirit/home/prana/sexpr/routine/become.hpp>
 
 int main (void) {
   using namespace boost;
@@ -19,46 +17,29 @@ int main (void) {
 
   using prana::sexpr;
 
-  typedef prana::scope<sexpr> scope_type;
-  typedef prana::unary_no_op_with_return<sexpr, scope_type> no_op_type;
-  typedef prana::stored_function<sexpr, no_op_type> function_type;
-
   { //[boolean_to_boolean
     sexpr s;
 
     s.type = sexpr::boolean::value;
-    *prana::cast_car<sexpr::boolean>(s) = true;
+    *prana::cast<sexpr::boolean>(s) = true;
 
-    prana::become<sexpr::boolean>(s);
+    prana::become<sexpr::boolean>(s); /*< Implicit clear. >*/
 
     BOOST_TEST(s.type == sexpr::boolean::value);
-    BOOST_TEST(*prana::cast_car<sexpr::boolean>(s) == true);
+    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
     //]
   }
   
-  { //[ascii_char_to_integer
+  { //[floating_to_integer
     sexpr s;
 
-    s.type = sexpr::ascii_char::value;
-    *prana::cast_car<sexpr::ascii_char>(s) = 'x';
+    s.type = sexpr::floating::value;
+    *prana::cast<sexpr::floating>(s) = 21.53;
 
     prana::become<sexpr::integer>(s);
 
     BOOST_TEST(s.type == sexpr::integer::value);
-    BOOST_TEST(s.car == 0);
-    //]
-  }
-  
-  { //[function_to_floating
-    sexpr s;
-
-    s.type = sexpr::function::value;
-    *prana::cast_car<sexpr::function>(s) = new function_type();
-
-    prana::become<sexpr::floating>(s); /*< Implicit clear. >*/
-
-    BOOST_TEST(s.type == sexpr::floating::value);
-    BOOST_TEST(s.car == 0);
+    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
     //]
   }
 

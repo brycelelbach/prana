@@ -169,10 +169,14 @@ struct trampoline;
       BOOST_PP_SEQ_TRANSFORM(BSP_PRE, class,                                \
         BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors)))                      \
   >                                                                         \
-  inline typename F<                                                        \
+  inline typename boost::result_of<F<                                       \
     BOOST_PP_ENUM_PARAMS(                                                   \
       BOOST_PP_ADD(num_tags, 1), prana::unused_type BOOST_PP_INTERCEPT)     \
-  >::result_type name (                                                     \
+  >(                                                                        \
+    BOOST_PP_SEQ_ENUM(                                                      \
+      BOOST_PP_SEQ_TRANSFORM(BSP_POST, &,                                   \
+        BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors)))                        \
+  )>::type name (                                                           \
     BOOST_PP_SEQ_FOR_EACH_I(BSP_ARGS, a, actors)                            \
   ) {                                                                       \
     BOOST_PP_CAT(bind_,                                                     \
@@ -185,10 +189,14 @@ struct trampoline;
     ));                                                                     \
     return trampoline<                                                      \
       mpl::size<Registry>::value, Registry,                                 \
-      typename F<                                                           \
+      typename boost::result_of<F<                                          \
         BOOST_PP_ENUM_PARAMS(                                               \
           BOOST_PP_ADD(num_tags, 1), prana::unused_type BOOST_PP_INTERCEPT) \
-      >::result_type,                                                       \
+      >(                                                                    \
+        BOOST_PP_SEQ_ENUM(                                                  \
+          BOOST_PP_SEQ_TRANSFORM(BSP_POST, &,                               \
+            BOOST_PP_SEQ_TRANSFORM(BSP_ALL, _, actors)))                    \
+      )>::type,                                                             \
       BOOST_PP_CAT(bind_,                                                   \
         BOOST_PP_CAT(BOOST_PP_SEQ_SIZE(actors),                             \
           BOOST_PP_CAT(x,                                                   \

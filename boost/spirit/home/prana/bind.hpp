@@ -101,7 +101,7 @@ namespace prana {
     struct result<                                                          \
       This(BOOST_PP_ENUM_PARAMS(num_tags, Tag))                             \
     > {                                                                     \
-      typedef typename result_of<                                           \
+      typedef typename boost::result_of<                                    \
         F<                                                                  \
           BOOST_PP_ENUM_PARAMS(num_tags, Tag),                              \
             prana::unused_type                                              \
@@ -120,7 +120,7 @@ namespace prana {
             BOOST_PP_SEQ_TRANSFORM(BSP_FIRST, _, actors))) { }              \
                                                                             \
     template<BOOST_PP_ENUM_PARAMS(num_tags, class Tag)>                     \
-    typename result_of<name(                                                \
+    typename boost::result_of<name(                                         \
       BOOST_PP_ENUM_PARAMS(num_tags, Tag)                                   \
     )>::type operator() (                                                   \
       BOOST_PP_ENUM_PARAMS(num_tags, Tag)                                   \
@@ -191,7 +191,7 @@ class dispatch_binder {
 
   template<class This, class TagY>
   struct result<This(TagY const&)> {
-    typedef typename result_of<F(TagX const&, TagY const&)>::type type;
+    typedef typename boost::result_of<F(TagX, TagY)>::type type;
   };
   
   template<std::size_t N>
@@ -209,9 +209,9 @@ class dispatch_binder {
   dispatch_binder (F& f_): f(f_) { }
 
   template<class TagY>
-  typename result_of<F(TagX const&, TagY const&)>::type
-  operator() (TagY const& tagy) const {
-    return f(TagX(), tagy);
+  typename boost::result_of<F(TagX, TagY)>::type
+  operator() (TagY const&) const {
+    return f(TagX(), TagY());
   }
 };
 //]

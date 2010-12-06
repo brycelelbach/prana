@@ -23,14 +23,20 @@
 #include <boost/mpl/insert.hpp>
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/logical.hpp>
 #include <boost/mpl/comparison.hpp>
-#include <boost/mpl/placeholders.hpp>
 
 #include <boost/preprocessor/seq.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/arithmetic/sub.hpp>
 
 #include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/exception.hpp>
+#include <boost/spirit/home/prana/support/nt2/preprocessor.hpp>
+
+namespace boost {
+namespace spirit {
+namespace prana {
 
 #define BOOST_SPIRIT_PRANA_COLUMN(R, Column, Element)                         \
   BOOST_PP_SEQ_ELEM(Column, Element)                                          \
@@ -44,11 +50,12 @@
   struct BOOST_PP_SEQ_ELEM(0, Element) {                                      \
     struct type_definition;                                                   \
     struct BOOST_PP_SEQ_ELEM(2, Element);                                     \
+    struct BOOST_PP_SEQ_ELEM(3, Element);                                     \
     typedef BOOST_PP_SEQ_ELEM(0, Data) value_type;                            \
     BOOST_STATIC_CONSTANT(value_type, value = (mpl::order<                    \
       BOOST_PP_SEQ_ELEM(1, Data), BOOST_PP_SEQ_ELEM(0, Element)               \
     >::type::value));                                                         \
-    typedef BOOST_PP_SEQ_ELEM(1, Element) data_type;                          \
+    typedef NT2_PP_STRIP(BOOST_PP_SEQ_ELEM(1, Element)) data_type;            \
   };                                                                          \
   /***/
 
@@ -61,9 +68,6 @@
     BOOST_SPIRIT_PRANA_DEFINE_TYPE, (ValueType) (RegistrySet), Tags)          \
   /***/
 
-namespace boost {
-namespace spirit {
-namespace prana {
 
 //[basic_registry
 template<typename RegistrySet>
@@ -74,41 +78,27 @@ struct basic_registry: RegistrySet {
     typedef std::size_t result_type;
 
     template<class F>
-    typename enable_if<is_tag_binder<F>, std::size_t>::type
-    operator() (F const& f) const {
+    typename enable_if<
+      is_tag_binder<F>,
+      std::size_t
+    >::type operator() (F const& f) const {
       return (*this)(f.template get<0>());
     }
    
-    template<class X> 
-    typename enable_if<is_universal_tree<X>, std::size_t>::type
-    operator() (X const& x) const {
-      return x.type;
+    template<class UniversalTree> 
+    typename enable_if<
+      is_universal_tree<UniversalTree>,
+      std::size_t
+    >::type operator() (UniversalTree const& t) const {
+      return t.type;
     }
     
     template<class TagX> 
-    typename enable_if<is_type_definition<TagX>, std::size_t>::type
-    operator() (TagX const&) const {
-      return TagX::value;
-    }
-
-    template<class T>
     typename enable_if<
-      mpl::not_<
-        mpl::equal<
-          mpl::find_if<
-            RegistrySet,
-            is_convertible_to_data_definition<mpl::placeholders::_1, T>
-          >,
-          mpl::end<RegistrySet>
-        >
-      >,
+      is_type_definition<TagX>,
       std::size_t
-    >::type
-    operator() (T const& t) const {
-      typedef typename mpl::find_if<
-        RegistrySet, is_convertible_to_data_definition<mpl::placeholders::_1, T>
-      >::type it;
-      return mpl::deref<it>::type::value; 
+    >::type operator() (TagX const&) const {
+      return TagX::value;
     }
   };
 
@@ -118,8 +108,7 @@ struct basic_registry: RegistrySet {
 
     template<class F>
     result_type operator() (F const& f) const {
-      BOOST_ASSERT(!"(error (\"invalid type information\"))");
-      return result_type();
+      BOOST_THROW_EXCEPTION(invalid_type_information(which()(f)));
     };
   };
 };

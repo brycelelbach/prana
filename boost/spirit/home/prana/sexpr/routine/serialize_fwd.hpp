@@ -7,55 +7,38 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_FWD_HPP
 
 #include <boost/spirit/home/prana/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
+#include <boost/spirit/home/prana/sexpr/core_fwd.hpp>
+#include <boost/spirit/home/prana/sexpr/cast.hpp>
+
+#include <boost/spirit/include/karma.hpp> 
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[set_declaration
-template<class X, class Y>
-inline void set (X& x, Y const& y);
+//[serialize_declaration
+template<class X>
+inline std::basic_string<char> serialize (X const& x);
 //]
 
-namespace procedure {
+namespace routine {
 
-//[procedure_set_declaration
+//[routine_serialize_declaration
 template<class TagX, class Dummy = prana::unused_type>
-struct set;
+struct serialize;
 //]
 
-//[procedure_set_definition
-template<class TagX, class Dummy>
-struct set {
-  struct procedure; 
-
-  typedef void result_type;
-  
-  template<class X, class Y>
-  result_type operator() (X& x, Y const& y) const {
-    // TODO (wash): implement
-  }
-};
-//]
-
-} /*<- procedure ->*/
-
-//[set_definition
-template<class X, class Y>
-inline void set (X& x, Y const& y) {
-  return dispatch<typename X::registry, procedure::set, X>(x, y);
-}
-//]
+} /*<- routine ->*/
 
 } /*<- prana ->*/
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_FWD_HPP ->*/
 

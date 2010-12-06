@@ -9,17 +9,16 @@
 
 import testing ;
 
-project spirit_prana_test :
-  requirements
+project spirit_prana_test 
+  : requirements
     <toolset>clang:<cxxflags>-Wno-unused
     <toolset>clang:<cxxflags>-Wno-tautological-compare
-    <include>./
     <include>../../../
     <testing.launcher>valgrind
+  : build-dir
+    ../../../bin
   ;
 
-for address in 32 64 {
-  for tests in [ glob ./prana/*.cpp ] {
-    run $(tests) : : : <address-model>$(address) : $(tests:B)_$(address) ;
-  }
+for tests in [ glob ./prana/*.cpp ] {
+    run $(tests) : : : : $(tests:B) ;
 }

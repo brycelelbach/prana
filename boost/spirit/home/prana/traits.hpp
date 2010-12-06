@@ -37,7 +37,7 @@ BOOST_SPIRIT_PRANA_TRAITS(
   ((type_definition) (is_type_definition)) 
   ((type_registry)   (is_type_registry))
   ((tag_binder)      (is_tag_binder)) 
-  ((procedure)       (is_procedure))) 
+  ((routine)         (is_routine))) 
 //]
 
 //[is_convertible_to_data_definition

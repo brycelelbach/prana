@@ -23,42 +23,21 @@ namespace prana {
 //[sexpr_traits
 BOOST_SPIRIT_PRANA_TRAITS(
   false,
+  // Atoms.
   ((arithmetic_type) (is_arithmetic_type)) /*< These types represent numeric
                                                data, e.g. integers, floating
                                                point types, etc. >*/ 
   ((sentinel_type)   (is_sentinel_type))   /*< Sentinel types are singletons
                                                used to terminate recursive
                                                s-expressions. >*/
-  ((symbol_type)     (is_symbol_type))     /*< Atoms representing language
-                                               symbols. >*/
-  ((function_type)   (is_function_type))   /*< Functions are represented in
-                                               Prana by C++ functors. >*/
-  ((character_type)  (is_character_type))  /*< Atoms representing textual
-                                               data (characters). >*/
-  ((string_type)     (is_string_type))     /*< Atoms representing textual
-                                               data (strings). >*/
-  ((container_type)  (is_container_type))) /*< Abstract data structures. >*/
-//]
 
-//[is_stack_allocated_type
-template<class T>
-struct is_stack_allocated_type:
-  mpl::or_<
-    is_arithmetic_type<T>,
-    is_sentinel_type<T>,
-    is_symbol_type<T>,
-    is_character_type<T>
-  > { };
-//]
+  // Abstract data structures.
+  ((vector_type) (is_vector_type))
+  ((cons_type)   (is_cons_type))       
 
-//[is_heap_allocated_type
-template<class T>
-struct is_heap_allocated_type:
-  mpl::or_<
-    is_function_type<T>,
-    is_string_type<T>,
-    is_container_type<T>
-  > { };
+  // Storage details.
+  ((heap)  (is_heap_allocated_type))   
+  ((stack) (is_stack_allocated_type))) 
 //]
 
 } /*<- prana ->*/

@@ -23,12 +23,12 @@ template<class TagX, class Member, Member Ptr, class Dummy = prana::unused_type>
 struct caster;
 //]
 
-//[cast_car_declaration
+//[cast_declaration
 template<class TagX, class X>
-inline typename TagX::data_type* cast_car (X& x);
+inline typename TagX::data_type* cast (X& x);
 
 template<class TagX, class X>
-inline typename TagX::data_type const* cast_car (X const& x);
+inline typename TagX::data_type const* cast (X const& x);
 //]
 
 //[caster_definition
@@ -56,15 +56,15 @@ struct caster<TagX, Type Object::*, Ptr, prana::unused_type> {
 };
 //]
 
-//[cast_car_definition
+//[cast_definition
 template<class TagX, class X>
-inline typename TagX::data_type* cast_car (X& x) {
-  return caster<TagX, void* X::*, &X::car>()(x);
+inline typename TagX::data_type* cast (X& x) {
+  return caster<TagX, void* (X::*)[2], &X::data>()(x);
 }
 
 template<class TagX, class X>
-inline typename TagX::data_type const* cast_car (X const& x) {
-  return caster<TagX, void* X::*, &X::car>()(x);
+inline typename TagX::data_type const* cast (X const& x) {
+  return caster<TagX, void* (X::*)[2], &X::data>()(x);
 }
 //]
 
