@@ -12,6 +12,7 @@
 
 #include <boost/spirit/home/prana/sexpr/core_fwd.hpp>
 #include <boost/spirit/home/prana/sexpr/routine/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/routine/set.hpp>
 
 namespace boost {
 namespace spirit {
@@ -22,8 +23,27 @@ sexpr::sexpr (void): type(nil::value) {
   data[1] = 0;
 }
 
+template<class X>
+sexpr::sexpr (X x): type(nil::value) {
+  data[0] = 0;
+  data[1] = 0;
+  set(*this, x);
+}
+
 sexpr::~sexpr (void) {
   clear(*this);
+}
+
+template<class X>
+sexpr& sexpr::operator= (X x) {
+  // TODO: Add eqv test here.
+  set(*this, x);
+}
+
+template<class X>
+void sexpr::assign (X x) {
+  // TODO: Add eqv test here.
+  set(*this, x);
 }
 
 } /*<- prana ->*/

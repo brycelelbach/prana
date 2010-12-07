@@ -34,19 +34,19 @@ struct sexpr {
     size_type,        /*< The value_type for each TypeDefinition. >*/
     type_definitions, /*< The name for the RegistrySet. >*/
 
-    ((boolean)  ((bool))     (arithmetic_type) (stack))
-    ((integer)  ((intmax_t)) (arithmetic_type) (stack))
-    ((floating) ((double))   (arithmetic_type) (stack))
+    ((boolean)  ((bool))     (arithmetic) (stack))
+    ((integer)  ((intmax_t)) (arithmetic) (stack))
+    ((floating) ((double))   (arithmetic) (stack))
 
-    ((nil) ((nil_type)) (sentinel_type) (stack))
+    ((nil) ((nil_type)) (sentinel) (stack))
 
-    ((pair)  ((tuple2<sexpr*, sexpr*>)) (cons_type) (heap))
-    ((range) ((tuple2<sexpr*, sexpr*>)) (cons_type) (stack))
-    ((list)  ((tuple2<sexpr*, sexpr*>)) (cons_type) (heap))
+    ((pair)  ((tuple2<sexpr*, sexpr*>)) (cons) (heap))
+    ((range) ((tuple2<sexpr*, sexpr*>)) (cons) (stack))
+    ((list)  ((tuple2<sexpr*, sexpr*>)) (cons) (heap))
 
-    ((vector) ((tuple3<uinthalf_t, uinthalf_t, sexpr*>)) (vector_type) (heap))
-    ((ascii)  ((tuple3<uinthalf_t, uinthalf_t, char*>))  (vector_type) (heap))
-    ((symbol) ((tuple3<uinthalf_t, uinthalf_t, char*>))  (vector_type) (heap))
+    ((vector) ((tuple3<uinthalf_t, uinthalf_t, sexpr*>)) (dynamic_array) (heap))
+    ((ascii)  ((tuple3<uinthalf_t, uinthalf_t, char*>))  (dynamic_array) (heap))
+    ((symbol) ((tuple3<uinthalf_t, uinthalf_t, char*>))  (dynamic_array) (heap))
     //]
   )
 
@@ -60,7 +60,16 @@ struct sexpr {
 
   sexpr (void);
 
+  template<class X>
+  sexpr (X);
+
   ~sexpr (void);
+
+  template<class X>
+  sexpr& operator= (X);
+
+  template<class X>
+  void assign (X);
 };
 //]
 

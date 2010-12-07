@@ -31,8 +31,8 @@ BOOST_SPIRIT_PRANA_TRAITS(
                                                used to terminate recursive
                                                s-expressions. >*/
 
-  // Abstract data structures.
-  ((vector_type) (is_vector_type))
+  // Composites.
+  ((dynamic_array_type) (is_dynamic_array_type))
   ((cons_type)   (is_cons_type))       
 
   // Storage details.

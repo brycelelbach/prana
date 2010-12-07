@@ -52,10 +52,7 @@ template<class X>
 inline X& set (X&, char);
 
 template<class X>
-inline X& set (X&, char const*, std::size_t);
-
-template<class X, std::size_t N>
-inline X& set (X&, char const [N]);
+inline X& set (X&, char const*);
 
 template<class X>
 inline X& set (X&, std::basic_string<char> const&);

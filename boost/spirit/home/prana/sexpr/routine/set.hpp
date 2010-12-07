@@ -118,7 +118,7 @@ struct set<
   TagX, TagY, typename enable_if<
     mpl::and_<
       is_heap_allocated_type<TagY>,
-      is_vector_type<TagY>
+      is_dynamic_array_type<TagY>
     >, 
     prana::unused_type
   >::type

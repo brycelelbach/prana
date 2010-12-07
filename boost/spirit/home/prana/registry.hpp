@@ -38,18 +38,18 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-#define BOOST_SPIRIT_PRANA_COLUMN(R, Column, Element)                         \
-  BOOST_PP_SEQ_ELEM(Column, Element)                                          \
+#define BOOST_SPIRIT_PRANA_COLUMN(R, Column, Element)   \
+  BOOST_PP_SEQ_ELEM(Column, Element)                    \
   /***/
 
-#define BOOST_SPIRIT_PRANA_DECLARE_TYPE(R, _, Element)                        \
-  struct BOOST_PP_SEQ_ELEM(0, Element);                                       \
+#define BOOST_SPIRIT_PRANA_DECLARE_TYPE(R, _, Element)  \
+  struct BOOST_PP_SEQ_ELEM(0, Element);                 \
   /***/
 
 #define BOOST_SPIRIT_PRANA_DEFINE_TYPE(R, Data, Element)                      \
   struct BOOST_PP_SEQ_ELEM(0, Element) {                                      \
     struct type_definition;                                                   \
-    struct BOOST_PP_SEQ_ELEM(2, Element);                                     \
+    struct BOOST_PP_CAT(BOOST_PP_SEQ_ELEM(2, Element), _type);                \
     struct BOOST_PP_SEQ_ELEM(3, Element);                                     \
     typedef BOOST_PP_SEQ_ELEM(0, Data) value_type;                            \
     BOOST_STATIC_CONSTANT(value_type, value = (mpl::order<                    \
@@ -67,7 +67,6 @@ namespace prana {
   BOOST_PP_SEQ_FOR_EACH(                                                      \
     BOOST_SPIRIT_PRANA_DEFINE_TYPE, (ValueType) (RegistrySet), Tags)          \
   /***/
-
 
 //[basic_registry
 template<typename RegistrySet>

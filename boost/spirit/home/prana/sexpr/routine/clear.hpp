@@ -94,7 +94,7 @@ struct clear<
   TagX, typename enable_if<
     mpl::and_<
       is_heap_allocated_type<TagX>, 
-      is_vector_type<TagX> 
+      is_dynamic_array_type<TagX> 
     >,
     prana::unused_type
   >::type
