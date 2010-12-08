@@ -5,40 +5,43 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <iostream>
+#include "harness.hpp"
 
-#include <boost/detail/lightweight_test.hpp>
-
-#include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
 #include <boost/spirit/home/prana/sexpr/routine/size.hpp>
 
 int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
+  using namespace boost::spirit::prana;
 
-  using prana::sexpr;
+  { /*[size_0_ascii*/
+    sexpr s0("");
+  
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s0) ("\"\"")))
 
-  { //[size_0_ascii
-    sexpr s("");
-    
-    BOOST_TEST(prana::size(s) == 0);
-    //]
-  }
+    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+      ((size(s0)) (0)))
+  /*]*/ }
   
-  { //[size_3_ascii
-    sexpr s("bar");
-    
-    BOOST_TEST(prana::size(s) == 3);
-    //]
-  }
+  { /*[size_3_ascii*/
+  sexpr s1("bar");
   
-  { //[size_8_ascii
-    sexpr s("fizzbuzz");
-    
-    BOOST_TEST(prana::size(s) == 8);
-    //]
-  }
+  BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    ((s1) ("\"bar\"")))
+
+  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    ((size(s1)) (3)))
+  /*]*/ }
+  
+  { /*[size_8_ascii*/
+  sexpr s2("fizzbuzz");
+  
+  BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    ((s2) ("\"fizzbuzz\"")))
+
+  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    ((size(s2)) (8)))
+  /*]*/ }
 
   return boost::report_errors();
 }

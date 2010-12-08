@@ -5,42 +5,31 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <iostream>
+#include "harness.hpp"
 
-#include <boost/detail/lightweight_test.hpp>
-
-#include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
 #include <boost/spirit/home/prana/sexpr/routine/set.hpp>
 
 int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
-
-  using prana::sexpr;
+  using namespace boost::spirit::prana;
 
   { //[string_literal
     sexpr s;
     
-    prana::set(s, "foo");
+    set(s, "abc");
 
-    BOOST_TEST(s.type == sexpr::ascii::value);
-    BOOST_TEST(std::string("foo") ==
-               std::string(
-                 prana::value_at<2>(*prana::cast<sexpr::ascii>(s)),
-                 prana::value_at<2>(*prana::cast<sexpr::ascii>(s)) +
-                 prana::value_at<0>(*prana::cast<sexpr::ascii>(s))
-               ));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("\"abc\"")))
     //]
   }
   
   { //[integer_literal
     sexpr s;
     
-    prana::set(s, 5);
+    set(s, 5);
 
-    BOOST_TEST(s.type == sexpr::integer::value);
-    BOOST_TEST(*prana::cast<sexpr::integer>(s) == 5);
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("5")))
     //]
   }
   

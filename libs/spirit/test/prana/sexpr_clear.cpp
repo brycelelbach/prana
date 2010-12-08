@@ -5,63 +5,54 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <boost/detail/lightweight_test.hpp>
+#include "harness.hpp"
 
-#include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
 #include <boost/spirit/home/prana/sexpr/routine/clear.hpp>
+#include <boost/spirit/home/prana/sexpr/routine/set.hpp>
 
 int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
-
-  using prana::sexpr;
+  using namespace boost::spirit::prana;
 
   { //[boolean
     sexpr s;
 
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
 
-    s.type = sexpr::boolean::value;
-    *prana::cast<sexpr::boolean>(s) = true;
+    set(s, true);
+    clear(s);
 
-    prana::clear(s);
-
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
     //]
   }
 
-  { //[integer
+  { //[ascii
     sexpr s;
 
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
 
-    s.type = sexpr::integer::value;
-    *prana::cast<sexpr::integer>(s) = 42;
+    set(s, "wxyz");
+    clear(s);
 
-    prana::clear(s);
-
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
     //]
   }
 
   { //[floating
     sexpr s;
 
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
 
-    s.type = sexpr::floating::value;
-    *prana::cast<sexpr::floating>(s) = 17.5;
+    set(s, 17.5); 
+    clear(s);
 
-    prana::clear(s);
-
-    BOOST_TEST(s.type == sexpr::nil::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#nil")))
     //]
   }
 

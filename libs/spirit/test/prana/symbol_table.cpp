@@ -5,9 +5,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <iostream>
-
-#include <boost/detail/lightweight_test.hpp>
+#include "harness.hpp"
 
 #include <boost/spirit/home/prana/adt/symbol_table.hpp> 
 
@@ -70,7 +68,6 @@ int main (void) {
 
   BOOST_TEST(bool(r) == true);
   BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foo.begin());
-//  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
   BOOST_TEST(*fusion::at_c<1>(*r) == a);
   BOOST_TEST(*it == *(foo.begin() + 1));
   //]
@@ -93,7 +90,7 @@ int main (void) {
 
   BOOST_TEST(bool(r) == true);
   BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foobar.begin());
-//  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
+  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
   BOOST_TEST(*fusion::at_c<1>(*r) == c);
   BOOST_TEST(*it == *foobar.end());
   //]

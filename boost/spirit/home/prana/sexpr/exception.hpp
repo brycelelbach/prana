@@ -64,6 +64,30 @@ struct expected_cons: std::exception {
   virtual const char* what (void) const throw() { return msg.c_str(); }
 };
 
+struct expected_composite: std::exception {
+  std::string msg;
+
+  template<class X>
+  expected_composite (X const& gotx) {
+    msg = "(exception '(expected-composite ";
+    msg += serialize(gotx);
+    msg += "))"; 
+  }
+
+  template<class X, class Y>
+  expected_composite (X const& gotx, Y const& goty) {
+    msg = "(exception '(expected-composite ";
+    msg += serialize(gotx);
+    msg += " "; 
+    msg += serialize(goty);
+    msg += "))"; 
+  }
+
+  virtual ~expected_composite (void) throw() { }
+
+  virtual const char* what (void) const throw() { return msg.c_str(); }
+};
+
 struct storage_unavailable: std::exception {
   std::string msg;
 

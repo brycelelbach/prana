@@ -5,41 +5,42 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <boost/detail/lightweight_test.hpp>
+#include "harness.hpp"
 
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
 #include <boost/spirit/home/prana/sexpr/routine/become.hpp>
 
 int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
-
-  using prana::sexpr;
+  using namespace boost::spirit::prana;
 
   { //[boolean_to_boolean
-    sexpr s;
+    sexpr s(true);
 
-    s.type = sexpr::boolean::value;
-    *prana::cast<sexpr::boolean>(s) = true;
+    become<sexpr::boolean>(s); 
 
-    prana::become<sexpr::boolean>(s); /*< Implicit clear. >*/
-
-    BOOST_TEST(s.type == sexpr::boolean::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("#false")))
     //]
   }
   
   { //[floating_to_integer
-    sexpr s;
+    sexpr s(21.53);
 
-    s.type = sexpr::floating::value;
-    *prana::cast<sexpr::floating>(s) = 21.53;
+    become<sexpr::integer>(s);
 
-    prana::become<sexpr::integer>(s);
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("0")))
+    //]
+  }
+  
+  { //[integer_to_ascii
+    sexpr s(14);
 
-    BOOST_TEST(s.type == sexpr::integer::value);
-    BOOST_TEST((s.data[0] == 0) && (s.data[1] == 0));
+    become<sexpr::ascii>(s);
+
+    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+      ((s) ("\"\"")))
     //]
   }
 

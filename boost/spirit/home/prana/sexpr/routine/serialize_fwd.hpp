@@ -23,14 +23,13 @@ namespace spirit {
 namespace prana {
 
 //[serialize_declaration
-template<class X>
-inline std::basic_string<char> serialize (X const& x);
+inline std::basic_string<char> serialize (sexpr const&);
 //]
 
 namespace routine {
 
 //[routine_serialize_declaration
-template<class TagX, class Dummy = prana::unused_type>
+template<class Tag, class Dummy = prana::unused_type>
 struct serialize;
 //]
 

@@ -1,4 +1,3 @@
-
 /*<-============================================================================
     Copyright (c) 2010      Bryce Lelbach
 
@@ -6,26 +5,35 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#include <boost/detail/lightweight_test.hpp>
+#include "harness.hpp"
 
-#include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/sexpr/core.hpp>
 
 int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
+  using namespace boost::spirit::prana;
 
-  using prana::sexpr;
+  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    //[arithmetic_types
+    ((sizeof(sexpr::boolean::data_type))  (sizeof(void*[2])))
+    ((sizeof(sexpr::integer::data_type))  (sizeof(void*[2])))
+    ((sizeof(sexpr::floating::data_type)) (sizeof(void*[2])))
+    //]
 
-  BOOST_TEST(sizeof(sexpr::boolean::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::integer::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::floating::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::nil::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::pair::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::range::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::vector::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::ascii::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::symbol::data_type) <= sizeof(void*[2]));
+    //[sentinel_types
+    ((sizeof(sexpr::nil::data_type)) (sizeof(void*[2])))
+    //]
+
+    //[cons_types
+    ((sizeof(sexpr::pair::data_type))  (sizeof(void*[2])))
+    ((sizeof(sexpr::range::data_type)) (sizeof(void*[2])))
+    ((sizeof(sexpr::list::data_type))  (sizeof(void*[2])))
+    //]
+
+    //[vector_types
+    ((sizeof(sexpr::vector::data_type)) (sizeof(void*[2])))
+    ((sizeof(sexpr::ascii::data_type))  (sizeof(void*[2])))
+    ((sizeof(sexpr::symbol::data_type)) (sizeof(void*[2]))))
+    //]
 
   return boost::report_errors();
 }
