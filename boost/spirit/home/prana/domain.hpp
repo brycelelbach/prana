@@ -35,6 +35,8 @@ struct nil_type: spirit::unused_type { };
 
 static unused_type const unused = unused_type();
 
+static nil_type const nil = nil_type();
+
 } /*<- prana ->*/
 } /*<- spirit ->*/
 } /*<- boost ->*/

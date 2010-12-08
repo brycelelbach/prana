@@ -23,8 +23,6 @@ int main (void) {
   BOOST_TEST(sizeof(sexpr::nil::data_type) <= sizeof(void*[2]));
   BOOST_TEST(sizeof(sexpr::pair::data_type) <= sizeof(void*[2]));
   BOOST_TEST(sizeof(sexpr::range::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::list::data_type) <= sizeof(void*[2]));
-  BOOST_TEST(sizeof(sexpr::list::data_type) <= sizeof(void*[2]));
   BOOST_TEST(sizeof(sexpr::vector::data_type) <= sizeof(void*[2]));
   BOOST_TEST(sizeof(sexpr::ascii::data_type) <= sizeof(void*[2]));
   BOOST_TEST(sizeof(sexpr::symbol::data_type) <= sizeof(void*[2]));

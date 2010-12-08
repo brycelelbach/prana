@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_HPP
 
 #include <boost/spirit/home/prana/sexpr/routine/size_fwd.hpp>
 
@@ -26,8 +26,8 @@ struct size {
   typedef uinthalf_t result_type;
   
   template<class X>
-  result_type operator() (X const& x) const {
-    BOOST_THROW_EXCEPTION(expected_composite(x));
+  result_type operator() (X& x) const {
+    BOOST_THROW_EXCEPTION(expected_dynamic_array(x));
   }
 };
 //]
@@ -45,7 +45,7 @@ struct size<
   typedef uinthalf_t result_type;
   
   template<class X>
-  result_type operator() (X const& x) const {
+  result_type operator() (X& x) const {
     return value_at<0>(*cast<TagX>(x)); 
   }
 };
@@ -64,5 +64,5 @@ inline uinthalf_t size (X const& x) {
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_HPP ->*/
 

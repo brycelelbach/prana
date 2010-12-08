@@ -5,33 +5,33 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_BECOME_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_BECOME_FWD_HPP
-
-#include <boost/type_traits/is_same.hpp>
-
-#include <boost/utility/enable_if.hpp>
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_CDR_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_CDR_FWD_HPP
 
 #include <boost/spirit/home/prana/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
+#include <boost/spirit/home/prana/adt/tuple.hpp>
+#include <boost/spirit/home/prana/sexpr/exception.hpp>
 #include <boost/spirit/home/prana/sexpr/cast.hpp>
+#include <boost/spirit/home/prana/sexpr/core_fwd.hpp>
 #include <boost/spirit/home/prana/sexpr/traits.hpp>
-#include <boost/spirit/home/prana/sexpr/routine/clear.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[become_declaration
-template<class To, class X>
-inline void become (X& x);
+//[set_cdr_declaration
+template<class Value>
+inline sexpr*& set_cdr (sexpr&, Value const&);
+
+inline sexpr*& set_cdr (sexpr&, sexpr* const&);
 //]
 
 namespace routine {
 
-//[routine_become_declaration
-template<class To, class From, class Dummy = prana::unused_type>
-struct become;
+//[routine_set_cdr_declaration
+template<class Tag, class Dummy = prana::unused_type>
+struct set_cdr;
 //]
 
 } /*<- routine ->*/
@@ -40,5 +40,5 @@ struct become;
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_BECOME_FWD_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_CDR_FWD_HPP ->*/
 

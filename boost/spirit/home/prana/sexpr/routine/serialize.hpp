@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SERIALIZE_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SERIALIZE_HPP
 
 #include <boost/spirit/home/prana/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
@@ -232,12 +232,7 @@ struct serialize<sexpr::vector, prana::unused_type> {
 template<class TagX>
 struct serialize<
   TagX, typename enable_if<
-    mpl::and_<
-      is_cons_type<TagX>,
-      mpl::not_<
-        is_same<TagX, sexpr::list>
-      >
-    >,
+    is_cons_type<TagX>,
     prana::unused_type
   >::type
 > {
@@ -280,30 +275,6 @@ struct serialize<
 };
 //]
 
-//[routine_serialize_list_specialization
-template<>
-struct serialize<sexpr::list, prana::unused_type> {
-  struct routine; 
-
-  typedef std::basic_string<char> result_type;
- 
-  result_type operator() (sexpr const& s) const {
-    return (*this)(*cast<sexpr::list>(s));
-  }
-  
-  result_type operator() (sexpr::list::data_type const& t) const {
-    return (*this)(value_at<0>(t));
-  }
-  
-  result_type operator() (sexpr const* first) const {
-    if (!first)
-      return "()";
-    else 
-      return prana::serialize(*first);
-  }
-};
-//]
-
 } /*<- routine ->*/
 
 //[serialize_definition
@@ -317,5 +288,5 @@ inline std::basic_string<char> serialize (X const& x) {
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SERIALIZE_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SERIALIZE_HPP ->*/
 

@@ -55,6 +55,7 @@
   #define BSP_M BOOST_PP_SUB(BSP_N, 1) 
 
   #define BSP_DECL(z, n, data) T##n data##n;
+  #define BSP_ASSIGN(z, n, data) data._##n = t##n;
 
   template<class Tuple>
   struct value_at_impl<BSP_M, Tuple> {
@@ -83,9 +84,19 @@
     BOOST_PP_REPEAT(BSP_N, BSP_DECL, _) 
   };
 
+  template<BOOST_PP_ENUM_PARAMS(BSP_N, class T)>
+  inline BOOST_PP_CAT(tuple, BSP_N)<BOOST_PP_ENUM_PARAMS(BSP_N, T)>
+  BOOST_PP_CAT(make_tuple, BSP_N)
+  (BOOST_PP_ENUM_BINARY_PARAMS(BSP_N, T, const& t)) {
+    BOOST_PP_CAT(tuple, BSP_N)<BOOST_PP_ENUM_PARAMS(BSP_N, T)> temp;
+    BOOST_PP_REPEAT(BSP_N, BSP_ASSIGN, temp);
+    return temp;
+  }
+
   #undef BSP_N
   #undef BSP_M
   #undef BSP_DECL
+  #undef BSP_ASSIGN
 
 #endif
 

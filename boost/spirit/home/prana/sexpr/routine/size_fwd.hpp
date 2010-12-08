@@ -5,8 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_FWD_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_FWD_HPP
 
 #include <boost/spirit/home/prana/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
@@ -38,5 +38,5 @@ struct size;
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SIZE_FWD_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SIZE_FWD_HPP ->*/
 

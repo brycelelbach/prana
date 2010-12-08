@@ -32,7 +32,7 @@ struct invalid_type_information: std::exception {
     karma::generate(
       sink,
       // begin grammar
-      lit("(exception 'invalid-type-information ") << size_ << ")",
+      lit("(exception '(invalid-type-information ") << size_ << "))",
       // end grammar
       type
     );

@@ -1,14 +1,12 @@
 /*<-============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2001-2010 Hartmut Kaiser
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ============================================================================->*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_FWD_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_FWD_HPP
 
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
@@ -63,13 +61,13 @@ inline X& set (X&, iterator_range<Iterator> const&);
 
 //[set_nil_type_declaration
 template<class X>
-inline X& set (X&, nil_type);
+inline X& set (X&, nil_type const&);
 
 template<class X>
-inline X& set (X&, spirit::unused_type);
+inline X& set (X&, spirit::unused_type const&);
 
 template<class X>
-inline X& set (X&, prana::unused_type);
+inline X& set (X&, prana::unused_type const&);
 //]
 
 //[set_integer_declaration
@@ -107,5 +105,5 @@ struct set;
 } /*<- spirit ->*/
 } /*<- boost ->*/
 
-#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_PROCEDURE_SET_FWD_HPP ->*/
+#endif /*<- BOOST_SPIRIT_PRANA_SEXPR_ROUTINE_SET_FWD_HPP ->*/
 

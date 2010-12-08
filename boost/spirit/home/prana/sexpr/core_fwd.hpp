@@ -58,18 +58,32 @@ struct sexpr {
   typeinfo type;
   void*    data [2];
 
-  sexpr (void);
+  sexpr (void); /*< Default ctor sets sexpr to nil type. >*/
 
-  template<class X>
-  sexpr (X);
+  ~sexpr (void); /*< Forwards to clear. >*/
 
-  ~sexpr (void);
+  //[set_forwarders
+  template<class Value>
+    sexpr (Value const&);
+  template<class Value>
+    sexpr& operator= (Value const&);
+  template<class Value>
+    void assign (Value const&);
+  //]
 
-  template<class X>
-  sexpr& operator= (X);
+  //[sexpr_list_interface
+  sexpr (tuple2<sexpr*, sexpr*> const&);
+  
+  void assign (tuple2<sexpr*, sexpr*> const&);
+  //]
 
-  template<class X>
-  void assign (X);
+  //[sexpr_pair_interface
+  template<class Car, class Cdr>
+    sexpr (Car, Cdr);
+
+  template<class Car, class Cdr>
+    void assign (Car, Cdr);
+  //]
 };
 //]
 
