@@ -38,7 +38,7 @@
   template<BOOST_PP_ENUM_PARAMS(BSP_N, class A)>
   function operator() (BOOST_PP_ENUM_BINARY_PARAMS(BSP_N, A, const& _)) const {
     actor_list elements;
-    BOOST_PP_REPEAT(N, SCHEME_PUSH_ELEMENT, _);
+    BOOST_PP_REPEAT(BSP_N, BSP_PUSH_ELEMENT, _);
     return derived()(elements);
   }
 
