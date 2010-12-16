@@ -10,7 +10,11 @@
 #define BOOST_SPIRIT_PRANA_INPUT_SAVE_LINE_POS_HPP
 
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_container.hpp>
+#include <boost/spirit/include/phoenix_statement.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
+#include <boost/spirit/include/support_utree.hpp>
 
 namespace boost {
 namespace spirit {

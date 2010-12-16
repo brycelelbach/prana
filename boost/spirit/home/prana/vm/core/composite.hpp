@@ -1,21 +1,52 @@
-template <typename Derived>
-struct composite {
-  typedef function result_type;
-  typedef composite<Derived> base_type;
+/*==============================================================================
+    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2010      Bryce Lelbach
 
-  function operator()(actor_list const& elements) const {
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+
+#if !defined(BOOST_SPIRIT_PRANA_VM_CORE_COMPOSITE_HPP)
+#define BOOST_SPIRIT_PRANA_VM_CORE_COMPOSITE_HPP
+
+#include <boost/spirit/home/prana/vm/core/value.hpp>
+
+namespace boost {
+namespace spirit {
+namespace prana {
+
+template<class T>
+inline function as_function (T const& val) {
+  return val(utree(val));
+}
+
+inline function const& as_function (function const& f) {
+  return f;
+}
+
+template<class Derived>
+struct composite {
+  typedef composite<Derived> base_type;
+  typedef function result_type;
+
+  Derived const& derived (void) const {
+    return *static_cast<Derived const*>(this);
+  }
+
+  function operator() (actor_list const& elements) const {
     return derived().compose(elements);
   }
 
-  template <typename A0>
-  function operator()(A0 const& _0) const {
+  template<class A0>
+  function operator() (A0 const& _0) const {
     actor_list elements;
     elements.push_back(as_function(_0));
     return derived().compose(elements);
   }
 
-  template <typename A0, typename A1>
-  function operator()(A0 const& _0, A1 const& _1) const {
+  template<class A0, class A1>
+  function operator() (A0 const& _0, A1 const& _1) const {
     actor_list elements;
     elements.push_back(as_function(_0));
     elements.push_back(as_function(_1));
@@ -23,19 +54,12 @@ struct composite {
   }
 
   // More operators
-  #include <scheme/detail/composite_call.hpp>
-
-  Derived const& derived() const {
-    return *static_cast<Derived const*>(this);
-  }
-
-  template <typename T>
-  static function as_function(T const& val) {
-    return scheme::val(utree(val));
-  }
-
-  static function const& as_function(function const& f) {
-    return f;
-  }
+  #include <boost/spirit/home/prana/vm/composite_call.hpp>
 };
+
+} // prana
+} // spirit
+} // boost
+
+#endif // BOOST_SPIRIT_PRANA_VM_CORE_COMPOSITE_HPP
 

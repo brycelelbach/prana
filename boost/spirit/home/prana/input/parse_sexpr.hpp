@@ -1,141 +1,125 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
-//  Copyright (c) 2001-2010 Joel de Guzman
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+/*==============================================================================
+    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2010      Bryce Lelbach
 
-#if !defined(BOOST_SPIRIT_PARSE_SEXPR_IMPL)
-#define BOOST_SPIRIT_PARSE_SEXPR_IMPL
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+
+#if !defined(BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_HPP)
+#define BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_HPP
 
 #include <iostream>
 #include <string>
+
 #include <boost/spirit/include/support_istream_iterator.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
-#include <input/sexpr.hpp>
-#include <input/parse_sexpr.hpp>
+#include <boost/spirit/home/prana/input/grammar/sexpr.hpp>
+#include <boost/spirit/home/prana/input/parse_sexpr_fwd.hpp>
 
-namespace scheme { namespace input
+namespace boost {
+namespace spirit {
+namespace prana {
+
+template<class Char>
+bool parse_sexpr (std::basic_istream<Char>& in, utree& out,
+                  std::string const& source)
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Char>
-    bool parse_sexpr(
-        std::basic_istream<Char>& is,
-        utree& result,
-        std::string const& source_file)
-    {
-        // no white space skipping in the stream!
-        is.unsetf(std::ios::skipws);
+  typedef spirit::basic_istream_iterator<Char>
+    stream_iterator_type;
+  
+  typedef line_pos_iterator<stream_iterator_type>
+    iterator_type;
 
-        typedef
-            boost::spirit::basic_istream_iterator<Char>
-        stream_iterator_type;
-        stream_iterator_type sfirst(is);
-        stream_iterator_type slast;
+  // no white space skipping in the stream!
+  in.unsetf(std::ios::skipws);
 
-        typedef boost::spirit::line_pos_iterator<stream_iterator_type>
-          iterator_type;
-        iterator_type first(sfirst);
-        iterator_type last(slast);
+  sexpr_parser<iterator_type> p(source);
+  sexpr_white_space<iterator_type> ws;
 
-        scheme::input::sexpr<iterator_type> p(source_file);
-        scheme::input::sexpr_white_space<iterator_type> ws;
+  stream_iterator_type sfirst(in);
+  stream_iterator_type slast;
+  iterator_type first(sfirst);
+  iterator_type last(slast);
 
-        using boost::spirit::qi::phrase_parse;
-        return phrase_parse(first, last, p, ws, result);
-    }
+  return qi::phrase_parse(first, last, p, ws, out);
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Char>
-    bool parse_sexpr_list(
-        std::basic_istream<Char>& is,
-        utree& result,
-        std::string const& source_file)
-    {
-        // no white space skipping in the stream!
-        is.unsetf(std::ios::skipws);
+template<class Char>
+bool parse_sexpr_list (std::basic_istream<Char>& in, utree& out,
+                       std::string const& source)
+{
+  typedef spirit::basic_istream_iterator<Char>
+    stream_iterator_type;
+  
+  typedef line_pos_iterator<stream_iterator_type>
+    iterator_type;
 
-        typedef
-            boost::spirit::basic_istream_iterator<Char>
-        stream_iterator_type;
-        stream_iterator_type sfirst(is);
-        stream_iterator_type slast;
+  // no white space skipping in the stream!
+  is.unsetf(std::ios::skipws);
 
-        typedef boost::spirit::line_pos_iterator<stream_iterator_type>
-          iterator_type;
-        iterator_type first(sfirst);
-        iterator_type last(slast);
+  sexpr_parser<iterator_type> p(source);
+  sexpr_white_space<iterator_type> ws;
 
-        scheme::input::sexpr<iterator_type> p(source_file);
-        scheme::input::sexpr_white_space<iterator_type> ws;
+  stream_iterator_type sfirst(in);
+  stream_iterator_type slast;
+  iterator_type first(sfirst);
+  iterator_type last(slast);
 
-        using boost::spirit::qi::phrase_parse;
-        bool ok = phrase_parse(first, last, +p, ws, result);
-        result.tag(1); // line
-        return ok;
-    }
+  bool ok = qi::phrase_parse(first, last, +p, ws, out);
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Range>
-    typename boost::disable_if<boost::is_base_of<std::ios_base, Range>, bool>::type
-    parse_sexpr(
-        Range const& rng,
-        utree& result,
-        std::string const& source_file)
-    {
-        typedef boost::spirit::line_pos_iterator<typename Range::const_iterator>
-          iterator_type;
+  result.tag(1); // line
 
-        scheme::input::sexpr<iterator_type> p(source_file);
-        scheme::input::sexpr_white_space<iterator_type> ws;
+  return ok;
+}
 
-        iterator_type first(rng.begin());
-        iterator_type last(rng.end());
+template<class Range>
+typename disable_if<is_base_of<std::ios_base, Range>, bool>::type
+parse_sexpr (Range const& in, utree& out, std::string const& source) {
+  typedef line_pos_iterator<typename Range::const_iterator>
+    iterator_type;
 
-        using boost::spirit::qi::phrase_parse;
-        return phrase_parse(first, last, p, ws, result);
-    }
+  sexpr_parser<iterator_type> p(source);
+  sexpr_white_space<iterator_type> ws;
 
-    template <typename Range>
-    typename boost::disable_if<boost::is_base_of<std::ios_base, Range>, bool>::type
-    parse_sexpr_list(
-        Range const& rng,
-        utree& result,
-        std::string const& source_file)
-    {
-        typedef boost::spirit::line_pos_iterator<typename Range::const_iterator>
-          iterator_type;
+  iterator_type first(in.begin());
+  iterator_type last(in.end());
 
-        scheme::input::sexpr<iterator_type> p(source_file);
-        scheme::input::sexpr_white_space<iterator_type> ws;
+  return qi::phrase_parse(first, last, p, ws, out);
+}
 
-        iterator_type first(rng.begin());
-        iterator_type last(rng.end());
+template<class Range>
+typename disable_if<is_base_of<std::ios_base, Range>, bool>::type
+parse_sexpr_list (Range const& in, utree& out, std::string const& source) {
+  typedef line_pos_iterator<typename Range::const_iterator>
+    iterator_type;
 
-        using boost::spirit::qi::phrase_parse;
-        bool ok = phrase_parse(first, last, +p, ws, result);
-        result.tag(1); // line
-        return ok;
-    }
+  sexpr_parser<iterator_type> p(source);
+  sexpr_white_space<iterator_type> ws;
 
-    ///////////////////////////////////////////////////////////////////////////
-    bool parse_sexpr(
-        utree const& in,
-        utree& result,
-        std::string const& source_file)
-    {
-        return parse_sexpr(in.get<utf8_string_range>(), result, source_file);
-    }
+  iterator_type first(in.begin());
+  iterator_type last(in.end());
 
-    bool parse_sexpr_list(
-        utree const& in,
-        utree& result,
-        std::string const& source_file)
-    {
-        return parse_sexpr_list(in.get<utf8_string_range>(), result, source_file);
-    }
-}}
+  bool ok = qi::phrase_parse(first, last, +p, ws, out);
 
-#endif
+  result.tag(1); // line
+
+  return ok;
+}
+
+bool parse_sexpr (utree const& in, utree& out, std::string const& source) {
+  return parse_sexpr(in.get<utf8_string_range>(), out, source);
+}
+
+bool parse_sexpr_list (utree const& in, utree& out, std::string const& source) {
+  return parse_sexpr_list(in.get<utf8_string_range>(), out, source);
+}
+
+} // prana
+} // spirit
+} // boost
+
+#endif // BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_HPP
 

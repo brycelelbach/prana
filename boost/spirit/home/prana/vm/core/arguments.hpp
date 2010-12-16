@@ -10,6 +10,12 @@
 #if !defined(BOOST_SPIRIT_PRANA_VM_CORE_ARGUMENTS_HPP)
 #define BOOST_SPIRIT_PRANA_VM_CORE_ARGUMENTS_HPP
 
+#include <boost/config.hpp>
+#include <boost/ref.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
+
 #include <boost/spirit/home/prana/vm/core/function.hpp>
 
 namespace boost {
@@ -71,11 +77,17 @@ argument<true> const arg = { };
 // unscoped arg
 argument<false> const unscoped_arg = { };
 
+#if !defined(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT)
+  #define BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT 8
+#endif
+
 #define BSP_UNSCOPED_ARG(z, n, data)            \
   function const BOOST_PP_CAT(_, n) = data(n);  \
   /***/
 
-BOOST_PP_REPEAT(8, BSP_UNSCOPED_ARG, unscoped_arg)
+BOOST_PP_REPEAT(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT,
+                BSP_UNSCOPED_ARG,
+                unscoped_arg)
 
 #undef BSP_UNSCOPED_ARG
 

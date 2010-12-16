@@ -73,7 +73,6 @@ struct push_esc_functor {
     }
   }
 };
-}
 
 template<class Iterator>
 struct string_parser: qi::grammar<Iterator, std::string(void)> {
@@ -89,7 +88,7 @@ struct string_parser: qi::grammar<Iterator, std::string(void)> {
   phoenix::function<push_esc_functor>
     push_esc;
 
-  string_parser (void): string::base_type (start) {
+  string_parser (void): string_parser::base_type (start) {
     using standard::char_;
     using qi::uint_parser;
     using qi::_val;
@@ -101,17 +100,17 @@ struct string_parser: qi::grammar<Iterator, std::string(void)> {
 
     escaped
       = '\\'
-      > (   ('u' > hex4)                  [push_utf8(_r1, _1)]
-        |   ('U' > hex8)                  [push_utf8(_r1, _1)]
-        |   char_("btnfr\\\"'")           [push_esc(_r1, _1)]
+      > (   ('u' > hex4)                 [push_utf8(_r1, _1)]
+        |   ('U' > hex8)                 [push_utf8(_r1, _1)]
+        |   char_("btnfr\\\"'")          [push_esc(_r1, _1)]
         );
 
     start
       = '"'
-      > *(char_esc(_val) | (~char_('"'))  [_val += _1])
+      > *(escaped(_val) | (~char_('"'))  [_val += _1])
       > '"';
 
-    char_esc.name("escaped_string");
+    escaped.name("escaped_string");
     start.name("string");
   }
 };

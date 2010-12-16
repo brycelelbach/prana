@@ -13,6 +13,7 @@
 
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
+#include <boost/spirit/home/prana/input/save_line_pos.hpp>
 
 namespace boost {
 namespace spirit {
@@ -44,6 +45,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::raw;
     using qi::eps;
     using qi::real_parser;
+    using qi::strict_real_policies;
     using qi::int_parser;
     using qi::on_error;
     using qi::fail;

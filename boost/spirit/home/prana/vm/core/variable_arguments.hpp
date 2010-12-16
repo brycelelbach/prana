@@ -1,13 +1,35 @@
-template < bool scoped = true >
-struct vararg_function : actor<vararg_function<scoped> > {
+/*==============================================================================
+    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2010      Bryce Lelbach
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+
+#if !defined(BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP)
+#define BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
+
+#include <boost/config.hpp>
+#include <boost/ref.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
+
+#include <boost/spirit/home/prana/vm/core/function.hpp>
+
+namespace boost {
+namespace spirit {
+namespace prana {
+
+template<bool scoped = true>
+struct vararg_function: actor<vararg_function<scoped> > {
   std::size_t n;
   std::size_t level;
-  vararg_function(std::size_t n, std::size_t level = 0)
-    : n(n),
-      level(level)
-  {}
 
-  utree eval(scope const& env) const {
+  vararg_function (std::size_t n, std::size_t level = 0): n(n), level(level) { }
+
+  utree eval (scope const& env) const {
     scope const* eptr = &env;
 
     while (level != eptr->level())
@@ -28,14 +50,12 @@ struct vararg_function : actor<vararg_function<scoped> > {
   }
 };
 
-template <> // scoped = false
-struct vararg_function<false> : actor<vararg_function<false> > {
+template<> 
+struct vararg_function<false>: actor<vararg_function<false> > {
   std::size_t n;
-  vararg_function(std::size_t n, std::size_t level = 0)
-    : n(n)
-  {}
+  vararg_function (std::size_t n, std::size_t level = 0): n(n) { }
 
-  utree eval(scope const& env) const {
+  utree eval (scope const& env) const {
     scope const* eptr = &env;
     utree result;
 
@@ -52,29 +72,38 @@ struct vararg_function<false> : actor<vararg_function<false> > {
   }
 };
 
-template < bool scoped = true >
+template<bool scoped = true>
 struct vararg {
   typedef function result_type;
-  function operator()(std::size_t n, std::size_t level = 0) const {
+
+  function operator() (std::size_t n, std::size_t level = 0) const {
     return function(vararg_function<scoped>(n, level));
   }
 };
 
 // scoped varg
-vararg<true> const varg = {};
+vararg<true> const varg = { };
 
 // unscoped varg
-vararg<false> const unscoped_varg = {};
+vararg<false> const unscoped_varg = { };
 
-// unscoped vargs
-function const _1_ = unscoped_varg(0);
-function const _2_ = unscoped_varg(1);
-function const _3_ = unscoped_varg(2);
-function const _4_ = unscoped_varg(3);
-function const _5_ = unscoped_varg(4);
-function const _6_ = unscoped_varg(5);
-function const _7_ = unscoped_varg(6);
-function const _8_ = unscoped_varg(7);
-function const _9_ = unscoped_varg(8);
-function const _10_ = unscoped_varg(10);
+#if !defined(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT)
+  #define BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT 8
+#endif
+
+#define BSP_UNSCOPED_VARG(z, n, data)                             \
+  function const BOOST_PP_CAT(BOOST_PP_CAT(_, n), _) = data(n);   \
+  /***/
+
+BOOST_PP_REPEAT(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT,
+                BSP_UNSCOPED_VARG,
+                unscoped_varg)
+
+#undef BSP_UNSCOPED_VARG
+
+} // prana
+} // spirit
+} // boost
+
+#endif // BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
 

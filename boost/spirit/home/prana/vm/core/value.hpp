@@ -10,6 +10,8 @@
 #if !defined(BOOST_SPIRIT_PRANA_VM_CORE_VALUE_HPP)
 #define BOOST_SPIRIT_PRANA_VM_CORE_VALUE_HPP
 
+#include <boost/ref.hpp>
+
 #include <boost/spirit/home/prana/vm/core/function.hpp>
 
 namespace boost {

@@ -6,8 +6,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_FWD_HPP
+#if !defined(BOOST_SPIRIT_PRANA_INPUT_PARSE_JSON_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_INPUT_PARSE_JSON_FWD_HPP
 
 #include <string>
 #include <iosfwd>
@@ -22,34 +22,21 @@ namespace spirit {
 namespace prana {
 
 template<class Char>
-bool parse_sexpr (std::basic_istream<Char>& in, utree& out,
+bool parse_json (std::basic_istream<Char>& in, utree& out,
                   std::string const& source = "<string>");
-
-template<class Char>
-bool parse_sexpr_list (std::basic_istream<Char>& in, utree& out,
-                       std::string const& source = "<string>");
 
 template<class Range>
 typename disable_if<
   is_base_of<std::ios_base, Range>, bool
->::type parse_sexpr (Range const& in, utree& out,
+>::type parse_json (Range const& in, utree& out,
                      std::string const& source = "<string>");
 
-template<class Range>
-typename disable_if<
-  is_base_of<std::ios_base, Range>, bool
->::type parse_sexpr_list (Range const& in, utree& out,
-                          std::string const& source = "<string>");
-
-bool parse_sexpr (utree const& in, utree& out,
+bool parse_json (utree const& in, utree& out,
                   std::string const& source = "<string>");
-
-bool parse_sexpr_list (utree const& in, utree& out,
-                       std::string const& source = "<string>");
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_FWD_HPP
+#endif // BOOST_SPIRIT_PRANA_INPUT_PARSE_JSON_FWD_HPP
 

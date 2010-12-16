@@ -6,13 +6,14 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP
+#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP)
+#define BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP
 
 #include <boost/spirit/include/support_utree.hpp>
 
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
+#include <boost/spirit/home/prana/input/save_line_pos.hpp>
 
 namespace boost {
 namespace spirit {
@@ -72,6 +73,7 @@ struct sexpr_parser:
     using qi::oct;
     using qi::no_case;
     using qi::real_parser;
+    using qi::strict_real_policies;
     using qi::int_parser;
     using qi::uint_parser;
     using qi::on_error;
@@ -120,7 +122,6 @@ struct sexpr_parser:
     list.name("list");
     atom.name("atom");
     integer.name("integer");
-    boolean.name("boolean");
     symbol.name("symbol");
     binary.name("binary");
  
@@ -132,5 +133,5 @@ struct sexpr_parser:
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP
+#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP
 

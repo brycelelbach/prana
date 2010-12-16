@@ -24,10 +24,15 @@ struct function;
 
 typedef std::list<function> actor_list;
 
+template<std::size_t n>
+inline scope get_range (boost::array<utree, n>& array) {
+  return scope(array.begin(), array.end());
+}
+
 template<class Derived>
 struct actor {
-  typedef utree result_type;
   typedef actor<Derived> base_type;
+  typedef utree result_type;
 
   Derived const& derived (void) const {
     return *static_cast<Derived const*>(this);
@@ -58,11 +63,6 @@ struct actor {
 
   // more operators
   #include <boost/spirit/home/prana/vm/function_call.hpp>
-
-  template<std::size_t n>
-  static scope get_range (boost::array<utree, n>& array) {
-    return scope(array.begin(), array.end());
-  }
 };
 
 } // prana
