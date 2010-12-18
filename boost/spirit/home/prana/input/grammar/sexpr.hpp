@@ -14,6 +14,7 @@
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
+#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -29,7 +30,7 @@ struct sexpr_white_space: qi::grammar<Iterator> {
     using standard::char_;
     using qi::eol;
 
-    start = space | ';' >> *(char_ - eol) >> eol;
+    start = space | (';' >> *(char_ - eol) >> eol);
   }
 };
 
@@ -41,7 +42,7 @@ struct sexpr_parser:
     start, element, list;
 
   qi::rule<Iterator, utree(void)>
-    atom;
+    atom, nil_;
 
   qi::rule<Iterator, int(void)>
     integer;
@@ -60,15 +61,17 @@ struct sexpr_parser:
 
   phoenix::function<ErrorHandler> const
     error;
+  
+  save_line_pos<Iterator>
+    pos;
 
   sexpr_parser (std::string const& source_file = "<string>"):
     sexpr_parser::base_type(start), error(ErrorHandler(source_file))
   {
     using standard::char_;
+    using qi::attr_cast;
+    using qi::lit;
     using qi::lexeme;
-    using qi::omit;
-    using qi::raw;
-    using qi::eps;
     using qi::hex;
     using qi::oct;
     using qi::no_case;
@@ -78,6 +81,7 @@ struct sexpr_parser:
     using qi::uint_parser;
     using qi::on_error;
     using qi::fail;
+    using qi::int_;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -85,32 +89,33 @@ struct sexpr_parser:
     using qi::_4;
 
     real_parser<double, strict_real_policies<double> > strict_double;
-    int_parser<boost::intmax_t> max_int;
     uint_parser<unsigned char, 16, 2, 2> hex2;
   
     start = element.alias();
 
     element = atom | list;
 
-    list %= '('
-          > omit[raw[eps] [save_line_pos(_val, _1)]]
-          > *element
-          > ')';
+    list %= pos(_val, '(') > *element > ')';
 
-    atom = strict_double
+    atom = nil_ 
+         | strict_double
          | integer
          | boolean
          | string
-         | binary
-         | symbol;
+         | symbol
+         | binary;
 
-    integer = lexeme[no_case["0x"] >  hex]
-            | lexeme[no_case["0o"] >> oct]
-            | max_int;
+    nil_ = attr_cast(lit("nil"));
+
+    integer = lexeme[ no_case["#x"] >  hex]
+            | lexeme[ no_case["#o"] >> oct]
+            | lexeme[-no_case["#d"] >> int_];
 
     boolean.add
-      ("#true", true)
-      ("#false", false);
+      ("#t", true)
+      ("true", true)
+      ("#f", false)
+      ("false", false);
 
     std::string exclude = std::string(" ();\"\x01-\x1f\x7f") + '\0';
     symbol = lexeme[+(~char_(exclude))];
@@ -121,6 +126,7 @@ struct sexpr_parser:
     element.name("element");
     list.name("list");
     atom.name("atom");
+    nil_.name("nil");
     integer.name("integer");
     symbol.name("symbol");
     binary.name("binary");

@@ -23,16 +23,39 @@ namespace prana {
 
 template<class Char>
 bool parse_json (std::basic_istream<Char>& in, utree& out,
+                 std::string const& source = "<string>");
+
+template<class Char>
+bool parse_json_array (std::basic_istream<Char>& in, utree& out,
+                       std::string const& source = "<string>");
+
+template<class Char>
+bool parse_json_object (std::basic_istream<Char>& in, utree& out,
+                        std::string const& source = "<string>");
+
+template<class Range>
+typename disable_if<is_base_of<std::ios_base, Range>, bool>::type
+parse_json (Range const& in, utree& out,
+            std::string const& source = "<string>");
+
+template<class Range>
+typename disable_if<is_base_of<std::ios_base, Range>, bool>::type
+parse_json_array (Range const& in, utree& out,
                   std::string const& source = "<string>");
 
 template<class Range>
-typename disable_if<
-  is_base_of<std::ios_base, Range>, bool
->::type parse_json (Range const& in, utree& out,
-                     std::string const& source = "<string>");
+typename disable_if<is_base_of<std::ios_base, Range>, bool>::type
+parse_json_object (Range const& in, utree& out,
+                   std::string const& source = "<string>");
 
 bool parse_json (utree const& in, utree& out,
-                  std::string const& source = "<string>");
+                 std::string const& source = "<string>");
+
+bool parse_json_array (utree const& in, utree& out,
+                       std::string const& source = "<string>");
+
+bool parse_json_object (utree const& in, utree& out,
+                        std::string const& source = "<string>");
 
 } // prana
 } // spirit

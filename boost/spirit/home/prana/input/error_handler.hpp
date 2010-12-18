@@ -37,9 +37,9 @@ struct error_handler {
     Iterator eol = err_pos;
     int line = get_line(err_pos);
 
-    std::cerr << "(\"" << source_file << "\" "
-                       << line << " \""
-                       << what << "\")\n";
+    std::cerr << "(non-fatal-exception \""
+              << source_file << "\" " << line
+              << " '(qi-expected \"" << what << "\"))\n";
   }
 };
 

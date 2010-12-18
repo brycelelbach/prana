@@ -14,6 +14,7 @@
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
+#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -23,6 +24,9 @@ template<class Iterator, class ErrorHandler = error_handler<Iterator> >
 struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   qi::rule<Iterator, utree(void), standard::space_type>
     start, value, object, member_pair, array;
+
+  qi::rule<Iterator, utree(void)>
+    null;
 
   qi::symbols<char, bool>
     boolean;
@@ -35,11 +39,16 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
 
   phoenix::function<ErrorHandler> const
     error;
+  
+  save_line_pos<Iterator>
+    pos;
 
   json_parser (std::string const& source_file = "<string>"):
     json_parser::base_type(start), error(ErrorHandler(source_file))
   {
     using standard::char_;
+    using qi::attr_cast;
+    using qi::lit;
     using qi::lexeme;
     using qi::omit;
     using qi::raw;
@@ -49,6 +58,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::int_parser;
     using qi::on_error;
     using qi::fail;
+    using qi::int_;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -56,32 +66,25 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::_4;
 
     real_parser<double, strict_real_policies<double> > strict_double;
-    int_parser<boost::intmax_t> max_int;
+    int_parser<boost::intmax_t> integer;
 
     start = value.alias();
 
-    value = max_int
+    value = null 
           | strict_double
+          | int_
           | boolean
           | string
           | object
-          | array
-          | "null";
-
-    object %= '{'
-            > omit[raw[eps] [save_line_pos(_val, _1)]]
-            > (member_pair % ',')
-            > '}';
-
-    member_pair %= omit[raw[eps] [save_line_pos(_val, _1)]]
-                 > member
-                 > ':'
-                 > value;
+          | array;
     
-    array %= '['
-           > omit[raw[eps] [save_line_pos(_val, _1)]]
-           > (value % ',')
-           > ']';
+    null = attr_cast(lit("null"));
+
+    object %= pos(_val, '{') > (member_pair % ',') > '}';
+
+    member_pair %= pos(_val, '"') > member > '"' > ':' > value;
+    
+    array %= pos(_val, '[') > (value % ',') > ']';
 
     boolean.add
       ("true", true)
@@ -92,6 +95,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
  
     start.name("json");
     value.name("value");
+    null.name("null");
     object.name("object");
     member_pair.name("member_pair");
     array.name("array");

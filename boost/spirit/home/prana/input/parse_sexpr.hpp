@@ -58,7 +58,7 @@ bool parse_sexpr_list (std::basic_istream<Char>& in, utree& out,
     iterator_type;
 
   // no white space skipping in the stream!
-  is.unsetf(std::ios::skipws);
+  in.unsetf(std::ios::skipws);
 
   sexpr_parser<iterator_type> p(source);
   sexpr_white_space<iterator_type> ws;
@@ -68,11 +68,7 @@ bool parse_sexpr_list (std::basic_istream<Char>& in, utree& out,
   iterator_type first(sfirst);
   iterator_type last(slast);
 
-  bool ok = qi::phrase_parse(first, last, +p, ws, out);
-
-  result.tag(1); // line
-
-  return ok;
+  return qi::phrase_parse(first, last, *p, ws, out);
 }
 
 template<class Range>
@@ -102,18 +98,18 @@ parse_sexpr_list (Range const& in, utree& out, std::string const& source) {
   iterator_type first(in.begin());
   iterator_type last(in.end());
 
-  bool ok = qi::phrase_parse(first, last, +p, ws, out);
-
-  result.tag(1); // line
-
-  return ok;
+  return qi::phrase_parse(first, last, *p, ws, out);
 }
 
-bool parse_sexpr (utree const& in, utree& out, std::string const& source) {
+bool parse_sexpr (utree const& in, utree& out,
+                  std::string const& source)
+{
   return parse_sexpr(in.get<utf8_string_range>(), out, source);
 }
 
-bool parse_sexpr_list (utree const& in, utree& out, std::string const& source) {
+bool parse_sexpr_list (utree const& in, utree& out,
+                       std::string const& source)
+{
   return parse_sexpr_list(in.get<utf8_string_range>(), out, source);
 }
 
