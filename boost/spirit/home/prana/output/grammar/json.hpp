@@ -22,19 +22,19 @@ struct json_generator:
   typedef iterator_range<utree::const_iterator> utree_list;
 
   karma::rule<Iterator, utree(void)>
-    start, ref_;
+    start, ref_, member;
 
   karma::rule<Iterator, utree_list(void)>
     array, member_pair, object;
 
   karma::rule<Iterator, utf8_symbol_range(void)>
-    member;
+    key;
 
   karma::rule<Iterator, utf8_string_range(void)>
     string_;
 
   karma::rule<Iterator, spirit::nil(void)>
-    null;
+    null, fail;
 
   karma::symbols<bool, char const*>
     boolean;
@@ -63,11 +63,15 @@ struct json_generator:
 
     object = '{' << -(member_pair % ", ") << '}'; 
 
-    member = '"' << *(&char_('"') << "\\\"" | char_) << '"';
+    member = key | fail;
+
+    key = '"' << *(&char_('"') << "\\\"" | char_) << '"';
     
     string_ = '"' << *(&char_('"') << "\\\"" | char_) << '"';
 
     null = eps << "null";
+
+    fail = eps(false);
 
     boolean.add
       (true, "true")
