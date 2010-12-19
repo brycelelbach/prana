@@ -16,23 +16,19 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-struct expected_dynamic_array: std::exception {
+struct sexpr_exception: std::exception { };
+
+struct expected_dynamic_array: sexpr_exception {
   std::string msg;
 
   template<class X>
-  expected_dynamic_array (X const& gotx) {
-    msg = "(exception '(expected-dynamic-array ";
-    msg += serialize(gotx);
-    msg += "))"; 
+  expected_dynamic_array (X const& x) {
+    msg = "'(expected-dynamic-array " + serialize(x) + ")"; 
   }
 
   template<class X, class Y>
-  expected_dynamic_array (X const& gotx, Y const& goty) {
-    msg = "(exception '(expected-dynamic-array ";
-    msg += serialize(gotx);
-    msg += " "; 
-    msg += serialize(goty);
-    msg += "))"; 
+  expected_dynamic_array (X const& x, Y const& y) {
+    msg = "'(expected-dynamic-array " + serialize(x) + " " + serialize(y) + ")";
   }
 
   virtual ~expected_dynamic_array (void) throw() { }
@@ -40,23 +36,17 @@ struct expected_dynamic_array: std::exception {
   virtual const char* what (void) const throw() { return msg.c_str(); }
 };
 
-struct expected_cons: std::exception {
+struct expected_cons: sexpr_exception {
   std::string msg;
 
   template<class X>
-  expected_cons (X const& gotx) {
-    msg = "(exception '(expected-cons ";
-    msg += serialize(gotx);
-    msg += "))"; 
+  expected_cons (X const& x) {
+    msg = "'(expected-cons " + serialize(x) + ")"; 
   }
 
   template<class X, class Y>
-  expected_cons (X const& gotx, Y const& goty) {
-    msg = "(exception '(expected-cons ";
-    msg += serialize(gotx);
-    msg += " "; 
-    msg += serialize(goty);
-    msg += "))"; 
+  expected_cons (X const& x, Y const& y) {
+    msg = "'(expected-cons " + serialize(x) + " " + serialize(y) + ")";
   }
 
   virtual ~expected_cons (void) throw() { }
@@ -64,23 +54,17 @@ struct expected_cons: std::exception {
   virtual const char* what (void) const throw() { return msg.c_str(); }
 };
 
-struct expected_composite: std::exception {
+struct expected_composite: sexpr_exception {
   std::string msg;
 
   template<class X>
-  expected_composite (X const& gotx) {
-    msg = "(exception '(expected-composite ";
-    msg += serialize(gotx);
-    msg += "))"; 
+  expected_composite (X const& x) {
+    msg = "'(expected-composite " + serialize(x) + ")"; 
   }
 
   template<class X, class Y>
-  expected_composite (X const& gotx, Y const& goty) {
-    msg = "(exception '(expected-composite ";
-    msg += serialize(gotx);
-    msg += " "; 
-    msg += serialize(goty);
-    msg += "))"; 
+  expected_composite (X const& x, Y const& y) {
+    msg = "'(expected-composite " + serialize(x) + " " + serialize(y) + ")";
   }
 
   virtual ~expected_composite (void) throw() { }
@@ -88,23 +72,17 @@ struct expected_composite: std::exception {
   virtual const char* what (void) const throw() { return msg.c_str(); }
 };
 
-struct storage_unavailable: std::exception {
+struct storage_unavailable: sexpr_exception {
   std::string msg;
 
   template<class X>
-  storage_unavailable (X const& gotx) {
-    msg = "(exception '(storage-unavailable ";
-    msg += serialize(gotx);
-    msg += "))"; 
+  storage_unavailable (X const& x) {
+    msg = "'(storage-unavailable " + serialize(x) + ")"; 
   }
 
   template<class X, class Y>
-  storage_unavailable (X const& gotx, Y const& goty) {
-    msg = "(exception '(storage-unavailable ";
-    msg += serialize(gotx);
-    msg += " "; 
-    msg += serialize(goty);
-    msg += "))"; 
+  storage_unavailable (X const& x, Y const& y) {
+    msg = "'(storage-unavailable " + serialize(x) + " " + serialize(y) + ")";
   }
 
   virtual ~storage_unavailable (void) throw() { }

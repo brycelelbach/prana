@@ -24,20 +24,24 @@ struct forward_environment: basic_environment<forward_environment, function*> {
   forward_environment (forward_environment* parent = 0):
     basic_environment(parent) { }
 
-  void define (std::string const& name, value_type const& val_) {
+  void define (key_type const& name, value_type const& val_) {
     if (definitions.find(name) != definitions.end())
       throw duplicate_identifier(name);
 
     definitions[name] = val_; 
   }
 
-  value_type find (std::string const& name) {
-    std::map<std::string, value_type>::iterator i = definitions.find(name);
+  result_type find (key_type const& name) {
+    iterator i = definitions.find(name);
 
     if (i == definitions.end())
-      return 0;
+      return sentinel();
     else
       return i->second;
+  }
+
+  result_type sentinel (void) const {
+    return 0; 
   }
 };
 

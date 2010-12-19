@@ -60,8 +60,6 @@ struct compiler {
 
 inline bool is_function_definition (utree const& name);
 
-inline std::string get_symbol (utree const& name);
-
 inline void compile (utree const& ast, compiler_environment& env,
                      function& r, actor_list& fragments,
                      std::size_t parent_line = 1,

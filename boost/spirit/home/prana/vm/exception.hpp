@@ -11,7 +11,8 @@
 #define BOOST_SPIRIT_PRANA_VM_EXCEPTION_HPP
 
 #include <sstream>
-#include <exception>
+
+#include <boost/throw_exception.hpp>
 
 #include <boost/spirit/include/support_utree.hpp>
 
@@ -25,20 +26,80 @@ struct compilation_error: std::exception {
   ~compilation_error (void) throw() { }
 
   virtual char const* what (void) const throw() {
-    return "compilation error";
+    return "'(compilation-error)";
   }
 };
 
-struct identifier_expected: vm_exception {
+struct expected_identifier: vm_exception {
   std::string msg;
+  
+  expected_identifier (void) {
+    msg = "'(expected-identifier)";
+  }
 
-  identifier_expected (utree const& got) {
+  expected_identifier (utree const& x) {
     std::ostringstream oss;
-    oss << "identifier expected " << got; 
+    oss << "'(expected-identifier " << x << ")"; 
     msg = oss.str();
   }
 
-  ~identifier_expected (void) throw() { }
+  ~expected_identifier (void) throw() { }
+
+  virtual char const* what (void) const throw() {
+    return msg.c_str();
+  }
+};
+
+struct unexpected_identifier: vm_exception {
+  std::string msg;
+  
+  unexpected_identifier (void) {
+    msg = "'(unexpected-identifier)";
+  }
+
+  unexpected_identifier (utree const& x) {
+    std::ostringstream oss;
+    oss << "'(unexpected-identifier " << x << ")"; 
+    msg = oss.str();
+  }
+
+  ~unexpected_identifier (void) throw() { }
+
+  virtual char const* what (void) const throw() {
+    return msg.c_str();
+  }
+};
+
+struct expected_pattern: vm_exception {
+  std::string msg;
+  
+  expected_pattern (utree const& x) {
+    std::ostringstream oss;
+    oss << "'(expected-pattern " << x << ")"; 
+    msg = oss.str();
+  }
+
+  expected_pattern (utree const& x, utree const& y) {
+    std::ostringstream oss;
+    oss << "'(expected-pattern " << x << " " << y << ")"; 
+    msg = oss.str();
+  }
+
+  ~expected_pattern (void) throw() { }
+
+  virtual char const* what (void) const throw() {
+    return msg.c_str();
+  }
+};
+
+struct macro_literals_not_found: vm_exception {
+  std::string msg;
+
+  macro_literals_not_found (std::string const& id) {
+    msg = "'(macro-literals-not-found " + id + ")"; 
+  }
+
+  ~macro_literals_not_found (void) throw() { }
 
   virtual char const* what (void) const throw() {
     return msg.c_str();
@@ -49,9 +110,7 @@ struct identifier_not_found: vm_exception {
   std::string msg;
 
   identifier_not_found (std::string const& id) {
-    std::ostringstream oss;
-    oss << "identifier " << id << " not found"; 
-    msg = oss.str();
+    msg = "'(identifier-not-found " + id + ")"; 
   }
 
   ~identifier_not_found (void) throw() { }
@@ -63,10 +122,13 @@ struct identifier_not_found: vm_exception {
 
 struct duplicate_identifier: vm_exception {
   std::string msg;
+  
+  duplicate_identifier (void) {
+    msg = "'(duplicate-identifier)";
+  }
 
   duplicate_identifier (std::string const& id) {
-    msg = "duplicate identifier ";
-    msg += id;
+    msg = "'(duplicate-identifier " + id + ")";
   }
 
   ~duplicate_identifier (void) throw() { }
@@ -80,9 +142,7 @@ struct body_already_defined: vm_exception {
   std::string msg;
 
   body_already_defined (std::string const& id) {
-    std::ostringstream oss;
-    oss << "multiple definition of " << id;
-    msg = oss.str();
+    msg = "'(body-already-defined " + id + ")";
   }
 
   ~body_already_defined (void) throw() { }
@@ -97,9 +157,8 @@ struct incorrect_arity: vm_exception {
 
   incorrect_arity (std::string const& id, int arity, bool fixed) {
     std::ostringstream oss;
-    oss << "invalid number of parameters to function call "
-        << id << ", " << (fixed ? "expecting " : "expecting at least ")
-        << arity << " arguments";
+    oss << "'(incorrect-arity " << id << " "
+        << arity << " " << (fixed ? "#t" : "#f") << ")"; 
     msg = oss.str();
   }
 
@@ -110,16 +169,16 @@ struct incorrect_arity: vm_exception {
   }
 };
 
-struct function_application_expected: vm_exception {
+struct expected_function_application: vm_exception {
   std::string msg;
 
-  function_application_expected (utree const& got) {
+  expected_function_application (utree const& x) {
     std::ostringstream oss;
-    oss << "function application expected, got " << got;
+    oss << "'(expected-function-application " << x << ")";
     msg = oss.str();
   }
 
-  ~function_application_expected (void) throw() { }
+  ~expected_function_application (void) throw() { }
 
   virtual char const* what (void) const throw() {
     return msg.c_str();

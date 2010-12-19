@@ -15,6 +15,18 @@
 namespace boost {
 namespace spirit {
 
+template<class X>
+inline X rest (X& x) {
+  typename X::iterator i = x.begin(); ++i;
+  return X(i, x.end());
+}
+
+template<class X>
+inline X rest (X const& x) {
+  typename X::const_iterator i = x.begin(); ++i;
+  return X(i, x.end());
+}
+
 inline utree rest (utree& x) {
   utree::iterator i = x.begin(); ++i;
   return utree(utree::range(i, x.end()), shallow);

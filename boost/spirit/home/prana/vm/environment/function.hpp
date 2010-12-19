@@ -37,7 +37,7 @@ struct function_environment:
     basic_environment(parent) { }
  
   template<typename Function>
-  void define (std::string const& name, Function const& f, unsigned arity,
+  void define (key_type const& name, Function const& f, unsigned arity,
                bool fixed)
   {
     if (definitions.find(name) != definitions.end())
@@ -46,10 +46,10 @@ struct function_environment:
     definitions[name] = value_type(compiled_function(f), arity, fixed);
   }
 
-  result_type find (std::string const& name) {
+  result_type find (key_type const& name) {
     using fusion::at_c;
 
-    std::map<std::string, value_type>::iterator i = definitions.find(name);
+    iterator i = definitions.find(name);
 
     if (i != definitions.end())
       return result_type(&at_c<0>(i->second),
@@ -58,6 +58,10 @@ struct function_environment:
     else if (outer)
       return (*outer)(name);
 
+    return sentinel();
+  }
+
+  result_type sentinel (void) const {
     return result_type((compiled_function*)0, 0, false);
   }
 };

@@ -17,8 +17,8 @@ namespace spirit {
 namespace prana {
 
 struct external_function: composite<external_function> {
-  // we must hold f by reference because functions can be recursive
-  boost::reference_wrapper<function const> f;
+  // We must hold f by reference because functions can be recursive.
+  reference_wrapper<function const> f;
   unsigned level;
 
   external_function (function const& f, unsigned level): f(f), level(level) { }

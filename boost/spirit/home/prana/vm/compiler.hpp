@@ -13,6 +13,7 @@
 #include <boost/bind.hpp>
 
 #include <boost/spirit/home/prana/vm/compiler_fwd.hpp>
+#include <boost/spirit/home/prana/vm/get_symbol.hpp>
 #include <boost/spirit/home/prana/vm/intrinsics.hpp>
 
 namespace boost {
@@ -59,7 +60,7 @@ function compiler::operator() (utree::const_range const& range) const {
   std::string name(get_symbol(*range.begin()));
 
   if (range.begin()->which() != utree_type::symbol_type)
-    throw function_application_expected(*range.begin());
+    throw expected_function_application(*range.begin());
 
   function_definition r = env.functions(name);
 
@@ -187,14 +188,6 @@ inline bool is_function_definition (utree const& item) {
   return get_symbol(*item.begin()) == "define";
 }
 
-inline std::string get_symbol (utree const& s) {
-  if (s.which() != utree_type::symbol_type)
-    throw identifier_expected(s);
-
-  utf8_symbol_range symbol = s.get<utf8_symbol_range>();
-  return std::string(symbol.begin(), symbol.end());
-}
-
 inline void compile (utree const& ast, compiler_environment& env,
                      function& r, actor_list& fragments,
                      std::size_t parent_line, std::string const& source)
@@ -206,8 +199,8 @@ inline void compile (utree const& ast, compiler_environment& env,
   try { r = utree::visit(ast, compiler(env, fragments, line, source)); }
 
   catch (utree_exception const& x) {
-    std::cerr << "(fatal-exception \""
-              << source << "\" " << line
+    std::cerr << "(exception \""
+              << source << "\" " << ((line == -1) ? -1 : line)
               << " '(compilation-error \"" << x.what() << "\"))\n";
   }
 }
@@ -229,8 +222,8 @@ inline void compile_program (utree const& ast, compiler_environment& env,
                                ? local_ast.tag()
                                : line;
     
-        std::cerr << "(non-fatal-exception \""
-                  << source << "\" " << line
+        std::cerr << "(exception \""
+                  << source << "\" " << ((line == -1) ? -1 : line)
                   << " '(function-definition-expected " << local_ast << "))\n";
         continue; // Try the next expression.
       }

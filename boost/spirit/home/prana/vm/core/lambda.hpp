@@ -22,9 +22,8 @@ namespace prana {
 struct lambda_function: actor<lambda_function> {
   int level;
   actor_list elements;
-  boost::reference_wrapper<function const> f; /*< We must hold f by reference
-                                                  because functions can be
-                                                  recursive. >*/
+  reference_wrapper<function const> f; // We must hold f by reference because
+                                       // functions can be recursive.
 
   typedef utree result_type;
 

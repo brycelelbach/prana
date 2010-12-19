@@ -38,12 +38,12 @@ struct actor {
     return *static_cast<Derived const*>(this);
   }
 
-  utree operator() (scope const& env) const {
-    return derived().eval(env);
-  }
-
   utree operator() (void) const {
     return derived().eval(scope());
+  }
+
+  utree operator() (scope const& env) const {
+    return derived().eval(env);
   }
 
   template<class A0>
