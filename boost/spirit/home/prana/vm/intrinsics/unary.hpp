@@ -10,6 +10,7 @@
 #if !defined(BOOST_SPIRIT_PRANA_VM_UNARY_INTRINSICS_HPP)
 #define BOOST_SPIRIT_PRANA_VM_UNARY_INTRINSICS_HPP
 
+#include <boost/spirit/home/prana/support/utree_rest.hpp>
 #include <boost/spirit/home/prana/vm/core/unary_function.hpp>
 
 namespace boost {
@@ -36,7 +37,7 @@ namespace prana {
 BSP_UNARY_INTRINSIC(display, (std::cout << element, utree()))
 BSP_UNARY_INTRINSIC(front,   element.front())
 BSP_UNARY_INTRINSIC(back,    element.back())
-BSP_UNARY_INTRINSIC(rest,    rest(element))
+BSP_UNARY_INTRINSIC(rest,    spirit::rest(element))
 
 #undef BSP_UNARY_INTRINSIC
 

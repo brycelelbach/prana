@@ -14,7 +14,6 @@
 
 namespace boost {
 namespace spirit {
-namespace prana {
 
 inline utree rest (utree& x) {
   utree::iterator i = x.begin(); ++i;
@@ -26,7 +25,6 @@ inline utree rest (utree const& x) {
   return utree(utree::const_range(i, x.end()), shallow);
 }
 
-} // prana
 } // spirit
 } // boost
 

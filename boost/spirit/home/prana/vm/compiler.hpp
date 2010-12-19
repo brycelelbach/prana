@@ -1,360 +1,255 @@
-#include <vector>
-#include <map>
-#include <exception>
+/*==============================================================================
+    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2010      Bryce Lelbach
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+
+#if !defined(BOOST_SPIRIT_PRANA_VM_COMPILER_HPP)
+#define BOOST_SPIRIT_PRANA_VM_COMPILER_HPP
 
 #include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lexical_cast.hpp>
-#include <scheme/intrinsics.hpp>
-#include <scheme/interpreter.hpp>
-#include <input/parse_sexpr.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-//  The compiler
-///////////////////////////////////////////////////////////////////////////////
-function compile(
-  utree const& ast,
-  environment& env,
-  actor_list& fragments,
-  int parent_line,
-  std::string const& source_file = "");
+#include <boost/spirit/home/prana/vm/compiler_fwd.hpp>
+#include <boost/spirit/home/prana/vm/intrinsics.hpp>
 
-struct external_function : composite<external_function> {
-  // we must hold f by reference because functions can be recursive
-  boost::reference_wrapper<function const> f;
-  int level;
+namespace boost {
+namespace spirit {
+namespace prana {
 
-  external_function(function const& f, int level)
-    : f(f), level(level) {}
+compiler::compiler (compiler_environment& env, actor_list& fragments,
+                    std::size_t line, std::string const& source):
+                      env(env),
+                      fragments(fragments),
+                      line(line),
+                      source(source) { }
 
-  using base_type::operator();
-  function operator()(actor_list const& elements) const {
-    return function(lambda_function(f, elements, level));
-  }
-};
+function compiler::operator() (spirit::nil) const {
+  return prana::val(utree());
+}
 
-struct compiler {
-  typedef function result_type;
-  environment& env;
-  actor_list& fragments;
-  int line;
-  std::string source_file;
+function compiler::operator() (utf8_symbol_range const& str) const {
+  using fusion::at_c;
 
-  compiler(
-    environment& env,
-    actor_list& fragments,
-    int line,
-    std::string const& source_file = "")
-    : env(env), fragments(fragments),
-      line(line), source_file(source_file) {
-  }
+  // TODO: Macro evaluation.
+  
+  std::string name(str.begin(), str.end());
 
-  function operator()(nil) const {
-    return scheme::val(utree());
-  }
+  // Find the symbol in the environment.
+  function_definition r = env.functions(name); 
 
-  template <typename T>
-  function operator()(T const& val) const {
-    return scheme::val(utree(val));
-  }
-
-  function operator()(utf8_symbol_range const& str) const {
-    std::string name(str.begin(), str.end());
-    boost::tuple<compiled_function*, int, bool> r = env.find(name);
-
-    if (boost::get<0>(r)) {
-      actor_list flist;
-      return (*boost::get<0>(r))(flist);
-    }
-
-    throw identifier_not_found(name);
-    return function();
-  }
-
-  function make_lambda(
-    std::vector<std::string> const& args,
-    bool fixed_arity,
-    utree const& body) const {
-    environment local_env(&this->env);
-
-    for (std::size_t i = 0; i < args.size(); ++i) {
-      if (!fixed_arity && (args.size() - 1) == i)
-        local_env.define(args[i],
-            boost::bind(varg, i, local_env.level()), 0, false);
-      else
-        local_env.define(args[i],
-            boost::bind(arg, i, local_env.level()), 0, false);
-    }
-
+  if (at_c<0>(r)) {
     actor_list flist;
-
-    if (body.size() == 0)
-      return function();
-
-    //~ throw no_body();
-    BOOST_FOREACH(utree const & item, body) {
-      function f = compile(item, local_env, fragments, line, source_file);
-
-      if (!is_define(item))
-        flist.push_back(f);
-    }
-
-    if (flist.size() > 1)
-      return protect(block(flist));
-    else
-      return protect(flist.front());
+    return (*at_c<0>(r))(flist);
   }
 
-  static bool is_define(utree const& item) {
-    if (item.which() != utree_type::list_type ||
-        item.begin()->which() != utree_type::symbol_type)
-      return false;
-
-    return get_symbol(*item.begin()) == "define";
-  }
-
-  function define_function(
-    std::string const& name,
-    std::vector<std::string>& args,
-    bool fixed_arity,
-    utree const& body) const {
-    try {
-      function* fp = 0;
-
-      if (env.defined(name)) {
-        fp = env.find_forward(name);
-
-        if (fp != 0 && !fp->empty())
-          throw body_already_defined(name);
-      }
-
-      if (fp == 0) {
-        fragments.push_back(function());
-        fp = &fragments.back();
-        env.define(name, external_function(*fp, env.level()), args.size(), fixed_arity);
-      }
-
-      function lambda = make_lambda(args, fixed_arity, body);
-
-      if (!lambda.empty()) {
-        // unprotect (eval returns a function)
-        *fp = lambda();
-      } else {
-        // allow forward declaration of scheme functions
-        env.forward_declare(name, fp);
-      }
-
-      return *fp;
-    } catch (std::exception const&) {
-      env.undefine(name);
-      throw;
-    }
-  }
-
-  function operator()(utree::const_range const& range) const {
-    typedef utree::const_range::iterator iterator;
-
-    if (range.begin()->which() != utree_type::symbol_type)
-      throw function_application_expected(*range.begin());
-
-    std::string name(get_symbol(*range.begin()));
-
-    if (name == "quote") {
-      iterator i = range.begin();
-      ++i;
-      return scheme::val(*i);
-    }
-
-    if (name == "define") {
-      std::string fname;
-      std::vector<std::string> args;
-      bool fixed_arity = true;
-      iterator i = range.begin();
-      ++i;
-
-      if (i->which() == utree_type::list_type) {
-        // (define (f x) ...body...)
-        utree const& decl = *i++;
-        iterator di = decl.begin();
-        fname = get_symbol(*di++);
-
-        while (di != decl.end()) {
-          std::string sym = get_symbol(*di++);
-
-          if (sym == ".")
-            // check that . is one pos behind the last arg
-            fixed_arity = false;
-          else
-            args.push_back(sym);
-        }
-      } else {
-        // (define f ...body...)
-        fname = get_symbol(*i++);
-
-        // (define f (lambda (x) ...body...))
-        if (i != range.end()
-            && i->which() == utree_type::list_type
-            && get_symbol((*i)[0]) == "lambda") {
-          utree const& arg_names = (*i)[1];
-          iterator ai = arg_names.begin();
-
-          while (ai != arg_names.end()) {
-            std::string sym = get_symbol(*ai++);
-
-            if (sym == ".")
-              // check that . is one pos behind the last arg
-              fixed_arity = false;
-            else
-              args.push_back(sym);
-          };
-
-          iterator bi = i->begin();
-
-          ++bi;
-
-          ++bi; // (*i)[2]
-
-          utree body(utree::const_range(bi, i->end()), shallow);
-
-          return define_function(fname, args, fixed_arity, body);
-        }
-      }
-
-      utree body(utree::const_range(i, range.end()), shallow);
-      return define_function(fname, args, fixed_arity, body);
-    }
-
-    if (name == "lambda") {
-      // (lambda (x) ...body...)
-      iterator i = range.begin();
-      ++i;
-      utree const& arg_names = *i++;
-      iterator ai = arg_names.begin();
-      std::vector<std::string> args;
-      bool fixed_arity = true;
-
-      while (ai != arg_names.end()) {
-        std::string sym = get_symbol(*ai++);
-
-        if (sym == ".")
-          // check that . is one pos behind the last arg
-          fixed_arity = false;
-        else
-          args.push_back(sym);
-      }
-
-      utree body(utree::const_range(i, range.end()), shallow);
-      return make_lambda(args, fixed_arity, body);
-    }
-
-    // (f x)
-    boost::tuple<compiled_function*, int, bool> r = env.find(name);
-
-    if (boost::get<0>(r)) {
-      compiled_function* cf = boost::get<0>(r);
-      int arity = boost::get<1>(r);
-      bool fixed_arity = boost::get<2>(r);
-      actor_list flist;
-      iterator i = range.begin();
-      ++i;
-      int size = 0;
-
-      for (; i != range.end(); ++i, ++size) {
-        flist.push_back(
-          compile(*i, env, fragments, line, source_file));
-      }
-
-      // Arity check
-      if (!fixed_arity) { // non-fixed arity
-        if (size < arity)
-          throw incorrect_arity(name, arity, false);
-      } else { // fixed arity
-        if (size != arity)
-          throw incorrect_arity(name, arity, true);
-      }
-
-      return (*cf)(flist);
-    } else {
-      throw identifier_not_found(name);
-    }
-
-    // Can't reach here
-    throw compilation_error();
-    return function();
-  }
-
-  function operator()(function_base const& pf) const {
-    // Can't reach here. Surely, at this point, we don't have
-    // utree functions yet. The utree AST should be pure data.
-    throw compilation_error();
-    return function();
-  }
-
-  static std::string get_symbol(utree const& s) {
-    if (s.which() != utree_type::symbol_type)
-      throw identifier_expected(s);
-
-    utf8_symbol_range symbol = s.get<utf8_symbol_range>();
-    return std::string(symbol.begin(), symbol.end());
-  }
-};
-
-inline function compile(
-  utree const& ast,
-  environment& env,
-  actor_list& fragments,
-  int parent_line,
-  std::string const& source_file) {
-  int line = (ast.which() == utree_type::list_type)
-      ? ast.tag() : parent_line;
-
-  try {
-    return utree::visit(ast,
-        compiler(env, fragments, line, source_file));
-  } catch (scheme_exception const& x) {
-    if (source_file != "")
-      std::cerr << source_file;
-
-    if (line != -1)
-      std::cerr << '(' << line << ')';
-
-    std::cerr << " : Error! "  << x.what() << std::endl;
-    throw compilation_error();
-  }
-
+  throw identifier_not_found(name);
   return function();
 }
 
-void compile_all(
-  utree const& ast,
-  environment& env,
-  actor_list& results,
-  actor_list& fragments,
-  std::string const& source_file = "") {
-  int line = (ast.which() == utree_type::list_type)
-      ? ast.tag() : 1;
-  BOOST_FOREACH(utree const & program, ast) {
-    scheme::function f;
+function compiler::operator() (utree::const_range const& range) const {
+  using fusion::at_c;
 
-    try {
-      if (!compiler::is_define(program)) {
-        if (source_file != "")
-          std::cerr << source_file;
+  typedef utree::const_range::iterator iterator;
+  
+  // TODO: Macro evaluation.
 
-        int progline = (program.which() == utree_type::list_type)
-            ? program.tag() : line;
-        std::cerr << '(' << progline << ')';
-        std::cerr << " : Error! scheme: Function definition expected." << std::endl;
-        continue; // try the next expression
-      } else {
-        f = compile(program, env, fragments, line, source_file);
-      }
-    } catch (compilation_error const&) {
-      continue; // try the next expression
+  std::string name(get_symbol(*range.begin()));
+
+  if (range.begin()->which() != utree_type::symbol_type)
+    throw function_application_expected(*range.begin());
+
+  function_definition r = env.functions(name);
+
+  if (at_c<0>(r)) {
+    compiled_function* cf = at_c<0>(r);
+    unsigned arity = at_c<1>(r);
+    bool fixed_arity = at_c<2>(r);
+
+    actor_list flist;
+
+    iterator i = range.begin(); ++i;
+    unsigned size = 0;
+
+    for (; i != range.end(); ++i, ++size) {
+      flist.push_back(function());
+      compile(*i, env, flist.back(), fragments, line, source);
     }
 
-    results.push_back(f);
+    if ((!fixed_arity) && (size < arity)) // Non-fixed arity.
+      throw incorrect_arity(name, arity, false);
+    else if (size != arity) // Fixed arity.
+      throw incorrect_arity(name, arity, true);
+
+    return (*cf)(flist);
+  }
+  
+  throw identifier_not_found(name);
+}
+
+function compiler::operator() (function_base const& pf) const {
+  // Can't reach here. Surely, at this point, we don't have
+  // utree functions yet. The utree AST should be pure data.
+  throw compilation_error();
+  return function();
+}
+
+template<class Value>
+function compiler::operator() (Value const& val_) const {
+  return prana::val(utree(val_));
+}
+
+function compiler::define_function (std::string const& name,
+                                    std::vector<std::string>& args,
+                                    bool fixed_arity, utree const& body)
+{
+  try {
+    function* fp = 0;
+
+    if (env.functions.defined(name)) {
+      fp = env.forwards(name);
+
+      if (fp && !fp->empty())
+        throw body_already_defined(name);
+    }
+
+    if (!fp) {
+      fragments.push_back(function());
+      fp = &fragments.back();
+      env.functions.define(
+        name,
+        external_function(*fp, env.functions.level()),
+        args.size(),
+        fixed_arity
+      );
+    }
+
+    function lambda = make_lambda(args, fixed_arity, body);
+
+    if (!lambda.empty())
+      *fp = lambda(); // unprotect (eval returns a function)
+    else // Allow forward declaration of scheme functions.
+      env.forwards.define(name, fp);
+
+    return *fp;
+  }
+
+  catch (std::exception const&) {
+    env.functions.undefine(name);
+    throw;
   }
 }
 
+function compiler::make_lambda (std::vector<std::string> const& args,
+                                bool fixed_arity, utree const& body)
+{
+  compiler_environment local_env(this->env);
+
+  for (std::size_t i = 0; i < args.size(); ++i) {
+    if (!fixed_arity && (args.size() - 1) == i)
+      local_env.functions.define(
+        args[i], boost::bind(prana::varg, i, local_env.functions.level()),
+        0, false
+      );
+    else
+      local_env.functions.define(
+        args[i], boost::bind(prana::arg, i, local_env.functions.level()),
+        0, false
+      );
+  }
+
+  actor_list flist;
+
+  if (body.size() == 0)
+    return function();
+
+  BOOST_FOREACH(utree const& item, body) {
+    function f;
+    compile(item, local_env, f, fragments, line, source);
+
+    if (!is_function_definition(item))
+      flist.push_back(f);
+  }
+
+  if (flist.size() > 1)
+    return protect(prana::begin(flist));
+  else
+    return protect(flist.front());
+}
+
+inline bool is_function_definition (utree const& item) {
+  if (  item.which() != utree_type::list_type
+     || item.begin()->which() != utree_type::symbol_type)
+    return false;
+
+  return get_symbol(*item.begin()) == "define";
+}
+
+inline std::string get_symbol (utree const& s) {
+  if (s.which() != utree_type::symbol_type)
+    throw identifier_expected(s);
+
+  utf8_symbol_range symbol = s.get<utf8_symbol_range>();
+  return std::string(symbol.begin(), symbol.end());
+}
+
+inline void compile (utree const& ast, compiler_environment& env,
+                     function& r, actor_list& fragments,
+                     std::size_t parent_line, std::string const& source)
+{
+  std::size_t line = (ast.which() == utree_type::list_type)
+                   ? ast.tag()
+                   : parent_line;
+
+  try { r = utree::visit(ast, compiler(env, fragments, line, source)); }
+
+  catch (utree_exception const& x) {
+    std::cerr << "(fatal-exception \""
+              << source << "\" " << line
+              << " '(compilation-error \"" << x.what() << "\"))\n";
+  }
+}
+
+inline void compile_program (utree const& ast, compiler_environment& env,
+                             actor_list& r, actor_list& fragments,
+                             std::size_t parent_line, std::string const& source)
+{
+  std::size_t line = (ast.which() == utree_type::list_type)
+                   ? ast.tag()
+                   : parent_line;
+
+  BOOST_FOREACH(utree const& local_ast, ast) {
+    function f;
+
+    try {
+      if (!is_function_definition(local_ast)) {
+        std::size_t local_line = (local_ast.which() == utree_type::list_type)
+                               ? local_ast.tag()
+                               : line;
+    
+        std::cerr << "(non-fatal-exception \""
+                  << source << "\" " << line
+                  << " '(function-definition-expected " << local_ast << "))\n";
+        continue; // Try the next expression.
+      }
+
+      else 
+        compile(local_ast, env, f, fragments, line, source);
+    }
+    
+    catch (compilation_error const&) {
+      continue; // Try the next expression.
+    }
+
+    r.push_back(f);
+  }
+}
+
+} // prana
+} // spirit
+} // boost
+
+#endif // BOOST_SPIRIT_PRANA_VM_COMPILER_HPP
 

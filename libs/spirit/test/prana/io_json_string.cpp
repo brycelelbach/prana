@@ -27,7 +27,6 @@ int main (void) {
     //]  
   }
 
-  #if 0
   { //[boolean
     std::string in = "false";
     utree out;
@@ -36,7 +35,7 @@ int main (void) {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
-      ((out) ("#f")))
+      ((out) ("false")))
     //]  
   }
 
@@ -75,7 +74,36 @@ int main (void) {
       ((out) ("\"fizz\"")))
     //]  
   }
-  #endif
+  
+  { //[empty_array
+    std::string in = "[]";
+    utree out;
+
+    parse_json(in, out);
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_json,
+      ((out) ("[]")))
+
+    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+      ((out.tag()) (1)))
+    //]  
+  }
+  
+  { //[empty_object
+    std::string in = "{}";
+    utree out;
+
+    parse_json(in, out);
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_json,
+      ((out) ("{}")))
+
+    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+      ((out.tag()) (1)))
+    //]  
+  }
 
   return boost::report_errors();
 }

@@ -28,7 +28,7 @@ struct json_generator:
     array, member_pair, object;
 
   karma::rule<Iterator, utf8_symbol_range(void)>
-    key;
+    key, empty_object, empty_array;
 
   karma::rule<Iterator, utf8_string_range(void)>
     string_;
@@ -41,7 +41,6 @@ struct json_generator:
 
   json_generator (void): json_generator::base_type(start) {
     using standard::char_;
-    using standard::string;
     using karma::double_;
     using karma::int_;
     using karma::eps;
@@ -52,16 +51,18 @@ struct json_generator:
           | string_
           | object
           | array
+          | empty_object
+          | empty_array
           | null
           | ref_;
   
     ref_ = start;
 
-    array = '[' << -(start % ", ") << ']';
+    array = '[' << (start % ", ") << ']';
 
     member_pair = member << ": " << start;  
 
-    object = '{' << -(member_pair % ", ") << '}'; 
+    object = '{' << (member_pair % ", ") << '}'; 
 
     member = key | fail;
 
@@ -69,6 +70,10 @@ struct json_generator:
     
     string_ = '"' << *(&char_('"') << "\\\"" | char_) << '"';
 
+    empty_object = char_('{') << char_('}');
+    
+    empty_array = char_('[') << char_(']');
+    
     null = eps << "null";
 
     fail = eps(false);

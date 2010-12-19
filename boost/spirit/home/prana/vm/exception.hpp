@@ -65,9 +65,8 @@ struct duplicate_identifier: vm_exception {
   std::string msg;
 
   duplicate_identifier (std::string const& id) {
-    std::ostringstream oss;
-    oss << "duplicate identifier " << id;
-    msg = oss.str();
+    msg = "duplicate identifier ";
+    msg += id;
   }
 
   ~duplicate_identifier (void) throw() { }

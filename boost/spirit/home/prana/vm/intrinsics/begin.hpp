@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_BLOCK_INTRINSICS_HPP)
-#define BOOST_SPIRIT_PRANA_VM_BLOCK_INTRINSICS_HPP
+#if !defined(BOOST_SPIRIT_PRANA_VM_BEGIN_INTRINSICS_HPP)
+#define BOOST_SPIRIT_PRANA_VM_BEGIN_INTRINSICS_HPP
 
 #include <boost/assert.hpp>
 #include <boost/foreach.hpp>
@@ -19,10 +19,10 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-struct block_function: actor<block_function> {
+struct begin_function: actor<begin_function> {
   actor_list elements;
 
-  block_function (actor_list const& elements): elements(elements) {
+  begin_function (actor_list const& elements): elements(elements) {
     BOOST_FOREACH(function const & element, elements) {
       BOOST_ASSERT(!element.empty());
     }
@@ -41,17 +41,17 @@ struct block_function: actor<block_function> {
   }
 };
 
-struct block_composite: composite<block_composite> {
+struct begin_composite: composite<begin_composite> {
   function compose (actor_list const& elements) const {
-    return function(block_function(elements));
+    return function(begin_function(elements));
   }
 };
 
-block_composite const block = block_composite();
+begin_composite const begin = begin_composite();
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_BLOCK_INTRINSICS_HPP
+#endif // BOOST_SPIRIT_PRANA_VM_BEGIN_INTRINSICS_HPP
 

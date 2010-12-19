@@ -32,7 +32,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     boolean;
 
   qi::rule<Iterator, utf8_symbol(void)>
-    member;
+    member, empty_object, empty_array;
 
   string_parser<Iterator>
     string;
@@ -46,6 +46,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   json_parser (std::string const& source_file = "<string>"):
     json_parser::base_type(start), error(ErrorHandler(source_file))
   {
+    using standard::space;
     using standard::char_;
     using qi::attr_cast;
     using qi::lit;
@@ -70,21 +71,23 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
 
     start = value.alias();
 
-    value = null 
+    value = null
           | strict_double
           | int_
           | boolean
           | string
           | object
-          | array;
+          | array
+          | empty_object
+          | empty_array; 
     
     null = attr_cast(lit("null"));
 
-    object %= pos(_val, '{') > (member_pair % ',') > '}';
+    object %= pos(_val, '{') >> (member_pair % ',') > '}';
 
     member_pair %= pos(_val, '"') > member > '"' > ':' > value;
     
-    array %= pos(_val, '[') > (value % ',') > ']';
+    array %= pos(_val, '[') >> (value % ',') > ']';
 
     boolean.add
       ("true", true)
@@ -92,6 +95,10 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
 
     std::string exclude = std::string(" {}[]:\"\x01-\x1f\x7f") + '\0';
     member = lexeme[+(~char_(exclude))];
+
+    empty_object = char_('{') > *space > char_('}');
+    
+    empty_array = char_('[') > *space > char_(']');
  
     start.name("json");
     value.name("value");
@@ -100,6 +107,8 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     member_pair.name("member_pair");
     array.name("array");
     member.name("member");
+    empty_object.name("empty_object");
+    empty_array.name("empty_array");
  
     on_error<fail>(start, error(_1, _2, _3, _4));
   }
