@@ -8,39 +8,30 @@
 #if !defined(BOOST_SPIRIT_PRANA_EXCEPTION_HPP)
 #define BOOST_SPIRIT_PRANA_EXCEPTION_HPP
 
-#include <boost/throw_exception.hpp>
+#include <sstream>
 
-#include <boost/spirit/home/karma/string.hpp>
-#include <boost/spirit/home/karma/numeric.hpp>
-#include <boost/spirit/home/karma/operator.hpp>
-#include <boost/spirit/home/karma/generate.hpp>
-#include <boost/spirit/home/karma/generate_attr.hpp>
+#include <boost/throw_exception.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-struct invalid_type_information: std::exception {
+struct dispatch_exception: std::exception { };
+
+struct invalid_type_information: dispatch_exception {
   std::string msg;
 
   invalid_type_information (std::size_t type) {
-    std::back_insert_iterator<std::string> sink(msg);
-
-    using karma::lit;
-    karma::uint_generator<std::size_t> size_;
-
-    karma::generate(
-      sink,
-      // begin grammar
-      lit("(exception '(invalid-type-information ") << size_ << "))",
-      // end grammar
-      type
-    );
+    std::ostringstream oss;
+    oss << "'(invalid-type-information " << type << ")";
+    msg = oss.str();
   }
 
   virtual ~invalid_type_information (void) throw() { }
 
-  virtual const char* what (void) const throw() { return msg.c_str(); }
+  virtual const char* what (void) const throw() {
+    return msg.c_str();
+  }
 };
 
 } /*<- prana ->*/

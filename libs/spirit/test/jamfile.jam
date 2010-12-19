@@ -7,9 +7,7 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-import testing ;
-
-project spirit_prana_test 
+project spirit_prana_test
   : requirements
     <toolset>clang:<cxxflags>-Wno-unused
     <toolset>clang:<cxxflags>-Wno-tautological-compare
@@ -19,6 +17,21 @@ project spirit_prana_test
     ../../../bin
   ;
 
-for tests in [ glob ./prana/*.cpp ] {
-    run $(tests) : : : : $(tests:B) ;
+import testing ;
+
+{
+  test-suite prana_test_suite :
+      [ run prana/sexpr_become.cpp        : : : : ]
+      [ run prana/sexpr_capacity.cpp      : : : : ]
+      [ run prana/sexpr_car.cpp           : : : : ]
+      [ run prana/sexpr_cdr.cpp           : : : : ]
+      [ run prana/sexpr_clear.cpp         : : : : ]
+      [ run prana/sexpr_set.cpp           : : : : ]
+      [ run prana/sexpr_size.cpp          : : : : ]
+      [ run prana/sexpr_sizeof.cpp        : : : : ]
+      [ run prana/adt_symbol_table.cpp    : : : : ]
+      [ run prana/io_sexpr_string.cpp     : : : : ]
+      [ run prana/io_json_string.cpp      : : : : ]
+    ;
 }
+
