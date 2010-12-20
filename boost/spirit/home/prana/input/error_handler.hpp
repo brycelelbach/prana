@@ -75,8 +75,8 @@ struct error_handler {
 
   std::string source;
 
-  error_handler (std::string const& source_file = "<string>"):
-    source_file (source_file) { }
+  error_handler (std::string const& source = "<string>"):
+    source(source) { }
 
   void operator() (Iterator first, Iterator last, Iterator err_pos,
                    info const& what) const

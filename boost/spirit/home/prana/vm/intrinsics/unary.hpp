@@ -38,6 +38,7 @@ BSP_UNARY_INTRINSIC(display, (std::cout << element, utree()))
 BSP_UNARY_INTRINSIC(front,   element.front())
 BSP_UNARY_INTRINSIC(back,    element.back())
 BSP_UNARY_INTRINSIC(rest,    spirit::rest(element))
+BSP_UNARY_INTRINSIC(negate,  !element)
 
 #undef BSP_UNARY_INTRINSIC
 

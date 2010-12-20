@@ -14,8 +14,7 @@
 #include <vector>
 
 #include <boost/spirit/home/prana/vm/core.hpp>
-#include <boost/spirit/home/prana/vm/environment/forward.hpp>
-#include <boost/spirit/home/prana/vm/environment/function.hpp>
+#include <boost/spirit/home/prana/vm/environment.hpp>
 
 namespace boost {
 namespace spirit {
@@ -26,10 +25,12 @@ struct compiler_environment {
 
   compiler_environment (compiler_environment& parent):
     functions(&parent.functions),
-    forwards(&parent.forwards) { }
+    forwards(&parent.forwards),
+    macros(&parent.macros) { }
 
   function_environment functions;
-  forward_environment forwards; 
+  forward_environment forwards;
+  macro_environment macros; 
 };
 
 struct compiler {
@@ -62,13 +63,13 @@ inline bool is_function_definition (utree const& name);
 
 inline void compile (utree const& ast, compiler_environment& env,
                      function& r, actor_list& fragments,
-                     std::size_t parent_line = 1,
-                     std::string const& source = "<string>");
+                     std::string const& source = "<string>",
+                     std::size_t parent_line = 1);
 
 inline void compile_program (utree const& ast, compiler_environment& env,
                              actor_list& r, actor_list& fragments,
-                             std::size_t parent_line = 1,
-                             std::string const& source = "<string>");
+                             std::string const& source = "<string>",
+                             std::size_t parent_line = 1);
 
 } // prana
 } // spirit

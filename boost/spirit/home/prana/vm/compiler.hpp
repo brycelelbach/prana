@@ -76,7 +76,7 @@ function compiler::operator() (utree::const_range const& range) const {
 
     for (; i != range.end(); ++i, ++size) {
       flist.push_back(function());
-      compile(*i, env, flist.back(), fragments, line, source);
+      compile(*i, env, flist.back(), fragments, source, line);
     }
 
     if ((!fixed_arity) && (size < arity)) // Non-fixed arity.
@@ -168,7 +168,7 @@ function compiler::make_lambda (std::vector<std::string> const& args,
 
   BOOST_FOREACH(utree const& item, body) {
     function f;
-    compile(item, local_env, f, fragments, line, source);
+    compile(item, local_env, f, fragments, source, line);
 
     if (!is_function_definition(item))
       flist.push_back(f);
@@ -190,7 +190,7 @@ inline bool is_function_definition (utree const& item) {
 
 inline void compile (utree const& ast, compiler_environment& env,
                      function& r, actor_list& fragments,
-                     std::size_t parent_line, std::string const& source)
+                     std::string const& source, std::size_t parent_line)
 {
   std::size_t line = (ast.which() == utree_type::list_type)
                    ? ast.tag()
@@ -207,7 +207,7 @@ inline void compile (utree const& ast, compiler_environment& env,
 
 inline void compile_program (utree const& ast, compiler_environment& env,
                              actor_list& r, actor_list& fragments,
-                             std::size_t parent_line, std::string const& source)
+                             std::string const& source, std::size_t parent_line)
 {
   std::size_t line = (ast.which() == utree_type::list_type)
                    ? ast.tag()
@@ -229,7 +229,7 @@ inline void compile_program (utree const& ast, compiler_environment& env,
       }
 
       else 
-        compile(local_ast, env, f, fragments, line, source);
+        compile(local_ast, env, f, fragments, source, line);
     }
     
     catch (compilation_error const&) {
