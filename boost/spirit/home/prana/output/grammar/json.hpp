@@ -27,20 +27,18 @@ struct json_generator:
   karma::rule<Iterator, utree_list(void)>
     array, member_pair, object;
 
-  karma::rule<Iterator, utf8_symbol_range(void)>
-    key, empty_object, empty_array;
+  karma::rule<Iterator, utf8_symbol_range_type(void)>
+    key, empty_object, empty_array, null;
 
-  karma::rule<Iterator, utf8_string_range(void)>
-    string_;
-
-  karma::rule<Iterator, spirit::nil(void)>
-    null, fail;
+  karma::rule<Iterator, utf8_string_range_type(void)>
+    utf8;
 
   karma::symbols<bool, char const*>
     boolean;
 
   json_generator (void): json_generator::base_type(start) {
     using standard::char_;
+    using karma::string;
     using karma::double_;
     using karma::int_;
     using karma::eps;
@@ -48,7 +46,7 @@ struct json_generator:
     start = double_
           | int_
           | boolean
-          | string_
+          | utf8
           | object
           | array
           | empty_object
@@ -64,19 +62,17 @@ struct json_generator:
 
     object = '{' << (member_pair % ", ") << '}'; 
 
-    member = key | fail;
+    member = key | eps(false);
 
     key = '"' << *(&char_('"') << "\\\"" | char_) << '"';
     
-    string_ = '"' << *(&char_('"') << "\\\"" | char_) << '"';
+    utf8 = '"' << *(&char_('"') << "\\\"" | char_) << '"';
 
-    empty_object = char_('{') << char_('}');
+    empty_object = string("{}");
     
-    empty_array = char_('[') << char_(']');
+    empty_array = string("[]"); 
     
-    null = eps << "null";
-
-    fail = eps(false);
+    null = string("null");
 
     boolean.add
       (true, "true")
@@ -88,7 +84,8 @@ struct json_generator:
     member_pair.name("member_pair");
     object.name("object");
     member.name("member");
-    string_.name("string");
+    key.name("key");
+    utf8.name("string");
     null.name("null");
   }
 };

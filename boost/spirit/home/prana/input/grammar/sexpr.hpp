@@ -14,7 +14,6 @@
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
-#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -42,7 +41,7 @@ struct sexpr_parser:
     start, element, list;
 
   qi::rule<Iterator, utree(void)>
-    atom, nil_;
+    atom;
 
   qi::rule<Iterator, int(void)>
     integer;
@@ -50,14 +49,14 @@ struct sexpr_parser:
   qi::symbols<char, bool>
     boolean;
 
-  qi::rule<Iterator, utf8_symbol(void)>
-    symbol;
+  qi::rule<Iterator, utf8_symbol_type(void)>
+    symbol, nil_;
 
-  qi::rule<Iterator, binary_string(void)>
+  qi::rule<Iterator, binary_string_type(void)>
     binary;
 
   string_parser<Iterator>
-    string;
+    utf8;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -69,12 +68,12 @@ struct sexpr_parser:
     sexpr_parser::base_type(start), error(ErrorHandler(source_file))
   {
     using standard::char_;
-    using qi::attr_cast;
-    using qi::lit;
+    using standard::string;
     using qi::lexeme;
     using qi::hex;
     using qi::oct;
     using qi::no_case;
+    using qi::eps;
     using qi::real_parser;
     using qi::strict_real_policies;
     using qi::int_parser;
@@ -95,17 +94,17 @@ struct sexpr_parser:
 
     element = atom | list;
 
-    list %= pos(_val, '(') > *element > ')';
+    list = pos(_val, '(') > *element > ')';
 
     atom = nil_ 
          | strict_double
          | integer
          | boolean
-         | string
+         | utf8
          | symbol
          | binary;
 
-    nil_ = attr_cast(lit("nil"));
+    nil_ = string("nil"); 
 
     integer = lexeme[ no_case["#x"] >  hex]
             | lexeme[ no_case["#o"] >> oct]

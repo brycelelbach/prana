@@ -45,7 +45,7 @@ struct compiler {
             std::size_t line = 1, std::string const& source = "<string>");
 
   result_type operator() (spirit::nil) const;
-  result_type operator() (utf8_symbol_range const&) const;
+  result_type operator() (utf8_symbol_range_type const&) const;
   result_type operator() (utree::const_range const&) const;
   result_type operator() (function_base const&) const;
   template<class Value>

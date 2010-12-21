@@ -28,53 +28,49 @@ struct sexpr_generator:
   karma::rule<Iterator, utree_list(void)>
     list;
 
-  karma::rule<Iterator, utf8_symbol_range(void)>
-    symbol;
+  karma::rule<Iterator, utf8_symbol_range_type(void)>
+    symbol, nil_;
 
-  karma::rule<Iterator, utf8_string_range(void)>
-    string_;
+  karma::rule<Iterator, utf8_string_range_type(void)>
+    utf8;
 
-  karma::rule<Iterator, binary_range(void)>
+  karma::rule<Iterator, binary_range_type(void)>
     binary;
-
-  karma::rule<Iterator, spirit::nil(void)>
-    nil_;
 
   karma::symbols<bool, char const*>
     boolean;
 
   sexpr_generator (void): sexpr_generator::base_type(start) {
     using standard::char_;
-    using standard::string;
+    using karma::string;
     using karma::uint_generator;
     using karma::double_;
     using karma::int_;
     using karma::right_align;
-    using karma::eps;
 
     uint_generator<unsigned char, 16> hex2;
 
-    start = double_
+    start = nil_
+          | double_
           | int_
           | boolean
-          | string_
+          | utf8
           | symbol
           | binary
           | list
-          | nil_
           | ref_;
   
     ref_ = start;
 
     list = '(' << -(start % ' ') << ')';
 
-    string_ = '"' << *(&char_('"') << "\\\"" | char_) << '"';
+    utf8 = '"' << *(&char_('"') << "\\\"" | char_) << '"';
 
     symbol = string;
 
     binary = '#' << *right_align(2, '0')[hex2] << '#';
 
-    nil_ = eps << "nil";
+    nil_ = string("nil");
 
     boolean.add
       (true, "#t")
@@ -83,7 +79,7 @@ struct sexpr_generator:
     start.name("sexpr");
     ref_.name("ref");
     list.name("list");
-    string_.name("string");
+    utf8.name("string");
     symbol.name("symbol");
     binary.name("binary");
     nil_.name("nil");

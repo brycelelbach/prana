@@ -104,13 +104,13 @@ parse_sexpr_list (Range const& in, utree& out, std::string const& source) {
 bool parse_sexpr (utree const& in, utree& out,
                   std::string const& source)
 {
-  return parse_sexpr(in.get<utf8_string_range>(), out, source);
+  return parse_sexpr(in.get<utf8_string_range_type>(), out, source);
 }
 
 bool parse_sexpr_list (utree const& in, utree& out,
                        std::string const& source)
 {
-  return parse_sexpr_list(in.get<utf8_string_range>(), out, source);
+  return parse_sexpr_list(in.get<utf8_string_range_type>(), out, source);
 }
 
 } // prana

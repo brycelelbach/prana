@@ -147,19 +147,19 @@ parse_json_object (Range const& in, utree& out, std::string const& source) {
 }
 
 bool parse_json (utree const& in, utree& out, std::string const& source) {
-  return parse_json(in.get<utf8_string_range>(), out, source);
+  return parse_json(in.get<utf8_string_range_type>(), out, source);
 }
 
 bool parse_json_array (utree const& in, utree& out,
                        std::string const& source)
 {
-  return parse_json_array(in.get<utf8_string_range>(), out, source);
+  return parse_json_array(in.get<utf8_string_range_type>(), out, source);
 }
 
 bool parse_json_object (utree const& in, utree& out,
                         std::string const& source)
 {
-  return parse_json_object(in.get<utf8_string_range>(), out, source);
+  return parse_json_object(in.get<utf8_string_range_type>(), out, source);
 }
 
 } // prana

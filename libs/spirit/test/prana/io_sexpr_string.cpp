@@ -5,6 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
+#include <iostream>
+
 #include "harness.hpp"
 
 #include <boost/spirit/home/prana/input/parse_sexpr.hpp>
@@ -22,6 +24,8 @@ int main (void) {
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,

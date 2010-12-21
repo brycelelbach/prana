@@ -22,7 +22,7 @@ inline std::string get_symbol (utree const& s) {
   if (s.which() != utree_type::symbol_type)
     throw expected_identifier(s);
 
-  utf8_symbol_range symbol = s.get<utf8_symbol_range>();
+  utf8_symbol_range_type symbol = s.get<utf8_symbol_range_type>();
   return std::string(symbol.begin(), symbol.end());
 }
 

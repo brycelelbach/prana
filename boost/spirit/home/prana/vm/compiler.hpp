@@ -31,7 +31,7 @@ function compiler::operator() (spirit::nil) const {
   return prana::val(utree());
 }
 
-function compiler::operator() (utf8_symbol_range const& str) const {
+function compiler::operator() (utf8_symbol_range_type const& str) const {
   using fusion::at_c;
 
   // TODO: Macro evaluation.

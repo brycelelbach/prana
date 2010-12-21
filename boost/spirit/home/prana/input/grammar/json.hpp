@@ -14,7 +14,6 @@
 #include <boost/spirit/home/prana/input/grammar/string.hpp>
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
-#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -25,17 +24,14 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   qi::rule<Iterator, utree(void), standard::space_type>
     start, value, object, member_pair, array;
 
-  qi::rule<Iterator, utree(void)>
-    null;
-
   qi::symbols<char, bool>
     boolean;
 
-  qi::rule<Iterator, utf8_symbol(void)>
-    member, empty_object, empty_array;
+  qi::rule<Iterator, utf8_symbol_type(void)>
+    member, empty_object, empty_array, null;
 
   string_parser<Iterator>
-    string;
+    utf8;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -48,8 +44,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   {
     using standard::space;
     using standard::char_;
-    using qi::attr_cast;
-    using qi::lit;
+    using qi::string;
     using qi::lexeme;
     using qi::omit;
     using qi::raw;
@@ -75,13 +70,13 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
           | strict_double
           | int_
           | boolean
-          | string
+          | utf8
           | object
           | array
           | empty_object
           | empty_array; 
     
-    null = attr_cast(lit("null"));
+    null = string("null");
 
     object %= pos(_val, '{') >> (member_pair % ',') > '}';
 
