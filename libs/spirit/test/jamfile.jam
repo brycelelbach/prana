@@ -21,17 +21,20 @@ import testing ;
 
 {
   test-suite prana_test_suite :
-      [ run prana/sexpr_become.cpp        : : : : ]
-      [ run prana/sexpr_capacity.cpp      : : : : ]
-      [ run prana/sexpr_car.cpp           : : : : ]
-      [ run prana/sexpr_cdr.cpp           : : : : ]
-      [ run prana/sexpr_clear.cpp         : : : : ]
-      [ run prana/sexpr_set.cpp           : : : : ]
-      [ run prana/sexpr_size.cpp          : : : : ]
-      [ run prana/sexpr_sizeof.cpp        : : : : ]
-      [ run prana/adt_symbol_table.cpp    : : : : ]
-      [ run prana/io_sexpr_string.cpp     : : : : ]
-      [ run prana/io_json_string.cpp      : : : : ]
+      [ run prana/schematic_become.cpp        : : : : ]
+      [ run prana/schematic_capacity.cpp      : : : : ]
+      [ run prana/schematic_car.cpp           : : : : ]
+      [ run prana/schematic_cdr.cpp           : : : : ]
+      [ run prana/schematic_clear.cpp         : : : : ]
+      [ run prana/schematic_set.cpp           : : : : ]
+      [ run prana/schematic_size.cpp          : : : : ]
+      [ run prana/schematic_sizeof.cpp        : : : : ]
+      [ run prana/adt_symbol_table.cpp        : : : : ]
+      [ run prana/sexpr_basic.cpp             : : : : ]
+      [ run prana/sexpr_list.cpp              : : : : ]
+      [ run prana/json_basic.cpp              : : : : ]
+      [ run prana/json_array.cpp              : : : : ]
+      [ run prana/json_object.cpp             : : : : ]
     ;
 }
 

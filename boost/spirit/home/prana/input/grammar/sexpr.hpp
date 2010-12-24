@@ -15,6 +15,8 @@
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
 
+#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -50,7 +52,10 @@ struct sexpr_parser:
     boolean;
 
   qi::rule<Iterator, utf8_symbol_type(void)>
-    symbol, nil_;
+    symbol;
+ 
+  qi::rule<Iterator, nil_type(void)>
+    nil_;
 
   qi::rule<Iterator, binary_string_type(void)>
     binary;
@@ -81,6 +86,8 @@ struct sexpr_parser:
     using qi::on_error;
     using qi::fail;
     using qi::int_;
+    using qi::attr_cast;
+    using qi::lit;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -104,7 +111,7 @@ struct sexpr_parser:
          | symbol
          | binary;
 
-    nil_ = string("nil"); 
+    nil_ = attr_cast(lit("nil")); 
 
     integer = lexeme[ no_case["#x"] >  hex]
             | lexeme[ no_case["#o"] >> oct]

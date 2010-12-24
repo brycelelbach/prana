@@ -15,6 +15,8 @@
 #include <boost/spirit/home/prana/input/error_handler.hpp>
 #include <boost/spirit/home/prana/input/save_line_pos.hpp>
 
+#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -28,7 +30,13 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     boolean;
 
   qi::rule<Iterator, utf8_symbol_type(void)>
-    member, empty_object, empty_array, null;
+    member;
+
+  qi::rule<Iterator, utf8_symbol_type(void), standard::space_type>
+    empty_object, empty_array;
+
+  qi::rule<Iterator, nil_type(void)>
+    null;
 
   string_parser<Iterator>
     utf8;
@@ -55,6 +63,8 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::on_error;
     using qi::fail;
     using qi::int_;
+    using qi::attr_cast;
+    using qi::lit;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -76,7 +86,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
           | empty_object
           | empty_array; 
     
-    null = string("null");
+    null = attr_cast(lit("null"));
 
     object %= pos(_val, '{') >> (member_pair % ',') > '}';
 
@@ -91,9 +101,9 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     std::string exclude = std::string(" {}[]:\"\x01-\x1f\x7f") + '\0';
     member = lexeme[+(~char_(exclude))];
 
-    empty_object = char_('{') > *space > char_('}');
+    empty_object = char_('{') > char_('}');
     
-    empty_array = char_('[') > *space > char_(']');
+    empty_array = char_('[') > char_(']');
  
     start.name("json");
     value.name("value");

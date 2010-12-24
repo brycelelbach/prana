@@ -1,29 +1,16 @@
-/*<-============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2001-2010 Hartmut Kaiser
+/*==============================================================================
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-============================================================================->*/
+==============================================================================*/
 
 #if !defined(BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP)
 #define BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP
 
 #include <cstring>
 
-#include <iterator>
-
 #include <boost/config.hpp>
-
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/mpl/size_t.hpp>
-#include <boost/mpl/modulus.hpp>
-#include <boost/mpl/not.hpp>
-
-#include <boost/type_traits/is_pod.hpp>
-#include <boost/type_traits/is_pointer.hpp>
 
 #include <boost/spirit/home/support/container.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
@@ -295,8 +282,9 @@ void dynamic_array<Data, InitialCapacity>::copy (Iterator first,
   }
 }
 
-} /*<- prana ->*/
-} /*<- spirit ->*/
-} /*<- boost ->*/
+} // prana
+} // spirit
+} // boost 
 
-#endif /*<- BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP ->*/
+#endif // BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP
+

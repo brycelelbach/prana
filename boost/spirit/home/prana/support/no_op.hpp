@@ -1,9 +1,9 @@
-/*<-============================================================================
+/*==============================================================================
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-============================================================================->*/
+==============================================================================*/
 
 #if !defined(BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP)
 #define BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP
@@ -15,7 +15,7 @@ namespace spirit {
 namespace prana {
 
 //[unary_no_op
-template<class X, class Dummy = prana::unused_type>
+template<class X, class Dummy = void>
 struct unary_no_op {
   typedef void result_type;
 
@@ -24,7 +24,7 @@ struct unary_no_op {
 //]
 
 //[binary_no_op
-template<class X, class Y, class Dummy = prana::unused_type>
+template<class X, class Y, class Dummy = void>
 struct binary_no_op {
   typedef void result_type;
 
@@ -33,7 +33,7 @@ struct binary_no_op {
 //]
 
 //[unary_no_op_with_return
-template<class Result, class X, class Dummy = prana::unused_type>
+template<class Result, class X, class Dummy = void>
 struct unary_no_op_with_return {
   typedef Result result_type;
 
@@ -42,7 +42,7 @@ struct unary_no_op_with_return {
 //]
 
 //[binary_no_op_with_return
-template<class Result, class X, class Y, class Dummy = prana::unused_type>
+template<class Result, class X, class Y, class Dummy = void>
 struct binary_no_op_with_return {
   typedef Result result_type;
 
@@ -50,9 +50,9 @@ struct binary_no_op_with_return {
 };
 //]
 
-} /*<- prana ->*/
-} /*<- spirit ->*/
-} /*<- boost ->*/
+} // prana
+} // spirit
+} // boost
 
-#endif /*<- BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP ->*/
+#endif // BOOST_SPIRIT_PRANA_SUPPORT_NO_OP_HPP
 

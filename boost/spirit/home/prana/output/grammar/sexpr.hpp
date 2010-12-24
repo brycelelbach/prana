@@ -12,6 +12,8 @@
 #include <boost/spirit/include/support_utree.hpp>
 #include <boost/spirit/include/karma.hpp>
 
+#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -29,7 +31,10 @@ struct sexpr_generator:
     list;
 
   karma::rule<Iterator, utf8_symbol_range_type(void)>
-    symbol, nil_;
+    symbol;
+
+  karma::rule<Iterator, nil_type(void)>
+    nil_;
 
   karma::rule<Iterator, utf8_string_range_type(void)>
     utf8;
@@ -42,10 +47,12 @@ struct sexpr_generator:
 
   sexpr_generator (void): sexpr_generator::base_type(start) {
     using standard::char_;
-    using karma::string;
+    using standard::string;
     using karma::uint_generator;
     using karma::double_;
     using karma::int_;
+    using karma::attr_cast;
+    using karma::lit;
     using karma::right_align;
 
     uint_generator<unsigned char, 16> hex2;
@@ -70,7 +77,7 @@ struct sexpr_generator:
 
     binary = '#' << *right_align(2, '0')[hex2] << '#';
 
-    nil_ = string("nil");
+    nil_ = attr_cast(lit("nil"));
 
     boolean.add
       (true, "#t")
