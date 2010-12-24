@@ -63,7 +63,7 @@ struct json_generator:
 
     member_pair = member << ": " << start;  
 
-    object = '{' << (member_pair % ", ") << '}'; 
+    object = '{' << ((member_pair % ", ") | eps(false)) << '}'; 
 
     member = key | eps(false);
 
