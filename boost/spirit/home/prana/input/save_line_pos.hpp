@@ -31,7 +31,7 @@ struct push_line_pos_functor {
   void operator() (utree& ast, Range const& rng) const {
     int n = get_line(rng.begin());
     BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
-    ast.tag(n);
+    try { ast.tag(n); } catch (...) { std::cout << ast << std::endl; }
   }
 };
 

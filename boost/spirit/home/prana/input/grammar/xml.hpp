@@ -38,19 +38,16 @@ struct xml_parser:
   qi::grammar<Iterator, utree(void), xml_white_space<Iterator> >
 {
   qi::rule<Iterator, utree(void), xml_white_space<Iterator> >
-    start, element;
-
-  qi::rule<Iterator, utree(void)>
-    atom;
+    start, element, atom;
 
   qi::symbols<char, bool>
     boolean;
 
   qi::rule<Iterator, utf8_symbol_type(void)>
-    symbol;
+    tag;
 
-  string_parser<Iterator>
-    utf8;
+  qi::rule<Iterator, utf8_string_type(void)>
+    text;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -64,8 +61,9 @@ struct xml_parser:
     using phoenix::front;
     using standard::char_;
     using qi::lexeme;
+    using qi::repeat;
+    using qi::omit;
     using qi::int_;
-    using qi::lazy;
     using qi::real_parser;
     using qi::strict_real_policies;
     using qi::uint_parser;
@@ -82,28 +80,29 @@ struct xml_parser:
   
     start = element.alias();
 
-    element = pos(_val, '<') > symbol            > '>'
-            > *atom
-            >           "</" > lazy(front(_val)) > '>';
+    element = pos(_val, '<') >> tag     >> '>'
+            > repeat(1)[*atom]
+            >           "</" > omit[tag] > '>';
 
     atom = strict_double
          | int_
          | boolean
-         | utf8
-         | symbol
-         | element;
+         | text
+         | start;
 
     boolean.add
       ("true", true)
       ("false", false);
 
-    std::string exclude = std::string(" <>&;\"\x01-\x1f\x7f") + '\0';
-    symbol = lexeme[+(~char_(exclude))];
+    std::string exclude = std::string(" /<>&;\"\x01-\x1f\x7f") + '\0';
+    tag  = lexeme[+(~char_(exclude))];
+    text = lexeme[+(~char_(exclude))];
 
     start.name("xml");
     element.name("element");
     atom.name("atom");
-    symbol.name("symbol");
+    tag.name("tag");
+    text.name("text");
  
     on_error<fail>(start, error(_1, _2, _3, _4));
   }

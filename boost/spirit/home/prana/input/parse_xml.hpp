@@ -37,15 +37,14 @@ bool parse_xml (std::basic_istream<Char>& in, utree& out,
   in.unsetf(std::ios::skipws);
 
   xml_parser<iterator_type> p(source);
+  xml_white_space<iterator_type> ws;
 
   stream_iterator_type sfirst(in);
   stream_iterator_type slast;
   iterator_type first(sfirst);
   iterator_type last(slast);
 
-  using standard::space;
-
-  return qi::phrase_parse(first, last, p, space, out);
+  return qi::phrase_parse(first, last, p, ws, out);
 }
 
 template<class Range>
@@ -55,13 +54,12 @@ parse_xml (Range const& in, utree& out, std::string const& source) {
     iterator_type;
 
   xml_parser<iterator_type> p(source);
+  xml_white_space<iterator_type> ws;
 
   iterator_type first(in.begin());
   iterator_type last(in.end());
 
-  using standard::space;
-
-  return qi::phrase_parse(first, last, p, space, out);
+  return qi::phrase_parse(first, last, p, ws, out);
 }
 
 bool parse_xml (utree const& in, utree& out, std::string const& source) {
