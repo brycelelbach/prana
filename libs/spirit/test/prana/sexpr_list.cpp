@@ -13,9 +13,7 @@
 int main (void) {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_sexpr;
-  using boost::spirit::prana::parse_sexpr_list;
   using boost::spirit::prana::generate_sexpr;
-  using boost::spirit::prana::generate_sexpr_list;
 
   { //[empty_list
     std::string in = "(() ( ))";
@@ -93,13 +91,13 @@ int main (void) {
   }
   
   { //[parse_list
-    std::string in = "1\n(2 3)\n";
+    std::string in = "(1\n(2 3)\n)";
     utree out;
 
-    parse_sexpr_list(in, out);
+    parse_sexpr(in, out);
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr_list,
+      generate_sexpr,
       ((out) ("(1 (2 3))")))
 
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(

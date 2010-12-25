@@ -65,6 +65,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::int_;
     using qi::attr_cast;
     using qi::lit;
+    using qi::repeat;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -90,7 +91,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
 
     object %= pos(_val, '{') >> (member_pair % ',') > '}';
 
-    member_pair %= pos(_val, '"') > member > '"' > ':' > value;
+    member_pair %= pos(_val, '"') > member > '"' > ':' > repeat(1)[value];
     
     array %= pos(_val, '[') >> (value % ',') > ']';
 

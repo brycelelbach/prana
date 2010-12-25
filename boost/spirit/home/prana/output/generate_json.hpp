@@ -8,12 +8,14 @@
 #if !defined(BOOST_SPIRIT_PRANA_OUTPUT_GENERATE_JSON_HPP)
 #define BOOST_SPIRIT_PRANA_OUTPUT_GENERATE_JSON_HPP
 
+#include <sstream>
+
 #include <boost/spirit/include/karma_generate.hpp>
 #include <boost/spirit/include/karma_char.hpp>
 #include <boost/spirit/include/karma_list.hpp>
 #include <boost/spirit/include/support_ostream_iterator.hpp>
 
-#include <boost/spirit/home/prana/output/grammar/json.hpp>
+#include <boost/spirit/home/prana/output/visit/json.hpp>
 #include <boost/spirit/home/prana/output/generate_json_fwd.hpp>
 
 namespace boost {
@@ -22,71 +24,24 @@ namespace prana {
 
 template<class Char>
 bool generate_json (utree const& in, std::basic_ostream<Char>& out) {
-  typedef spirit::ostream_iterator
-    iterator_type;
+  json_printer<std::basic_ostream<Char> > print(out);
 
-  json_generator<iterator_type> g;
+  utree::visit(in, print);
 
-  return karma::generate(iterator_type(out), g, in);
-}
-
-template<class Char>
-bool generate_json_array (utree const& in, std::basic_ostream<Char>& out) {
-  typedef spirit::ostream_iterator
-    iterator_type;
-
-  json_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.array, in);
-}
-
-template<class Char>
-bool generate_json_object (utree const& in, std::basic_ostream<Char>& out) {
-  typedef spirit::ostream_iterator
-    iterator_type;
-
-  json_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.object, in);
+  return true; 
 }
 
 template<class Char>
 bool generate_json (utree const& in, std::basic_string<Char>& out) {
-  typedef std::basic_string<Char>
-    string_type;
+  std::basic_stringstream<Char> oss;
 
-  typedef std::back_insert_iterator<string_type>
-    iterator_type;
+  json_printer<std::basic_stringstream<Char> > print(oss);
 
-  json_generator<iterator_type> g;
+  utree::visit(in, print);
 
-  return karma::generate(iterator_type(out), g, in);
-}
+  out = oss.str();
 
-template<class Char>
-bool generate_json_array (utree const& in, std::basic_string<Char>& out) {
-  typedef std::basic_string<Char>
-    string_type;
-
-  typedef std::back_insert_iterator<string_type>
-    iterator_type;
-
-  json_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.array, in);
-}
-
-template<class Char>
-bool generate_json_object (utree const& in, std::basic_string<Char>& out) {
-  typedef std::basic_string<Char>
-    string_type;
-
-  typedef std::back_insert_iterator<string_type>
-    iterator_type;
-
-  json_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.object, in);
+  return true; 
 }
 
 } // prana

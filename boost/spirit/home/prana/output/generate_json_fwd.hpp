@@ -21,19 +21,7 @@ template<class Char>
 bool generate_json (utree const& in, std::basic_ostream<Char>& out);
 
 template<class Char>
-bool generate_json_array (utree const& in, std::basic_ostream<Char>& out);
-
-template<class Char>
-bool generate_json_object (utree const& in, std::basic_ostream<Char>& out);
-
-template<class Char>
 bool generate_json (utree const& in, std::basic_string<Char>& out);
-
-template<class Char>
-bool generate_json_array (utree const& in, std::basic_string<Char>& out);
-
-template<class Char>
-bool generate_json_object (utree const& in, std::basic_string<Char>& out);
 
 } // prana
 } // spirit

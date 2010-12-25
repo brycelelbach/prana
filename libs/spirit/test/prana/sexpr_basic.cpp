@@ -13,9 +13,7 @@
 int main (void) {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_sexpr;
-  using boost::spirit::prana::parse_sexpr_list;
   using boost::spirit::prana::generate_sexpr;
-  using boost::spirit::prana::generate_sexpr_list;
 
   { //[nil
     std::string in = "nil";

@@ -13,9 +13,7 @@
 int main (void) {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_json;
-  using boost::spirit::prana::parse_json_array;
   using boost::spirit::prana::generate_json;
-  using boost::spirit::prana::generate_json_array;
 
   { //[empty_array
     std::string in = "[[], [ ]]";
@@ -93,13 +91,13 @@ int main (void) {
   }
 
   { //[parse_array
-    std::string in = "[true, false],\ntrue\n";
+    std::string in = "[[true, false],\ntrue\n]";
     utree out;
 
-    parse_json_array(in, out);
+    parse_json(in, out);
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_json_array,
+      generate_json,
       ((out) ("[[true, false], true]")))
 
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(

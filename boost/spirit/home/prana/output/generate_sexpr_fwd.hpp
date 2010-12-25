@@ -22,13 +22,7 @@ template<class Char>
 bool generate_sexpr (utree const& in, std::basic_ostream<Char>& out);
 
 template<class Char>
-bool generate_sexpr_list (utree const& in, std::basic_ostream<Char>& out);
-
-template<class Char>
 bool generate_sexpr (utree const& in, std::basic_string<Char>& out);
-
-template<class Char>
-bool generate_sexpr_list (utree const& in, std::basic_string<Char>& out);
 
 } // prana
 } // spirit

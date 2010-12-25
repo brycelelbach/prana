@@ -35,7 +35,6 @@ struct push_line_pos_functor {
   }
 };
 
-
 template<class Iterator>
 struct save_line_pos: qi::grammar<Iterator, void(utree&, char)> {
   qi::rule<Iterator, void(utree&, char)>

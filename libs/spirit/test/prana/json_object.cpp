@@ -13,9 +13,7 @@
 int main (void) {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_json;
-  using boost::spirit::prana::parse_json_object;
   using boost::spirit::prana::generate_json;
-  using boost::spirit::prana::generate_json_object;
 
   { //[empty_object
     std::string in = "[{\n}, {}]";
@@ -55,7 +53,7 @@ int main (void) {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
-      ((out) ("{\"/\":273, \"+\":36, \"-\": -17, \"*\":45}")))
+      ((out) ("{\"/\":273, \"+\":36, \"-\":-17, \"*\":45}")))
 
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
       ((out.tag()) (1)))
@@ -63,13 +61,11 @@ int main (void) {
   }
   
   { //[multi_type_object
-    std::string in = "{\"a\":18, \"b\":true, \"c\":null,"
+    std::string in = "{\"a\":18, \"b\":true, \"c\":null, "
                       "\"d\":0.57, \"e\":\"zoo\", \"f\":[2, 4]}";
     utree out;
 
     parse_json(in, out);
-
-    std::cout << out << "\n";
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
@@ -81,9 +77,9 @@ int main (void) {
   }
   
   { //[nested_object
-    std::string in = "{\"a\":{\"a\":{\"a\":{\"a\":true}}},"
-                      "\"b\":null,"
-                      "\"c\":{\"a\":\"waze\",\"b\":451}}";
+    std::string in = "{\"a\":{\"a\":{\"a\":{\"a\":true}}}, "
+                      "\"b\":null, "
+                      "\"c\":{\"a\":\"waze\", \"b\":451}}";
 
     utree out;
 
@@ -99,13 +95,13 @@ int main (void) {
   }
   
   { //[parse_object
-    std::string in = "\"car\":1,\n\"cdr\":{\"two\":2, \"three\":3}\n";
+    std::string in = "{\"car\":1,\n\"cdr\":{\"two\":2, \"three\":3}\n}";
     utree out;
 
-    parse_json_object(in, out);
-
+    parse_json(in, out);
+    
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_json_object,
+      generate_json,
       ((out) ("{\"car\":1, \"cdr\":{\"two\":2, \"three\":3}}")))
 
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(

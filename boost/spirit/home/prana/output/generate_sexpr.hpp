@@ -32,16 +32,6 @@ bool generate_sexpr (utree const& in, std::basic_ostream<Char>& out) {
 }
 
 template<class Char>
-bool generate_sexpr_list (utree const& in, std::basic_ostream<Char>& out) {
-  typedef spirit::ostream_iterator
-    iterator_type;
-
-  sexpr_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.list, in);
-}
-
-template<class Char>
 bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
   typedef std::basic_string<Char>
     string_type;
@@ -52,19 +42,6 @@ bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
   sexpr_generator<iterator_type> g;
 
   return karma::generate(iterator_type(out), g, in);
-}
-
-template<class Char>
-bool generate_sexpr_list (utree const& in, std::basic_string<Char>& out) {
-  typedef std::basic_string<Char>
-    string_type;
-
-  typedef std::back_insert_iterator<string_type>
-    iterator_type;
-
-  sexpr_generator<iterator_type> g;
-
-  return karma::generate(iterator_type(out), g.list, in);
 }
 
 } // prana
