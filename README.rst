@@ -6,7 +6,7 @@ parser/generator framework <http://www.boost-spirit.com/home>`_.
 License
 =======
 
-Prana uses the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
+Prana uses the `Boost Software License <http://www.boost.org/BOOST_LICENSE_1_0.rst>`_.
 A copy should be available in the credit directory of this repository.
  
 Contact
