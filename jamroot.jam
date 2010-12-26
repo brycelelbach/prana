@@ -8,7 +8,12 @@
 ################################################################################
 
 import os ;
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-use-project /boost : $(BOOST_ROOT) ;
+import testing ;
 
-build-project libs/spirit/test ;
+local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
+
+variant valgrind : <testing.launcher>valgrind ;
+
+use-project /boost : $(BOOST_ROOT) ;
+use-project /prana : libs/spirit/test ;
+

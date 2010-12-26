@@ -15,11 +15,15 @@ int main (void) {
   using boost::spirit::prana::parse_sexpr;
   using boost::spirit::prana::generate_sexpr;
 
+  std::cout << "empty list test: " << std::endl; 
+
   { //[empty_list
     std::string in = "(() ( ))";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -29,12 +33,16 @@ int main (void) {
       ((out.tag()) (1)))
     //]  
   }
-  
-  { //[simple_list
+
+  std::cout << std::endl << "basic list test: " << std::endl; 
+
+  { //[basic_list
     std::string in = "(1 2 3)";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -45,11 +53,15 @@ int main (void) {
     //]  
   }
   
+  std::cout << std::endl << "list skipping test: " << std::endl; 
+
   { //[list_skipping
     std::string in = "(1  2   3    4)";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -60,12 +72,16 @@ int main (void) {
     //]  
   }
 
+  std::cout << std::endl << "multi type list test: " << std::endl; 
+
   { //[multi_type_list
     std::string in = "(nil #f 35 0.57 \"bizz\" #\xDE\xED# sizzle)";
     utree out;
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
@@ -75,12 +91,16 @@ int main (void) {
     //]  
   }
   
+  std::cout << std::endl << "nested list test: " << std::endl; 
+
   { //[nested_list
     std::string in = "(((1)) (-5003 #t) \"foobar\")";
     utree out;
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
@@ -90,11 +110,15 @@ int main (void) {
     //]  
   }
   
-  { //[parse_list
+  std::cout << std::endl << "line position test: " << std::endl; 
+
+  { //[line_position
     std::string in = "(1\n(2 3)\n)";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,

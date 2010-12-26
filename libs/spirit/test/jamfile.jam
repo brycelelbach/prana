@@ -7,12 +7,11 @@
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project spirit_prana_test
+project 
   : requirements
     <toolset>clang:<cxxflags>-Wno-unused
     <toolset>clang:<cxxflags>-Wno-tautological-compare
     <include>../../../
-    <testing.launcher>valgrind
   : build-dir
     ../../../bin
   ;
@@ -20,7 +19,7 @@ project spirit_prana_test
 import testing ;
 
 {
-  test-suite prana_test_suite :
+  test-suite schematic :
       [ run prana/schematic_become.cpp        : : : : ]
       [ run prana/schematic_capacity.cpp      : : : : ]
       [ run prana/schematic_car.cpp           : : : : ]
@@ -29,12 +28,24 @@ import testing ;
       [ run prana/schematic_set.cpp           : : : : ]
       [ run prana/schematic_size.cpp          : : : : ]
       [ run prana/schematic_sizeof.cpp        : : : : ]
+    ;
+
+  test-suite adt :
       [ run prana/adt_symbol_table.cpp        : : : : ]
+    ;
+  
+  test-suite sexpr :
       [ run prana/sexpr_basic.cpp             : : : : ]
       [ run prana/sexpr_list.cpp              : : : : ]
+    ;
+
+  test-suite json :
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
+    ;
+  
+  test-suite xml :
       [ run prana/xml_basic.cpp               : : : : ]
     ;
 }

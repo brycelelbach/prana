@@ -15,59 +15,15 @@ int main (void) {
   using boost::spirit::prana::parse_xml;
   using boost::spirit::prana::generate_sexpr;
 
-  { //[boolean
-    std::string in = "<foo>true</foo>";
-    utree out;
+  std::cout << "empty test: " << std::endl;
 
-    parse_xml(in, out);
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(foo (#t))")))
-    //]  
-  }
-
-  { //[integer
-    std::string in = "<bar>5</bar>";
-    utree out;
-
-    parse_xml(in, out);
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(bar (5))")))
-    //]  
-  }
-  
-  { //[floating
-    std::string in = "<dab>2145.71</dab>";
-    utree out;
-
-    parse_xml(in, out);
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(dab (2145.71))")))
-    //]  
-  }
-
-  { //[string
-    std::string in = "<bizz>abcd</bizz>";
-    utree out;
-
-    parse_xml(in, out);
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(bizz (\"abcd\"))")))
-    //]  
-  }
-
-  { //[symbol
+  { //[empty
     std::string in = "<flop></flop>";
     utree out;
 
     parse_xml(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -75,6 +31,70 @@ int main (void) {
     //]  
   }
   
+  std::cout << "boolean test: " << std::endl;
+
+  { //[boolean
+    std::string in = "<foo>true</foo>";
+    utree out;
+
+    parse_xml(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) ("(foo (#t))")))
+    //]  
+  }
+
+  std::cout << "integer test: " << std::endl;
+
+  { //[integer
+    std::string in = "<bar>5</bar>";
+    utree out;
+
+    parse_xml(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) ("(bar (5))")))
+    //]  
+  }
+  
+  std::cout << "floating test: " << std::endl;
+
+  { //[floating
+    std::string in = "<dab>2145.71</dab>";
+    utree out;
+
+    parse_xml(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) ("(dab (2145.71))")))
+    //]  
+  }
+
+  std::cout << "string test: " << std::endl;
+
+  { //[string
+    std::string in = "<bizz>abcd</bizz>";
+    utree out;
+
+    parse_xml(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) ("(bizz (\"abcd\"))")))
+    //]  
+  }
+
   return boost::report_errors();
 }
  

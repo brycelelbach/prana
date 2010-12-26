@@ -15,17 +15,23 @@ int main (void) {
   using boost::spirit::prana::parse_sexpr;
   using boost::spirit::prana::generate_sexpr;
 
+  std::cout << "nil test: " << std::endl; 
+
   { //[nil
     std::string in = "nil";
     utree out;
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
   }
+
+  std::cout << std::endl << "boolean test: " << std::endl; 
 
   { //[boolean
     std::string in = "#t";
@@ -33,11 +39,15 @@ int main (void) {
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
   }
+
+  std::cout << std::endl << "integer dec test: " << std::endl; 
 
   { //[integer_dec
     std::string in = "10";
@@ -45,17 +55,23 @@ int main (void) {
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
   }
   
+  std::cout << std::endl << "integer hex test: " << std::endl; 
+
   { //[integer_hex
     std::string in = "#x10";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -63,11 +79,15 @@ int main (void) {
     //]  
   }
   
+  std::cout << std::endl << "integer oct test: " << std::endl; 
+
   { //[integer_oct
     std::string in = "#o10";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -75,6 +95,8 @@ int main (void) {
     //]  
   }
   
+  std::cout << std::endl << "floating test: " << std::endl; 
+
   { //[floating
     std::string in = "17.5";
     utree out;
@@ -87,17 +109,23 @@ int main (void) {
     //]  
   }
 
+  std::cout << std::endl << "string test: " << std::endl; 
+
   { //[string
     std::string in = "\"foo\"";
     utree out;
 
     parse_sexpr(in, out);
 
+    std::cout << out << std::endl;
+
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
   }
+
+  std::cout << std::endl << "string double-quote character test: " << std::endl; 
 
   { //[string_double_quote_character
     std::string in = "(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")";
@@ -111,11 +139,15 @@ int main (void) {
     //]  
   }
 
+  std::cout << std::endl << "binary test: " << std::endl; 
+
   { //[binary
     std::string in = "#\xDE\xAD\xBE\xEF#";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -123,6 +155,8 @@ int main (void) {
     //]  
   }
   
+  std::cout << std::endl << "binary hash character test: " << std::endl; 
+
   { //[binary_hash_character
     std::string in = "(### #\xBE## ##\xEF# #\xBE#\xEF#)";
     utree out;
@@ -135,11 +169,15 @@ int main (void) {
     //]  
   }
 
+  std::cout << std::endl << "symbol test: " << std::endl; 
+
   { //[symbol
     std::string in = "bar";
     utree out;
 
     parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
