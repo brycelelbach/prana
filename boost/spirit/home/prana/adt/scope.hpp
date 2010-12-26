@@ -4,7 +4,7 @@
     Copyright (c) 2010      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
-    file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/BOOST_LICENSE_1_0.rst)
+    file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
 #if !defined(BOOST_SPIRIT_PRANA_ADT_SCOPE_HPP)
@@ -38,8 +38,7 @@ class scope: public iterator_range<Iterator*> {
 //]
 
 template<class Iterator>
-scope<Iterator>::scope (Iterator* first, Iterator* last,
-                             scope const* parent_):
+scope<Iterator>::scope (Iterator* first, Iterator* last, scope const* parent_):
   iterator_range<Iterator*>(first, last), parent(parent_),
   depth(parent_ ? parent_->depth + 1 : 0) { }
 
