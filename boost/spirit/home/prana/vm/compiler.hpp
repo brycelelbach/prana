@@ -27,18 +27,16 @@ compiler::compiler (compiler_environment& env, actor_list& fragments,
                       line(line),
                       source(source) { }
 
-function compiler::operator() (spirit::nil) const {
+function compiler::operator() (utree::nil_type) const {
   return prana::val(utree());
 }
 
 function compiler::operator() (utf8_symbol_range_type const& str) const {
   using fusion::at_c;
 
-  // TODO: Macro evaluation.
-  
   std::string name(str.begin(), str.end());
 
-  // Find the symbol in the environment.
+  // Find the variable in the environment.
   function_definition r = env.functions(name); 
 
   if (at_c<0>(r)) {
@@ -54,13 +52,94 @@ function compiler::operator() (utree::const_range const& range) const {
   using fusion::at_c;
 
   typedef utree::const_range::iterator iterator;
-  
-  // TODO: Macro evaluation.
+
+  // (<keyword> <datum> ...) 
+  utree p(utree::const_range(range.begin(), range.end()), shallow);
+  if (env.macros.defined(p)) 
+    return utree::visit(env.macros.invoke(p), *this);
 
   std::string name(get_symbol(*range.begin()));
 
   if (range.begin()->which() != utree_type::symbol_type)
     throw expected_function_application(*range.begin());
+
+  if (name == "define") {
+    std::string fname;
+    std::vector<std::string> args;
+    bool fixed_arity = true;
+    iterator i = range.begin(); ++i;
+
+    if (i->which() == utree_type::list_type) {
+      // (define (f x) ...body...)
+      utree const& decl = *i++;
+      iterator di = decl.begin();
+      fname = get_symbol(*di++);
+
+      while (di != decl.end()) {
+        std::string sym = get_symbol(*di++);
+
+        if (sym == "...")
+          // check that . is one pos behind the last arg
+          fixed_arity = false;
+        else
+          args.push_back(sym);
+      }
+    }
+
+    else {
+      // (define f ...body...)
+      fname = get_symbol(*i++);
+
+      // (define f (lambda (x) ...body...))
+      if (i != range.end()
+          && i->which() == utree_type::list_type
+          && get_symbol((*i)[0]) == "lambda") {
+        utree const& arg_names = (*i)[1];
+        iterator ai = arg_names.begin();
+
+        while (ai != arg_names.end()) {
+          std::string sym = get_symbol(*ai++);
+
+          if (sym == "...")
+            // check that . is one pos behind the last arg
+            fixed_arity = false;
+          else
+            args.push_back(sym);
+        };
+
+        iterator bi = i->begin(); ++i; ++i; // (*i)[2]
+
+        utree body(utree::const_range(bi, i->end()), shallow);
+
+        return define_function(fname, args, fixed_arity, body);
+      }
+    }
+
+    utree body(utree::const_range(i, range.end()), shallow);
+    return define_function(fname, args, fixed_arity, body);
+  }
+
+  if (name == "lambda") {
+    // (lambda (x) ...body...)
+    iterator i = range.begin(); ++i;
+    utree const& arg_names = *i++;
+    iterator ai = arg_names.begin();
+    std::vector<std::string> args;
+    bool fixed_arity = true;
+
+    while (ai != arg_names.end()) {
+      std::string sym = get_symbol(*ai++);
+
+      if (sym == "...")
+        // check that . is one pos behind the last arg
+        fixed_arity = false;
+      else
+        args.push_back(sym);
+    }
+
+    utree body(utree::const_range(i, range.end()), shallow);
+    return make_lambda(args, fixed_arity, body);
+  }
 
   function_definition r = env.functions(name);
 
@@ -104,7 +183,7 @@ function compiler::operator() (Value const& val_) const {
 
 function compiler::define_function (std::string const& name,
                                     std::vector<std::string>& args,
-                                    bool fixed_arity, utree const& body)
+                                    bool fixed_arity, utree const& body) const
 {
   try {
     function* fp = 0;
@@ -144,7 +223,7 @@ function compiler::define_function (std::string const& name,
 }
 
 function compiler::make_lambda (std::vector<std::string> const& args,
-                                bool fixed_arity, utree const& body)
+                                bool fixed_arity, utree const& body) const
 {
   compiler_environment local_env(this->env);
 
@@ -186,6 +265,14 @@ inline bool is_function_definition (utree const& item) {
     return false;
 
   return get_symbol(*item.begin()) == "define";
+}
+
+inline bool is_syntax_definition (utree const& item) {
+  if (  item.which() != utree_type::list_type
+     || item.begin()->which() != utree_type::symbol_type)
+    return false;
+
+  return get_symbol(*item.begin()) == "define-syntax";
 }
 
 inline void compile (utree const& ast, compiler_environment& env,

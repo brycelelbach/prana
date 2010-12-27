@@ -44,7 +44,7 @@ struct compiler {
   compiler (compiler_environment& env, actor_list& fragments,
             std::size_t line = 1, std::string const& source = "<string>");
 
-  result_type operator() (spirit::nil) const;
+  result_type operator() (utree::nil_type) const;
   result_type operator() (utf8_symbol_range_type const&) const;
   result_type operator() (utree::const_range const&) const;
   result_type operator() (function_base const&) const;
@@ -53,13 +53,15 @@ struct compiler {
 
   result_type define_function (std::string const& name,
                                std::vector<std::string>& args,
-                               bool fixed_arity, utree const& body);
+                               bool fixed_arity, utree const& body) const;
 
   function make_lambda (std::vector<std::string> const& args, bool fixed_arity,
-                        utree const& body);
+                        utree const& body) const;
 };
 
 inline bool is_function_definition (utree const& name);
+
+inline bool is_syntax_definition (utree const& name);
 
 inline void compile (utree const& ast, compiler_environment& env,
                      function& r, actor_list& fragments,

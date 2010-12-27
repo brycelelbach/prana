@@ -11,16 +11,18 @@
 #define BOOST_SPIRIT_PRANA_VM_ENVIRONMENT_BASIC_HPP
 
 #include <string>
-#include <map>
+
+#include <boost/unordered_map.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 template<class Derived, class Value, class Result = Value,
-         class Key = std::string, class Compare = std::less<Key> >
+         class Key = std::string, class Hash = boost::hash<Key>,
+         class Pred = std::equal_to<Key> >
 struct basic_environment {
-  typedef basic_environment<Derived, Value, Result, Key> base_type;
+  typedef basic_environment<Derived, Value, Result, Key, Hash, Pred> base_type;
   
   typedef Value value_type;
   
@@ -28,10 +30,14 @@ struct basic_environment {
 
   typedef Key key_type;
 
-  typedef typename std::map<key_type, value_type, Compare>::iterator iterator;
+  typedef boost::unordered_map<key_type, value_type, Hash, Pred> map_type;
 
-  basic_environment (Derived* parent = 0, Compare const& comp = Compare()):
-    outer(parent), depth(parent ? parent->depth + 1 : 0), definitions(comp) { }
+  typedef typename map_type::iterator iterator;
+
+  basic_environment (Derived* parent = 0, Hash const& hash = Hash(),
+                     Pred const& pred = Pred()):
+    outer(parent), depth(parent ? parent->depth + 1 : 0),
+    definitions(boost::unordered_detail::default_bucket_count, hash, pred) { }
   
   Derived const& derived (void) const {
     return *static_cast<Derived const*>(this);
@@ -59,7 +65,7 @@ struct basic_environment {
 
   Derived* outer;
   unsigned depth;
-  std::map<key_type, value_type, Compare> definitions;
+  map_type definitions;
 };
 
 } // prana

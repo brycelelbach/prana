@@ -101,11 +101,11 @@ struct json_printer {
     (*this)(']');
   }
 
-  void operator() (uninitialized_type) const {
+  void operator() (utree::uninitialized_type) const {
     out << "\"uninitialized\"";
   }
 
-  void operator() (nil_type) const {
+  void operator() (utree::nil_type) const {
     out << "null";
   }
 

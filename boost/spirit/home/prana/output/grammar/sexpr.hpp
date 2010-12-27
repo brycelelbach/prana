@@ -33,7 +33,7 @@ struct sexpr_generator:
   karma::rule<Iterator, utf8_symbol_range_type(void)>
     symbol;
 
-  karma::rule<Iterator, nil_type(void)>
+  karma::rule<Iterator, utree::nil_type(void)>
     nil_;
 
   karma::rule<Iterator, utf8_string_range_type(void)>

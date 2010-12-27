@@ -54,7 +54,7 @@ struct sexpr_parser:
   qi::rule<Iterator, utf8_symbol_type(void)>
     symbol;
  
-  qi::rule<Iterator, nil_type(void)>
+  qi::rule<Iterator, utree::nil_type(void)>
     nil_;
 
   qi::rule<Iterator, binary_string_type(void)>

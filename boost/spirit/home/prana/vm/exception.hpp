@@ -92,6 +92,28 @@ struct expected_pattern: vm_exception {
   }
 };
 
+struct expected_match: vm_exception {
+  std::string msg;
+  
+  expected_match (utree const& x) {
+    std::ostringstream oss;
+    oss << "'(expected-match " << x << ")"; 
+    msg = oss.str();
+  }
+
+  expected_match (utree const& x, utree const& y) {
+    std::ostringstream oss;
+    oss << "'(expected-match " << x << " " << y << ")"; 
+    msg = oss.str();
+  }
+
+  ~expected_match (void) throw() { }
+
+  virtual char const* what (void) const throw() {
+    return msg.c_str();
+  }
+};
+
 struct macro_literals_not_found: vm_exception {
   std::string msg;
 

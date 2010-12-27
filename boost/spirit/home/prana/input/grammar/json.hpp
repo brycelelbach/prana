@@ -35,7 +35,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   qi::rule<Iterator, utf8_symbol_type(void), standard::space_type>
     empty_object, empty_array;
 
-  qi::rule<Iterator, nil_type(void)>
+  qi::rule<Iterator, utree::nil_type(void)>
     null;
 
   string_parser<Iterator>
