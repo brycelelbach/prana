@@ -22,7 +22,7 @@ namespace prana {
 
 struct vm_exception: std::exception { };
 
-struct compilation_error: std::exception {
+struct compilation_error: vm_exception {
   ~compilation_error (void) throw() { }
 
   virtual char const* what (void) const throw() {
@@ -64,64 +64,6 @@ struct unexpected_identifier: vm_exception {
   }
 
   ~unexpected_identifier (void) throw() { }
-
-  virtual char const* what (void) const throw() {
-    return msg.c_str();
-  }
-};
-
-struct expected_pattern: vm_exception {
-  std::string msg;
-  
-  expected_pattern (utree const& x) {
-    std::ostringstream oss;
-    oss << "'(expected-pattern " << x << ")"; 
-    msg = oss.str();
-  }
-
-  expected_pattern (utree const& x, utree const& y) {
-    std::ostringstream oss;
-    oss << "'(expected-pattern " << x << " " << y << ")"; 
-    msg = oss.str();
-  }
-
-  ~expected_pattern (void) throw() { }
-
-  virtual char const* what (void) const throw() {
-    return msg.c_str();
-  }
-};
-
-struct expected_match: vm_exception {
-  std::string msg;
-  
-  expected_match (utree const& x) {
-    std::ostringstream oss;
-    oss << "'(expected-match " << x << ")"; 
-    msg = oss.str();
-  }
-
-  expected_match (utree const& x, utree const& y) {
-    std::ostringstream oss;
-    oss << "'(expected-match " << x << " " << y << ")"; 
-    msg = oss.str();
-  }
-
-  ~expected_match (void) throw() { }
-
-  virtual char const* what (void) const throw() {
-    return msg.c_str();
-  }
-};
-
-struct macro_literals_not_found: vm_exception {
-  std::string msg;
-
-  macro_literals_not_found (std::string const& id) {
-    msg = "'(macro-literals-not-found " + id + ")"; 
-  }
-
-  ~macro_literals_not_found (void) throw() { }
 
   virtual char const* what (void) const throw() {
     return msg.c_str();

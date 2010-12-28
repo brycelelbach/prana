@@ -22,7 +22,7 @@ namespace prana {
 
 struct forward_environment: basic_environment<forward_environment, function*> {
   forward_environment (forward_environment* parent = 0):
-    basic_environment(parent) { }
+    forward_environment::base_type(parent) { }
 
   void define (key_type const& name, value_type const& val_) {
     if (definitions.find(name) != definitions.end())

@@ -10,6 +10,7 @@
 #define BOOST_SPIRIT_PRANA_INPUT_PARSE_SEXPR_HPP
 
 #include <iostream>
+#include <ifstream>
 #include <string>
 
 #include <boost/spirit/include/support_istream_iterator.hpp>

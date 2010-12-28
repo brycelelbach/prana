@@ -54,14 +54,17 @@ function compiler::operator() (utree::const_range const& range) const {
   typedef utree::const_range::iterator iterator;
 
   // (<keyword> <datum> ...) 
-  utree p(utree::const_range(range.begin(), range.end()), shallow);
-  if (env.macros.defined(p)) 
-    return utree::visit(env.macros.invoke(p), *this);
+  // TODO: macros
 
   std::string name(get_symbol(*range.begin()));
 
   if (range.begin()->which() != utree_type::symbol_type)
     throw expected_function_application(*range.begin());
+  
+  if (name == "quote") {
+    iterator i = range.begin(); ++i;
+    return prana::val(*i);
+  }
 
   if (name == "define") {
     std::string fname;

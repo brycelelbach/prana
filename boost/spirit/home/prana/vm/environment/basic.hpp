@@ -33,11 +33,16 @@ struct basic_environment {
   typedef boost::unordered_map<key_type, value_type, Hash, Pred> map_type;
 
   typedef typename map_type::iterator iterator;
+  typedef typename map_type::const_iterator const_iterator;
 
   basic_environment (Derived* parent = 0, Hash const& hash = Hash(),
                      Pred const& pred = Pred()):
     outer(parent), depth(parent ? parent->depth + 1 : 0),
     definitions(boost::unordered_detail::default_bucket_count, hash, pred) { }
+  
+  Derived& derived (void) {
+    return *static_cast<Derived*>(this);
+  }
   
   Derived const& derived (void) const {
     return *static_cast<Derived const*>(this);
@@ -51,7 +56,7 @@ struct basic_environment {
     definitions.erase(name);
   }
 
-  bool defined (key_type const& name) const {
+  bool defined (key_type const& name) {
     return (*this)(name) != derived().sentinel();
   }
 

@@ -25,12 +25,12 @@ struct compiler_environment {
 
   compiler_environment (compiler_environment& parent):
     functions(&parent.functions),
-    forwards(&parent.forwards),
-    macros(&parent.macros) { }
+    forwards(&parent.forwards)
+  /*macros(&parent.macros)*/ { }
 
   function_environment functions;
   forward_environment forwards;
-  macro_environment macros; 
+  //macro_environment macros; 
 };
 
 struct compiler {
