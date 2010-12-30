@@ -10,8 +10,9 @@
 #include <boost/spirit/home/prana/schematic/core.hpp>
 #include <boost/spirit/home/prana/schematic/routine/capacity.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::capacity;
 
   { //[capacity_2_ascii
     schematic s("f");
@@ -44,6 +45,11 @@ int main (void) {
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
       ((capacity(s)) (16)))
     //]
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
 
   return boost::report_errors();

@@ -24,7 +24,10 @@ namespace prana {
 template<class Iterator, class ErrorHandler = error_handler<Iterator> >
 struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   qi::rule<Iterator, utree(void), standard::space_type>
-    start, value, object, member_pair, array;
+    start, value, member_pair;
+  
+  qi::rule<Iterator, utree::list_type(void), standard::space_type>
+    object, array;
 
   qi::symbols<char, bool>
     boolean;
@@ -50,22 +53,15 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
   json_parser (std::string const& source_file = "<string>"):
     json_parser::base_type(start), error(ErrorHandler(source_file))
   {
-    using standard::space;
     using standard::char_;
-    using qi::string;
     using qi::lexeme;
-    using qi::omit;
-    using qi::raw;
-    using qi::eps;
     using qi::real_parser;
     using qi::strict_real_policies;
-    using qi::int_parser;
     using qi::on_error;
     using qi::fail;
     using qi::int_;
     using qi::attr_cast;
     using qi::lit;
-    using qi::repeat;
     using qi::_val;
     using qi::_1;
     using qi::_2;
@@ -73,7 +69,6 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using qi::_4;
 
     real_parser<double, strict_real_policies<double> > strict_double;
-    int_parser<boost::intmax_t> integer;
 
     start = value.alias();
 
@@ -91,7 +86,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
 
     object %= pos(_val, '{') >> (member_pair % ',') > '}';
 
-    member_pair %= pos(_val, '"') > member > '"' > ':' > repeat(1)[value];
+    member_pair %= pos(_val, '"') > member > '"' > ':' > value;
     
     array %= pos(_val, '[') >> (value % ',') > ']';
 

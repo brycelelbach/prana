@@ -11,8 +11,10 @@
 #include <boost/spirit/home/prana/schematic/routine/clear.hpp>
 #include <boost/spirit/home/prana/schematic/routine/set.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::set;
+  using boost::spirit::prana::clear;
 
   { //[boolean
     schematic s;
@@ -54,6 +56,11 @@ int main (void) {
     BOOST_SPIRIT_PRANA_SEXPR_TESTS(
       ((s) ("nil")))
     //]
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
 
   return boost::report_errors();

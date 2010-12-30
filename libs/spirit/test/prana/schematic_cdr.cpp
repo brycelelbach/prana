@@ -10,8 +10,9 @@
 #include <boost/spirit/home/prana/schematic/core.hpp>
 #include <boost/spirit/home/prana/schematic/routine/cdr.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::cdr;
 
   { //[floating_boolean_pair
     schematic s(19.95, true);
@@ -29,6 +30,11 @@ int main (void) {
       ((s)       ("(\"bar\" \"bizz\")"))
       ((*cdr(s)) ("\"bizz\"")))
     //]
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
   
   return boost::report_errors();

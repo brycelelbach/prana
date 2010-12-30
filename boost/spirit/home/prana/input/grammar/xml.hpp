@@ -40,14 +40,17 @@ struct xml_parser:
   qi::rule<Iterator, utree(void), xml_white_space<Iterator> >
     start, element, atom;
 
+  qi::rule<Iterator, utree::list_type(void), xml_white_space<Iterator> >
+    children;
+
   qi::symbols<char, bool>
     boolean;
 
   qi::rule<Iterator, utf8_symbol_type(void)>
-    tag;
+    name;
 
   qi::rule<Iterator, utf8_string_type(void)>
-    text;
+    char_data;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -80,29 +83,35 @@ struct xml_parser:
   
     start = element.alias();
 
-    element = pos(_val, '<') >> tag     >> '>'
-            > repeat(1)[*atom]
-            >           "</" > omit[tag] > '>';
+    element = pos(_val, '<') >> name     >> '>'
+            > children
+            >           "</" > omit[name] > '>';
 
     atom = strict_double
          | int_
          | boolean
-         | text
+         | char_data
          | start;
+
+    children = *atom;
 
     boolean.add
       ("true", true)
       ("false", false);
 
-    std::string exclude = std::string(" /<>&;\"\x01-\x1f\x7f") + '\0';
-    tag  = lexeme[+(~char_(exclude))];
-    text = lexeme[+(~char_(exclude))];
+    std::string name_start_char = ":A-Z_a-z";
+    std::string name_char = ":A-Z_a-z-.0-9";
+
+    name = char_(name_start_char) >> *char_(name_char);
+    
+    char_data = +(~char_("<&") - "</");
 
     start.name("xml");
     element.name("element");
     atom.name("atom");
-    tag.name("tag");
-    text.name("text");
+    children.name("children");
+    name.name("name");
+    char_data.name("char_data");
  
     on_error<fail>(start, error(_1, _2, _3, _4));
   }

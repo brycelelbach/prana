@@ -8,6 +8,7 @@
 #if !defined(BOOST_SPIRIT_PRANA_HARNESS_HPP)
 #define BOOST_SPIRIT_PRANA_HARNESS_HPP
 
+#include <exception>
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>

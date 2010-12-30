@@ -10,8 +10,9 @@
 #include <boost/spirit/home/prana/schematic/core.hpp>
 #include <boost/spirit/home/prana/schematic/routine/size.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::size;
 
   { /*[size_0_ascii*/
     schematic s0("");
@@ -42,6 +43,11 @@ int main (void) {
   BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
     ((size(s2)) (8)))
   /*]*/ }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
+  }
 
   return boost::report_errors();
 }

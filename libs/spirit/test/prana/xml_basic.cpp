@@ -10,7 +10,7 @@
 #include <boost/spirit/home/prana/input/parse_xml.hpp>
 #include <boost/spirit/home/prana/output/generate_sexpr.hpp>
 
-int main (void) {
+int main (void) { try {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_xml;
   using boost::spirit::prana::generate_sexpr;
@@ -27,7 +27,7 @@ int main (void) {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
-      ((out) ("(flop)")))
+      ((out) ("(flop ())")))
     //]  
   }
   
@@ -93,6 +93,11 @@ int main (void) {
       generate_sexpr,
       ((out) ("(bizz (\"abcd\"))")))
     //]  
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
 
   return boost::report_errors();

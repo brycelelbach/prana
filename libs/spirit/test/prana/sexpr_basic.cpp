@@ -10,7 +10,7 @@
 #include <boost/spirit/home/prana/input/parse_sexpr.hpp>
 #include <boost/spirit/home/prana/output/generate_sexpr.hpp>
 
-int main (void) {
+int main (void) { try {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_sexpr;
   using boost::spirit::prana::generate_sexpr;
@@ -124,6 +124,22 @@ int main (void) {
       ((out) (in)))
     //]  
   }
+  
+  std::cout << std::endl << "empty string test: " << std::endl; 
+
+  { //[empty_string
+    std::string in = "\"\"";
+    utree out;
+
+    parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) (in)))
+    //]  
+  }
 
   std::cout << std::endl << "string double-quote character test: " << std::endl; 
 
@@ -132,6 +148,8 @@ int main (void) {
     utree out;
 
     parse_sexpr(in, out);
+    
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -154,6 +172,22 @@ int main (void) {
       ((out) (in)))
     //]  
   }
+
+  std::cout << std::endl << "empty binary test: " << std::endl; 
+
+  { //[empty_binary
+    std::string in = "##";
+    utree out;
+
+    parse_sexpr(in, out);
+
+    std::cout << out << std::endl;
+
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_sexpr,
+      ((out) (in)))
+    //]  
+  }
   
   std::cout << std::endl << "binary hash character test: " << std::endl; 
 
@@ -162,6 +196,8 @@ int main (void) {
     utree out;
 
     parse_sexpr(in, out);
+    
+    std::cout << out << std::endl;
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
@@ -183,6 +219,11 @@ int main (void) {
       generate_sexpr,
       ((out) (in)))
     //]  
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
   
   return boost::report_errors();

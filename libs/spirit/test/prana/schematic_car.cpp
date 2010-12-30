@@ -10,8 +10,9 @@
 #include <boost/spirit/home/prana/schematic/core.hpp>
 #include <boost/spirit/home/prana/schematic/routine/car.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::car;
 
   { //[integer_integer_pair
     schematic s(3, 5);
@@ -31,6 +32,11 @@ int main (void) {
     //]
   }
   
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
+  }
+
   return boost::report_errors();
 }
  

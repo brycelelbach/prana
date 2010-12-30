@@ -10,14 +10,14 @@
 #include <boost/spirit/home/prana/input/parse_json.hpp>
 #include <boost/spirit/home/prana/output/generate_json.hpp>
 
-int main (void) {
+int main (void) { try {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_json;
   using boost::spirit::prana::generate_json;
 
   std::cout << "null test: " << std::endl; 
 
-  { //[null
+  { 
     std::string in = "null";
     utree out;
 
@@ -33,7 +33,7 @@ int main (void) {
 
   std::cout << std::endl << "boolean test: " << std::endl; 
 
-  { //[boolean
+  { 
     std::string in = "true";
     utree out;
 
@@ -44,12 +44,11 @@ int main (void) {
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
       ((out) (in)))
-    //]  
   }
 
   std::cout << std::endl << "integer test: " << std::endl; 
 
-  { //[integer
+  { 
     std::string in = "-19";
     utree out;
 
@@ -60,12 +59,11 @@ int main (void) {
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
       ((out) (in)))
-    //]  
   }
   
   std::cout << std::endl << "floating test: " << std::endl; 
 
-  { //[floating
+  {
     std::string in = "4532.5";
     utree out;
 
@@ -76,12 +74,11 @@ int main (void) {
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
       ((out) (in)))
-    //]  
   }
 
   std::cout << std::endl << "string test: " << std::endl; 
 
-  { //[string
+  { 
     std::string in = "\"abc\"";
     utree out;
 
@@ -92,8 +89,12 @@ int main (void) {
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
       ((out) (in)))
-    //]  
- }
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
+  }
 
   return boost::report_errors();
 }

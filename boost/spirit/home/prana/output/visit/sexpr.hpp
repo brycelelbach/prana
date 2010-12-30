@@ -22,7 +22,7 @@ struct sexpr_printer {
 
   sexpr_printer (Out& out): out(out) { }
 
-  void operator() (utree::uninitialized_type) const {
+  void operator() (utree::invalid_type) const {
     out << "#uninitialized";
   }
 

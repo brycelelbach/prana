@@ -9,8 +9,8 @@
 
 #include <boost/spirit/home/prana/schematic/core.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
 
   BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
     //[arithmetic_types
@@ -34,6 +34,11 @@ int main (void) {
     ((sizeof(schematic::ascii::data_type))  (sizeof(void*[2])))
     ((sizeof(schematic::symbol::data_type)) (sizeof(void*[2]))))
     //]
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
+  }
 
   return boost::report_errors();
 }

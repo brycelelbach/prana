@@ -78,10 +78,8 @@ struct sexpr_parser:
     using qi::hex;
     using qi::oct;
     using qi::no_case;
-    using qi::eps;
     using qi::real_parser;
     using qi::strict_real_policies;
-    using qi::int_parser;
     using qi::uint_parser;
     using qi::on_error;
     using qi::fail;
@@ -126,7 +124,7 @@ struct sexpr_parser:
     std::string exclude = std::string(" ();\"\x01-\x1f\x7f") + '\0';
     symbol = lexeme[+(~char_(exclude))];
 
-    binary = lexeme['#' > +hex2 > '#'];
+    binary = lexeme['#' > *hex2 > '#'];
 
     start.name("sexpr");
     element.name("element");

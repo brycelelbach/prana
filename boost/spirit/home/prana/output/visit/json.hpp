@@ -101,8 +101,8 @@ struct json_printer {
     (*this)(']');
   }
 
-  void operator() (utree::uninitialized_type) const {
-    out << "\"uninitialized\"";
+  void operator() (utree::invalid_type) const {
+    out << "\"invalid\"";
   }
 
   void operator() (utree::nil_type) const {

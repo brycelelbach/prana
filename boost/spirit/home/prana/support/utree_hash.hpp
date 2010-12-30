@@ -19,8 +19,8 @@ namespace prana {
 struct utree_hasher {
   typedef std::size_t result_type;
 
-  result_type operator() (utree::uninitialized_type) const {
-    return hash_value(utree_type::uninitialized_type);
+  result_type operator() (utree::invalid_type) const {
+    return hash_value(utree_type::invalid_type);
   }
 
   result_type operator() (utree::nil_type) const {

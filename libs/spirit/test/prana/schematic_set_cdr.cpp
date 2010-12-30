@@ -10,8 +10,9 @@
 #include <boost/spirit/home/prana/schematic/core.hpp>
 #include <boost/spirit/home/prana/schematic/routine/set_car.hpp>
 
-int main (void) {
-  using namespace boost::spirit::prana;
+int main (void) { try {
+  using boost::spirit::prana::schematic;
+  using boost::spirit::prana::set_cdr;
 
   { 
     schematic s(17, 53.5);
@@ -35,6 +36,11 @@ int main (void) {
 
     BOOST_SPIRIT_PRANA_SEXPR_TESTS(
       ((s) ("(\"foo\" #t)")))
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
   
   return boost::report_errors();

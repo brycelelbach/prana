@@ -9,11 +9,11 @@
 
 #include <boost/spirit/home/prana/adt/symbol_table.hpp> 
 
-int main (void) {
-  using namespace boost;
-  using namespace boost::spirit;
+int main (void) { try {
+  using boost::fusion::at_c;
+  using boost::spirit::prana::symbol_table;
 
-  typedef prana::symbol_table<char, unsigned> table_type;
+  typedef symbol_table<char, unsigned> table_type;
   
   table_type t;
 
@@ -67,8 +67,8 @@ int main (void) {
   table_type::pointer r = t.find(it, foo.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foo.begin());
-  BOOST_TEST(*fusion::at_c<1>(*r) == a);
+  BOOST_TEST(*(at_c<0>(*r)->begin()) == *foo.begin());
+  BOOST_TEST(*at_c<1>(*r) == a);
   BOOST_TEST(*it == *(foo.begin() + 1));
   //]
  
@@ -78,9 +78,9 @@ int main (void) {
   r = t.find(it, bar.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *bar.begin());
-  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
-  BOOST_TEST(*fusion::at_c<1>(*r) == b);
+  BOOST_TEST(*(at_c<0>(*r)->begin()) == *bar.begin());
+  BOOST_TEST(*(at_c<0>(*r)->end()) == *it);
+  BOOST_TEST(*at_c<1>(*r) == b);
   BOOST_TEST(*it == *bar.end());
   //]
 
@@ -89,11 +89,16 @@ int main (void) {
   r = t.find(it, foobar.end());
 
   BOOST_TEST(bool(r) == true);
-  BOOST_TEST(*(fusion::at_c<0>(*r)->begin()) == *foobar.begin());
-  BOOST_TEST(*(fusion::at_c<0>(*r)->end()) == *it);
-  BOOST_TEST(*fusion::at_c<1>(*r) == c);
+  BOOST_TEST(*(at_c<0>(*r)->begin()) == *foobar.begin());
+  BOOST_TEST(*(at_c<0>(*r)->end()) == *it);
+  BOOST_TEST(*at_c<1>(*r) == c);
   BOOST_TEST(*it == *foobar.end());
   //]
+
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
+  }
 
   return boost::report_errors();
 }

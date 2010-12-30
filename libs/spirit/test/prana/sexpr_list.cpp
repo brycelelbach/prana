@@ -10,7 +10,7 @@
 #include <boost/spirit/home/prana/input/parse_sexpr.hpp>
 #include <boost/spirit/home/prana/output/generate_sexpr.hpp>
 
-int main (void) {
+int main (void) { try {
   using boost::spirit::utree;
   using boost::spirit::prana::parse_sexpr;
   using boost::spirit::prana::generate_sexpr;
@@ -128,6 +128,11 @@ int main (void) {
       ((out.tag())    (1))
       ((out[1].tag()) (2)))
     //]  
+  }
+  
+  } catch (std::exception& e) {
+    std::cout << "caught: " << e.what() << "\n";
+    return -1;
   }
   
   return boost::report_errors();
