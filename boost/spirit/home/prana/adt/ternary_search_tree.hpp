@@ -6,8 +6,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP)
-#define BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP
+#if !defined(BOOST_SPIRIT_PRANA_ADT_TERNARY_SEARCH_TREE_HPP)
+#define BOOST_SPIRIT_PRANA_ADT_TERNARY_SEARCH_TREE_HPP
 
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
@@ -22,11 +22,9 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-struct schematic;
-
-//[symbol_node
+//[ternary_search_tree_node
 template<class Char, class Data>
-struct symbol_node: private noncopyable {
+struct ternary_search_tree_node: private noncopyable {
   typedef Char id_type;
 
   typedef std::basic_string<Char>* key_type;
@@ -35,34 +33,34 @@ struct symbol_node: private noncopyable {
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
   
-  symbol_node (id_type);
+  ternary_search_tree_node (id_type);
 
   struct destruct { /*< Destruction functor. >*/
     typedef void result_type;
 
     template<class Alloc>
-    void operator() (symbol_node*, Alloc*) const;
+    void operator() (ternary_search_tree_node*, Alloc*) const;
   };
 
   struct find { /*< Lookup functor. >*/
     typedef pointer result_type;
 
     template<class Iterator>
-    pointer operator() (symbol_node*, Iterator&, Iterator) const;
+    pointer operator() (ternary_search_tree_node*, Iterator&, Iterator) const;
     
     template<class Iterator>
-    const_pointer operator() (symbol_node const*, Iterator&,
+    const_pointer operator() (ternary_search_tree_node const*, Iterator&,
                               Iterator) const;
     
     template<class Pointer, class Node, class Iterator>
-    Pointer operator() (Node, Iterator&, Iterator) const;
+    static Pointer call (Node, Iterator&, Iterator);
   };
 
   struct insert { /*< Insertion functor. >*/
     typedef pointer result_type;
 
     template<class Iterator, class Value, class Alloc>
-    pointer operator() (symbol_node*&, Iterator, Iterator,
+    pointer operator() (ternary_search_tree_node*&, Iterator, Iterator,
                         Value const&, Alloc*) const;
   };
 
@@ -70,26 +68,27 @@ struct symbol_node: private noncopyable {
     typedef pointer result_type;
 
     template<class Iterator, class Alloc>
-    void operator() (symbol_node*&, Iterator, Iterator, Alloc*) const;
+    void operator() (ternary_search_tree_node*&, Iterator, Iterator,
+                     Alloc*) const;
   };
 
-  id_type id;        /*< The node's identity character. >*/
-  pointer data;      /*< Optional data. >*/
-  symbol_node* lt;   /*< Left pointer. >*/
-  symbol_node* eq;   /*< Middle pointer. >*/
-  symbol_node* gt;   /*< Right pointer. >*/
+  id_type id;                     /*< The node's identity character. >*/
+  pointer data;                   /*< Optional data. >*/
+  ternary_search_tree_node* lt;   /*< Left pointer. >*/
+  ternary_search_tree_node* eq;   /*< Middle pointer. >*/
+  ternary_search_tree_node* gt;   /*< Right pointer. >*/
 };
 //]
 
 template<class Char, class Data>
-symbol_node<Char, Data>::symbol_node (id_type id_):
+ternary_search_tree_node<Char, Data>::ternary_search_tree_node (id_type id_):
   id(id_), data(0), lt(0), eq(0), gt(0) { }
 
-//[symbol_node_destruct_algorithm
+//[ternary_search_tree_node_destruct_algorithm
 template<class Char, class Data>
 template<class Alloc>
-inline void symbol_node<Char, Data>::destruct::operator() (
-  symbol_node* p, Alloc* alloc
+inline void ternary_search_tree_node<Char, Data>::destruct::operator() (
+  ternary_search_tree_node* p, Alloc* alloc
 ) const {
   if (p) {
     if (p->data)
@@ -105,28 +104,28 @@ inline void symbol_node<Char, Data>::destruct::operator() (
 
 template<class Char, class Data>
 template<class Iterator>
-inline typename symbol_node<Char, Data>::pointer
-symbol_node<Char, Data>::find::operator() (
-  symbol_node* root, Iterator& it, Iterator end
+inline typename ternary_search_tree_node<Char, Data>::pointer
+ternary_search_tree_node<Char, Data>::find::operator() (
+  ternary_search_tree_node* root, Iterator& it, Iterator end
 ) const {
-  return (*this).operator()<pointer, symbol_node*>(root, it, end);
+  return call<pointer>(root, it, end);
 }
 
 template<class Char, class Data>
 template<class Iterator>
-inline typename symbol_node<Char, Data>::const_pointer
-symbol_node<Char, Data>::find::operator() (
-  symbol_node const* root, Iterator& it, Iterator end
+inline typename ternary_search_tree_node<Char, Data>::const_pointer
+ternary_search_tree_node<Char, Data>::find::operator() (
+  ternary_search_tree_node const* root, Iterator& it, Iterator end
 ) const {
-  return (*this).operator()<const_pointer, symbol_node const*>(root, it, end);
+  return call<const_pointer>(root, it, end);
 }
 
-//[symbol_node_lookup_algorithm
+//[ternary_search_tree_node_lookup_algorithm
 template<class Char, class Data>
 template<class Pointer, class Node, class Iterator>
-inline Pointer symbol_node<Char, Data>::find::operator() (
+inline Pointer ternary_search_tree_node<Char, Data>::find::call (
   Node root, Iterator& it, Iterator end
-) const {
+) {
   if (it == end)
     return 0;
 
@@ -162,20 +161,20 @@ inline Pointer symbol_node<Char, Data>::find::operator() (
 }
 //]
 
-//[symbol_node_insertion_algorithm
+//[ternary_search_tree_node_insertion_algorithm
 template<class Char, class Data>
 template<class Iterator, class Value, class Alloc>
-inline typename symbol_node<Char, Data>::pointer
-symbol_node<Char, Data>::insert::operator() (
-  symbol_node*& root, Iterator first, Iterator last, Value const& val,
-  Alloc* alloc
+inline typename ternary_search_tree_node<Char, Data>::pointer
+ternary_search_tree_node<Char, Data>::insert::operator() (
+  ternary_search_tree_node*& root, Iterator first, Iterator last,
+  Value const& val, Alloc* alloc
 ) const {
   if (first == last)
     return 0;
 
   Iterator it = first;
 
-  symbol_node** pp = &root;
+  ternary_search_tree_node** pp = &root;
 
   for (;;) {
     typename boost::detail::iterator_traits<Iterator>::value_type c = *it;
@@ -183,7 +182,7 @@ symbol_node<Char, Data>::insert::operator() (
     if (*pp == 0)
       *pp = alloc->new_node(*it);
 
-    symbol_node* p = *pp;
+    ternary_search_tree_node* p = *pp;
 
     if (c == p->id) {
       if (++it == last) {
@@ -205,11 +204,11 @@ symbol_node<Char, Data>::insert::operator() (
 }
 //]
 
-//[symbol_node_erasure_algorithm
+//[ternary_search_tree_node_erasure_algorithm
 template<class Char, class Data>
 template<class Iterator, class Alloc>
-inline void symbol_node<Char, Data>::erase::operator() (
-  symbol_node*& p, Iterator first, Iterator last, Alloc* alloc
+inline void ternary_search_tree_node<Char, Data>::erase::operator() (
+  ternary_search_tree_node*& p, Iterator first, Iterator last, Alloc* alloc
 ) const {
   if (p == 0 || first == last)
     return;
@@ -240,9 +239,9 @@ inline void symbol_node<Char, Data>::erase::operator() (
 }
 //]
 
-//[symbol_table
-template<class Char, class Data = function_node<schematic> > 
-class symbol_table: private noncopyable {
+//[ternary_search_tree
+template<class Char, class Data> 
+class ternary_search_tree: private noncopyable {
  public:
   typedef Char id_type;
   
@@ -252,11 +251,11 @@ class symbol_table: private noncopyable {
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
 
-  typedef symbol_node<Char, Data> node;
+  typedef ternary_search_tree_node<Char, Data> node;
 
-  symbol_table (void);
+  ternary_search_tree (void);
 
-  ~symbol_table (void);
+  ~ternary_search_tree (void);
 
   template<class Iterator>
     pointer find (Iterator&, Iterator);
@@ -272,7 +271,7 @@ class symbol_table: private noncopyable {
   void clear (void);
 
  protected:
-  friend struct symbol_node<Char, Data>;
+  friend struct ternary_search_tree_node<Char, Data>;
 
   node* new_node (id_type);
 
@@ -289,44 +288,44 @@ class symbol_table: private noncopyable {
 //]
 
 template<class Char, class Data>
-symbol_table<Char, Data>::symbol_table (void): root(0) { }
+ternary_search_tree<Char, Data>::ternary_search_tree (void): root(0) { }
 
 template<class Char, class Data>
-symbol_table<Char, Data>::~symbol_table (void) {
+ternary_search_tree<Char, Data>::~ternary_search_tree (void) {
   clear();
 }
 
 template<class Char, class Data>
 template<class Iterator>
-typename symbol_table<Char, Data>::pointer
-symbol_table<Char, Data>::find (Iterator& first, Iterator last) {
+typename ternary_search_tree<Char, Data>::pointer
+ternary_search_tree<Char, Data>::find (Iterator& first, Iterator last) {
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
 template<class Char, class Data>
 template<class Iterator>
-typename symbol_table<Char, Data>::const_pointer
-symbol_table<Char, Data>::find (Iterator& first,
+typename ternary_search_tree<Char, Data>::const_pointer
+ternary_search_tree<Char, Data>::find (Iterator& first,
                                     Iterator last) const {
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
 template<class Char, class Data>
 template<class Iterator, class Value>
-typename symbol_table<Char, Data>::pointer
-symbol_table<Char, Data>::insert (Iterator first, Iterator last,
+typename ternary_search_tree<Char, Data>::pointer
+ternary_search_tree<Char, Data>::insert (Iterator first, Iterator last,
                                   Value const& val) {
   return typename node::insert()(root, first, last, val, this);
 }
 
 template<class Char, class Data>
 template<class Iterator>
-void symbol_table<Char, Data>::erase (Iterator first, Iterator last) {
+void ternary_search_tree<Char, Data>::erase (Iterator first, Iterator last) {
   return typename node::erase()(root, first, last, this);
 }
 
 template<class Char, class Data>
-void symbol_table<Char, Data>::clear (void) {
+void ternary_search_tree<Char, Data>::clear (void) {
   if (root) {
     typename node::destruct()(root, this);
     root = 0;
@@ -334,15 +333,15 @@ void symbol_table<Char, Data>::clear (void) {
 }
 
 template<class Char, class Data>
-typename symbol_table<Char, Data>::node*
-symbol_table<Char, Data>::new_node (id_type id) {
+typename ternary_search_tree<Char, Data>::node*
+ternary_search_tree<Char, Data>::new_node (id_type id) {
   return new node(id);
 }
 
 template<class Char, class Data>
 template<class Iterator, class Value>
-typename symbol_table<Char, Data>::pointer
-symbol_table<Char, Data>::new_data (Iterator first, Iterator last,
+typename ternary_search_tree<Char, Data>::pointer
+ternary_search_tree<Char, Data>::new_data (Iterator first, Iterator last,
                                     Value const& val) {
   return new value_type(
     new std::basic_string<Char>(first, last), new Value(val)
@@ -350,13 +349,13 @@ symbol_table<Char, Data>::new_data (Iterator first, Iterator last,
 }
 
 template<class Char, class Data>
-void symbol_table<Char, Data>::delete_node (node* p) {
+void ternary_search_tree<Char, Data>::delete_node (node* p) {
   if (p) 
     delete p;
 }
 
 template<class Char, class Data>
-void symbol_table<Char, Data>::delete_data (pointer p) {
+void ternary_search_tree<Char, Data>::delete_data (pointer p) {
   if (p) {
     if (fusion::at_c<0>(*p))
       delete fusion::at_c<0>(*p);
@@ -372,5 +371,5 @@ void symbol_table<Char, Data>::delete_data (pointer p) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_ADT_SYMBOL_TABLE_HPP 
+#endif // BOOST_SPIRIT_PRANA_ADT_TERNARY_SEARCH_TREE_HPP 
 

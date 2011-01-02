@@ -40,18 +40,24 @@ struct save_line_pos: qi::grammar<Iterator, void(utree&, char)> {
   qi::rule<Iterator, void(utree&, char)>
     start;
   
+  qi::rule<Iterator, void(utree&)>
+    epsilon;
+
   phoenix::function<push_line_pos_functor>
     push_line_pos;
 
   save_line_pos (void): save_line_pos::base_type(start) {
     using qi::omit;
     using qi::raw;
+    using qi::eps;
     using qi::lit;
     using qi::_1;
     using qi::_r1;
     using qi::_r2;
 
-    start = omit[raw[lit(_r2)] [push_line_pos(_r1, _1)]];
+    start   = omit[raw[lit(_r2)] [push_line_pos(_r1, _1)]];
+
+    epsilon = omit[raw[eps]      [push_line_pos(_r1, _1)]];
   }
 };
 

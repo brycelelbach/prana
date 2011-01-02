@@ -7,15 +7,15 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/adt/symbol_table.hpp> 
+#include <boost/spirit/home/prana/adt/ternary_search_tree.hpp> 
 
 int main (void) { try {
   using boost::fusion::at_c;
-  using boost::spirit::prana::symbol_table;
+  using boost::spirit::prana::ternary_search_tree;
 
-  typedef symbol_table<char, unsigned> table_type;
+  typedef ternary_search_tree<char, unsigned> tst_type;
   
-  table_type t;
+  tst_type t;
 
   std::string foo("foo"), bar("bar"), foobar("foobar");
   unsigned a(17), b(1405), c(742);
@@ -64,7 +64,7 @@ int main (void) { try {
   //[test_foo_data
   t.insert(foo.begin(), foo.begin() + 1, a);
   it = foo.begin();
-  table_type::pointer r = t.find(it, foo.end());
+  tst_type::pointer r = t.find(it, foo.end());
 
   BOOST_TEST(bool(r) == true);
   BOOST_TEST(*(at_c<0>(*r)->begin()) == *foo.begin());

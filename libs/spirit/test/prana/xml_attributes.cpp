@@ -15,42 +15,10 @@ int main (void) { try {
   using boost::spirit::prana::parse_xml;
   using boost::spirit::prana::generate_sexpr;
 
-  std::cout << "empty test: " << std::endl;
-
-  { //[empty
-    std::string in = "<abc />";
-    utree out;
-
-    parse_xml(in, out);
-
-    std::cout << out << std::endl;
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(abc ())")))
-    //]  
-  }
-  
-  std::cout << std::endl << "childless test: " << std::endl;
-  
-  { //[childless
-    std::string in = "<abc></abc>";
-    utree out;
-
-    parse_xml(in, out);
-
-    std::cout << out << std::endl;
-
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
-      generate_sexpr,
-      ((out) ("(abc () ())")))
-    //]  
-  }
-  
-  std::cout << std::endl << "boolean test: " << std::endl;
+  std::cout << "boolean test: " << std::endl;
 
   { //[boolean
-    std::string in = "<abc>true</abc>";
+    std::string in = "<abc def=\"true\" />";
     utree out;
 
     parse_xml(in, out);
@@ -59,14 +27,14 @@ int main (void) { try {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (#t))")))
+      ((out) ("(abc ((def #t)))")))
     //]  
   }
 
   std::cout << std::endl << "integer test: " << std::endl;
 
   { //[integer
-    std::string in = "<abc>123</abc>";
+    std::string in = "<abc def=\"123\" />";
     utree out;
 
     parse_xml(in, out);
@@ -75,14 +43,14 @@ int main (void) { try {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (123))")))
+      ((out) ("(abc ((def 123)))")))
     //]  
   }
   
   std::cout << std::endl << "floating test: " << std::endl;
 
   { //[floating
-    std::string in = "<abc>1.23</abc>";
+    std::string in = "<abc def=\"1.23\" />";
     utree out;
 
     parse_xml(in, out);
@@ -91,14 +59,14 @@ int main (void) { try {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (1.23))")))
+      ((out) ("(abc ((def 1.23)))")))
     //]  
   }
 
   std::cout << std::endl << "string test: " << std::endl;
 
   { //[string
-    std::string in = "<abc>def</abc>";
+    std::string in = "<abc def=\"ghi\" />";
     utree out;
 
     parse_xml(in, out);
@@ -107,10 +75,10 @@ int main (void) { try {
 
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (\"def\"))")))
+      ((out) ("(abc ((def \"ghi\")))")))
     //]  
   }
-  
+
   } catch (std::exception& e) {
     std::cout << "caught: " << e.what() << "\n";
     return -1;

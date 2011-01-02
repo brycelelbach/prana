@@ -38,10 +38,10 @@ struct xml_parser:
   qi::grammar<Iterator, utree(void), xml_white_space<Iterator> >
 {
   qi::rule<Iterator, utree(void), xml_white_space<Iterator> >
-    start, element, atom;
+    start, empty, element, atom, value, attribute;
 
   qi::rule<Iterator, utree::list_type(void), xml_white_space<Iterator> >
-    children;
+    attributes, children;
 
   qi::symbols<char, bool>
     boolean;
@@ -50,7 +50,7 @@ struct xml_parser:
     name;
 
   qi::rule<Iterator, utf8_string_type(void)>
-    char_data;
+    char_data, attr_string;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -63,13 +63,11 @@ struct xml_parser:
   {
     using phoenix::front;
     using standard::char_;
-    using qi::lexeme;
     using qi::repeat;
     using qi::omit;
     using qi::int_;
     using qi::real_parser;
     using qi::strict_real_policies;
-    using qi::uint_parser;
     using qi::on_error;
     using qi::fail;
     using qi::_val;
@@ -78,22 +76,33 @@ struct xml_parser:
     using qi::_3;
     using qi::_4;
 
-    real_parser<double, strict_real_policies<double> > strict_double;
-    uint_parser<unsigned char, 16, 2, 2> hex2;
-  
-    start = element.alias();
+    typedef real_parser<double, strict_real_policies<double> > real_type;
+    real_type const real = real_type();
+ 
+    start = empty | element;
 
-    element = pos(_val, '<') >> name     >> '>'
-            > children
-            >           "</" > omit[name] > '>';
+    empty    = pos(_val, '<') >> name >> attributes >> "/>";
+ 
+    element  = pos(_val, '<') >> name >> attributes >> '>'
+            >> children
+            >>           "</" >> omit[name] >>         '>';
 
-    atom = strict_double
+    atom = real
          | int_
          | boolean
          | char_data
          | start;
 
-    children = *atom;
+    value = real
+          | int_
+          | boolean
+          | attr_string;
+
+    attributes = *attribute;
+
+    attribute = pos.epsilon(_val) >> name >> '=' >> '"' >> value >> '"';
+
+    children = pos.epsilon(_val) >> *atom;
 
     boolean.add
       ("true", true)
@@ -105,6 +114,8 @@ struct xml_parser:
     name = char_(name_start_char) >> *char_(name_char);
     
     char_data = +(~char_("<&") - "</");
+    
+    attr_string = +~char_("<&\"");
 
     start.name("xml");
     element.name("element");

@@ -19,7 +19,7 @@ project
 import testing ;
 
 {
-  alias schematic :
+  test-suite schematic :
       [ run prana/schematic_become.cpp        : : : : ]
       [ run prana/schematic_capacity.cpp      : : : : ]
       [ run prana/schematic_car.cpp           : : : : ]
@@ -30,23 +30,25 @@ import testing ;
       [ run prana/schematic_sizeof.cpp        : : : : ]
     ;
 
-  alias adt :
-      [ run prana/adt_symbol_table.cpp        : : : : ]
+  test-suite adt :
+      [ run prana/adt_ternary_search_tree.cpp : : : : ]
     ;
   
-  alias sexpr :
+  test-suite sexpr :
       [ run prana/sexpr_basic.cpp             : : : : ]
       [ run prana/sexpr_list.cpp              : : : : ]
     ;
 
-  alias json :
+  test-suite json :
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
     ;
   
-  alias xml :
+  test-suite xml :
       [ run prana/xml_basic.cpp               : : : : ]
+      [ run prana/xml_attributes.cpp          : : : : ]
+      [ run prana/xml_children.cpp            : : : : ]
     ;
 }
 
