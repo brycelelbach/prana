@@ -13,7 +13,7 @@
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/detail/iterator.hpp>
 
-#include <boost/spirit/home/support/container.hpp>
+#include <boost/spirit/home/support/string_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -150,7 +150,8 @@ inline Pointer tst_node<Char, Data>::find::call (
   Pointer found = 0;
 
   while (p && i != end) {
-    typename spirit::result_of::deref<Iterator>::type c = traits::deref(i); 
+    typename boost::detail::iterator_traits<Iterator>::value_type
+      c = traits::deref(i); 
 
     if (c == p->id) {
       if (p->data) {
@@ -192,7 +193,8 @@ tst_node<Char, Data>::insert::operator() (
   tst_node** pp = &root;
 
   for (;;) {
-    typename spirit::result_of::deref<Iterator>::type c = traits::deref(it); 
+    typename boost::detail::iterator_traits<Iterator>::value_type
+      c = traits::deref(it); 
 
     if (*pp == 0)
       *pp = alloc->new_node(traits::deref(it));
@@ -227,7 +229,8 @@ inline void tst_node<Char, Data>::erase::operator() (
   if (p == 0 || first == last)
     return;
 
-  typename spirit::result_of::deref<Iterator>::type c = traits::deref(first); 
+  typename boost::detail::iterator_traits<Iterator>::value_type
+    c = traits::deref(first); 
   
   if (c == p->id) {
     traits::next(first);
@@ -373,26 +376,26 @@ template<class Char, class Data>
 template<class Container>
 typename ternary_search_tree<Char, Data>::reference
 ternary_search_tree<Char, Data>::operator[] (Container const& c) {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
-  return *(typename node::find()(root, first, last));
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
+  return *(typename node::insert()(root, first, last, Data(), this));
 }
 
 template<class Char, class Data>
 template<class Container>
 typename ternary_search_tree<Char, Data>::const_reference
 ternary_search_tree<Char, Data>::operator[] (Container const& c) const {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
-  return *(typename node::find()(root, first, last));
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
+  return *(typename node::insert()(root, first, last, Data(), this));
 }
 
 template<class Char, class Data>
 template<class Container>
 typename ternary_search_tree<Char, Data>::pointer
 ternary_search_tree<Char, Data>::find (Container const& c) {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
@@ -409,8 +412,8 @@ template<class Char, class Data>
 template<class Container>
 typename ternary_search_tree<Char, Data>::const_pointer
 ternary_search_tree<Char, Data>::find (Container const& c) const {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
@@ -429,8 +432,8 @@ typename ternary_search_tree<Char, Data>::pointer
 ternary_search_tree<Char, Data>::insert (Container const& c,
                                          Value const& val) 
 {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
   return typename node::insert()(root, first, last, val, this);
 }
 
@@ -446,8 +449,8 @@ ternary_search_tree<Char, Data>::insert (Iterator first, Iterator last,
 template<class Char, class Data>
 template<class Container>
 void ternary_search_tree<Char, Data>::erase (Container const& c) {
-  typedef typename spirit::result_of::begin<Container const>::type iterator;
-  iterator first = traits::begin(c), last = traits::end(c);
+  typedef typename result_of::get_begin<Char, Container const>::type iterator;
+  iterator first = traits::get_begin<Char>(c), last = traits::get_end<Char>(c);
   return typename node::erase()(root, first, last, this);
 }
 

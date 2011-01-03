@@ -32,6 +32,7 @@ import testing ;
 
   test-suite adt :
       [ run prana/adt_ternary_search_tree.cpp : : : : ]
+      [ run prana/adt_dynamic_array.cpp       : : : : ]
     ;
   
   test-suite sexpr :

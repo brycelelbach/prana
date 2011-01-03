@@ -8,7 +8,7 @@
 #if !defined(BOOST_SPIRIT_PRANA_OUTPUT_VISIT_JSON_HPP)
 #define BOOST_SPIRIT_PRANA_OUTPUT_VISIT_JSON_HPP
 
-#include <boost/spirit/include/support_utree.hpp>
+#include <boost/spirit/home/prana/dsir/json/predicates.hpp>
 
 namespace boost {
 namespace spirit {
@@ -21,28 +21,6 @@ struct json_printer {
   Out& out;
 
   json_printer (Out& out): out(out) { }
-
-  template<typename Iterator>
-  static bool is_object (iterator_range<Iterator> const& range) {
-    typedef typename iterator_range<Iterator>::const_iterator iterator;
-
-    iterator it = range.begin(), end = range.end();
-
-    for (; it != end; ++it) {
-      try {
-        if (it->size() != 2)
-          return false;
-        if (it->begin()->which() != utree_type::symbol_type)
-          return false;
-      }
-
-      catch (...) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 
   template<typename Iterator>
   void print_object (iterator_range<Iterator> const& range) const {

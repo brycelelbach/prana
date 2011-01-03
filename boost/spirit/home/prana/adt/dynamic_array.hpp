@@ -20,13 +20,7 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-//[dynamic_array_declaration
 template<class Data, uinthalf_t InitialCapacity = 8>
-class dynamic_array;
-//]
-
-//[dynamic_array_definition
-template<class Data, uinthalf_t InitialCapacity>
 class dynamic_array {
  public:
   typedef Data value_type;
@@ -70,8 +64,7 @@ class dynamic_array {
   template<class Value>
     void push (Value const&);
   
-  template<class Value>
-    void pop (void);
+  void pop (void);
 
         iterator begin (void);
   const_iterator begin (void) const;
@@ -84,7 +77,10 @@ class dynamic_array {
         
         reference back (void);
   const_reference back (void) const;
-
+        
+        reference operator[] (size_type);
+  const_reference operator[] (size_type) const;
+        
   template<class Container>
     Container get (void) const;
 
@@ -96,7 +92,6 @@ class dynamic_array {
   size_type _capacity;
   Data* _data;
 };
-//]
 
 template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>::dynamic_array (void):
@@ -122,7 +117,7 @@ dynamic_array<Data, InitialCapacity>::dynamic_array (Iterator first,
 
 template<class Data, uinthalf_t InitialCapacity>
 dynamic_array<Data, InitialCapacity>::~dynamic_array (void) {
-  delete[] _data;
+  if (_data) delete[] _data;
 }
 
 template<class Data, uinthalf_t InitialCapacity>
@@ -186,9 +181,10 @@ bool dynamic_array<Data, InitialCapacity>::empty (void) const {
 
 template<class Data, uinthalf_t InitialCapacity>
 void dynamic_array<Data, InitialCapacity>::clear (void) {
-  std::memset(_data, 0, _size);
+  std::memset(_data, 0, _size * sizeof(Data));
+  _size = 0;  
 }
-//[dynamic_array_insertion_algorithm
+
 template<class Data, uinthalf_t InitialCapacity>
 template<class Value>
 void dynamic_array<Data, InitialCapacity>::push (Value const& val) {
@@ -196,10 +192,13 @@ void dynamic_array<Data, InitialCapacity>::push (Value const& val) {
     _capacity *= 2; /*< Resize to twice its current capacity. >*/
 
     Data* new_data = new Data[_capacity]; /*< Allocate the new block. >*/
-
-    std::memcpy(_data, new_data, _size); /*< Copy the old data to the newly
-                                             allocated block. >*/
+    
+    /*< Copy the old data to the newly allocated block. >*/
+    std::memcpy(new_data, _data, _size * sizeof(Data)); 
+    
     delete[] _data;
+
+    _data = new_data;
   }
 
   _data[_size] = val;
@@ -207,8 +206,8 @@ void dynamic_array<Data, InitialCapacity>::push (Value const& val) {
 } 
 
 template<class Data, uinthalf_t InitialCapacity>
-template<class Value>
 void dynamic_array<Data, InitialCapacity>::pop (void) {
+  std::memset(&_data[_size - 1], 0, sizeof(Data));
   _size -= 1;
 }
 
@@ -261,6 +260,18 @@ dynamic_array<Data, InitialCapacity>::back (void) const {
 }
 
 template<class Data, uinthalf_t InitialCapacity>
+typename dynamic_array<Data, InitialCapacity>::reference
+dynamic_array<Data, InitialCapacity>::operator[] (size_type i) {
+  return _data[i];
+}
+
+template<class Data, uinthalf_t InitialCapacity>
+typename dynamic_array<Data, InitialCapacity>::const_reference
+dynamic_array<Data, InitialCapacity>::operator[] (size_type i) const {
+  return _data[i];
+}
+
+template<class Data, uinthalf_t InitialCapacity>
 template<class Container>
 Container dynamic_array<Data, InitialCapacity>::get (void) const {
   return Container(begin(), end());
@@ -274,7 +285,7 @@ void dynamic_array<Data, InitialCapacity>::copy (Iterator first,
     if (_size == _capacity) {
       _capacity *= 2; 
       Data* new_data = new Data[_capacity]; 
-      std::memcpy(_data, new_data, _size); 
+      std::memcpy(_data, new_data, _size * sizeof(Data)); 
       delete[] _data;
     }
 
