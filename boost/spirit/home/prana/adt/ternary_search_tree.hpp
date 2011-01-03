@@ -9,86 +9,103 @@
 #if !defined(BOOST_SPIRIT_PRANA_ADT_TERNARY_SEARCH_TREE_HPP)
 #define BOOST_SPIRIT_PRANA_ADT_TERNARY_SEARCH_TREE_HPP
 
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/vector_fwd.hpp>
-#include <boost/fusion/include/at_c.hpp>
-
-#include <boost/noncopyable.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/detail/iterator.hpp>
 
-#include <boost/spirit/home/prana/adt/function_node.hpp>
+#include <boost/spirit/home/support/container.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[ternary_search_tree_node
 template<class Char, class Data>
-struct ternary_search_tree_node: private noncopyable {
+struct tst_node {
   typedef Char id_type;
 
-  typedef std::basic_string<Char>* key_type;
-  typedef Data* mapped_type;
-  typedef fusion::vector2<key_type, mapped_type> value_type;
-  typedef value_type* pointer;
-  typedef value_type const* const_pointer;
+  typedef Data value_type;
+  typedef Data* pointer;
+  typedef Data const* const_pointer;
   
-  ternary_search_tree_node (id_type);
+  tst_node (id_type);
 
-  struct destruct { /*< Destruction functor. >*/
+  struct destruct { // destruction functor 
     typedef void result_type;
 
     template<class Alloc>
-    void operator() (ternary_search_tree_node*, Alloc*) const;
+    result_type operator() (tst_node*, Alloc*) const;
   };
 
-  struct find { /*< Lookup functor. >*/
-    typedef pointer result_type;
+  struct find { // lookup functor
+    template<class> struct result;
+
+    template<class This, class Iterator>
+    struct result<This(tst_node*, Iterator&, Iterator)> {
+      typedef pointer type;
+    };
+
+    template<class This, class Iterator>
+    struct result<This(tst_node const*, Iterator&, Iterator)> {
+      typedef const_pointer type;
+    };
 
     template<class Iterator>
-    pointer operator() (ternary_search_tree_node*, Iterator&, Iterator) const;
+    pointer operator() (tst_node*, Iterator&,
+                        Iterator) const;
     
     template<class Iterator>
-    const_pointer operator() (ternary_search_tree_node const*, Iterator&,
+    const_pointer operator() (tst_node const*, Iterator&,
                               Iterator) const;
     
     template<class Pointer, class Node, class Iterator>
     static Pointer call (Node, Iterator&, Iterator);
   };
 
-  struct insert { /*< Insertion functor. >*/
+  struct insert { // insertion functor
     typedef pointer result_type;
 
     template<class Iterator, class Value, class Alloc>
-    pointer operator() (ternary_search_tree_node*&, Iterator, Iterator,
-                        Value const&, Alloc*) const;
+    result_type operator() (tst_node*&, Iterator, Iterator,
+                            Value const&, Alloc*) const;
   };
 
-  struct erase { /*< Removal functor. >*/
-    typedef pointer result_type;
+  struct erase { // removal functor
+    typedef void result_type;
 
     template<class Iterator, class Alloc>
-    void operator() (ternary_search_tree_node*&, Iterator, Iterator,
-                     Alloc*) const;
+    result_type operator() (tst_node*&, Iterator, Iterator,
+                            Alloc*) const;
   };
 
-  id_type id;                     /*< The node's identity character. >*/
-  pointer data;                   /*< Optional data. >*/
-  ternary_search_tree_node* lt;   /*< Left pointer. >*/
-  ternary_search_tree_node* eq;   /*< Middle pointer. >*/
-  ternary_search_tree_node* gt;   /*< Right pointer. >*/
+  struct clone { // clone functor
+    typedef tst_node* result_type;
+
+    template<class Alloc>
+    result_type operator() (tst_node const*, Alloc*) const;
+  }; 
+
+  struct for_each { // for_each functor
+    typedef void result_type;
+
+    template<class Node, class F>
+    result_type operator() (Node*, std::basic_string<Char>, F) const;
+  }; 
+  
+  id_type id;   // the node's identity character
+  pointer data; // optional data
+  tst_node* lt; // left pointer
+  tst_node* eq; // middle pointer
+  tst_node* gt; // right pointer
 };
-//]
 
 template<class Char, class Data>
-ternary_search_tree_node<Char, Data>::ternary_search_tree_node (id_type id_):
+tst_node<Char, Data>::tst_node (id_type id_):
   id(id_), data(0), lt(0), eq(0), gt(0) { }
 
-//[ternary_search_tree_node_destruct_algorithm
 template<class Char, class Data>
 template<class Alloc>
-inline void ternary_search_tree_node<Char, Data>::destruct::operator() (
-  ternary_search_tree_node* p, Alloc* alloc
+inline void tst_node<Char, Data>::destruct::operator() (
+  tst_node* p, Alloc* alloc
 ) const {
   if (p) {
     if (p->data)
@@ -100,30 +117,28 @@ inline void ternary_search_tree_node<Char, Data>::destruct::operator() (
     alloc->delete_node(p);
   }
 }
-//]
 
 template<class Char, class Data>
 template<class Iterator>
-inline typename ternary_search_tree_node<Char, Data>::pointer
-ternary_search_tree_node<Char, Data>::find::operator() (
-  ternary_search_tree_node* root, Iterator& it, Iterator end
+inline typename tst_node<Char, Data>::pointer
+tst_node<Char, Data>::find::operator() (
+  tst_node* root, Iterator& it, Iterator end
 ) const {
   return call<pointer>(root, it, end);
 }
 
 template<class Char, class Data>
 template<class Iterator>
-inline typename ternary_search_tree_node<Char, Data>::const_pointer
-ternary_search_tree_node<Char, Data>::find::operator() (
-  ternary_search_tree_node const* root, Iterator& it, Iterator end
+inline typename tst_node<Char, Data>::const_pointer
+tst_node<Char, Data>::find::operator() (
+  tst_node const* root, Iterator& it, Iterator end
 ) const {
   return call<const_pointer>(root, it, end);
 }
 
-//[ternary_search_tree_node_lookup_algorithm
 template<class Char, class Data>
 template<class Pointer, class Node, class Iterator>
-inline Pointer ternary_search_tree_node<Char, Data>::find::call (
+inline Pointer tst_node<Char, Data>::find::call (
   Node root, Iterator& it, Iterator end
 ) {
   if (it == end)
@@ -135,7 +150,7 @@ inline Pointer ternary_search_tree_node<Char, Data>::find::call (
   Pointer found = 0;
 
   while (p && i != end) {
-    typename boost::detail::iterator_traits<Iterator>::value_type c = *i; 
+    typename spirit::result_of::deref<Iterator>::type c = traits::deref(i); 
 
     if (c == p->id) {
       if (p->data) {
@@ -144,7 +159,7 @@ inline Pointer ternary_search_tree_node<Char, Data>::find::call (
       }
 
       p = p->eq;
-      i++;
+      traits::next(i);
     }
 
     else if (c < p->id) 
@@ -154,19 +169,19 @@ inline Pointer ternary_search_tree_node<Char, Data>::find::call (
       p = p->gt;
   }
 
-  if (found)
-    it = ++latest; /*< one past the end matching char >*/
+  if (found) {
+    traits::next(latest); // one past the end matching char
+    it = latest;
+  }
 
   return found;
 }
-//]
 
-//[ternary_search_tree_node_insertion_algorithm
 template<class Char, class Data>
 template<class Iterator, class Value, class Alloc>
-inline typename ternary_search_tree_node<Char, Data>::pointer
-ternary_search_tree_node<Char, Data>::insert::operator() (
-  ternary_search_tree_node*& root, Iterator first, Iterator last,
+inline typename tst_node<Char, Data>::pointer
+tst_node<Char, Data>::insert::operator() (
+  tst_node*& root, Iterator first, Iterator last,
   Value const& val, Alloc* alloc
 ) const {
   if (first == last)
@@ -174,18 +189,19 @@ ternary_search_tree_node<Char, Data>::insert::operator() (
 
   Iterator it = first;
 
-  ternary_search_tree_node** pp = &root;
+  tst_node** pp = &root;
 
   for (;;) {
-    typename boost::detail::iterator_traits<Iterator>::value_type c = *it;
+    typename spirit::result_of::deref<Iterator>::type c = traits::deref(it); 
 
     if (*pp == 0)
-      *pp = alloc->new_node(*it);
+      *pp = alloc->new_node(traits::deref(it));
 
-    ternary_search_tree_node* p = *pp;
+    tst_node* p = *pp;
 
     if (c == p->id) {
-      if (++it == last) {
+      traits::next(it);
+      if (it == last) {
         if (p->data == 0)
           p->data = alloc->new_data(first, last, val);
 
@@ -202,21 +218,20 @@ ternary_search_tree_node<Char, Data>::insert::operator() (
       pp = &p->gt;
   }
 }
-//]
 
-//[ternary_search_tree_node_erasure_algorithm
 template<class Char, class Data>
 template<class Iterator, class Alloc>
-inline void ternary_search_tree_node<Char, Data>::erase::operator() (
-  ternary_search_tree_node*& p, Iterator first, Iterator last, Alloc* alloc
+inline void tst_node<Char, Data>::erase::operator() (
+  tst_node*& p, Iterator first, Iterator last, Alloc* alloc
 ) const {
   if (p == 0 || first == last)
     return;
 
-  typename boost::detail::iterator_traits<Iterator>::value_type c = *first;
+  typename spirit::result_of::deref<Iterator>::type c = traits::deref(first); 
   
   if (c == p->id) {
-    if (++first == last) {
+    traits::next(first);
+    if (first == last) {
       if (p->data) {
         alloc->delete_data(p->data);
         p->data = 0;
@@ -237,46 +252,106 @@ inline void ternary_search_tree_node<Char, Data>::erase::operator() (
     p = 0;
   }
 }
-//]
 
-//[ternary_search_tree
+template<class Char, class Data>
+template<class Alloc>
+inline tst_node<Char, Data>*
+tst_node<Char, Data>::clone::operator() (
+  tst_node const* p, Alloc* alloc
+) const {
+  if (p) {
+    tst_node* c = alloc->new_node(p->id);
+
+    if (p->data)
+      c->data = alloc->new_data(*p->data);
+
+    c->lt = (*this)(p->lt, alloc);
+    c->eq = (*this)(p->eq, alloc);
+    c->gt = (*this)(p->gt, alloc);
+    return c;
+  }
+
+  return 0;
+}
+        
+template<class Char, class Data>
+template<class Node, class F>
+inline void tst_node<Char, Data>::for_each::operator() (
+  Node* p, std::basic_string<Char> prefix, F f
+) const {
+  if (p) {
+    (*this)(p->lt, prefix, f);
+
+    std::basic_string<Char> s = prefix + p->id;
+
+    (*this)(p->eq, s, f);
+
+    if (p->data)
+      f(s, *p->data);
+
+    (*this)(p->gt, prefix, f);
+  }
+}
+
 template<class Char, class Data> 
-class ternary_search_tree: private noncopyable {
+class ternary_search_tree {
  public:
   typedef Char id_type;
   
-  typedef std::basic_string<char>* key_type;
-  typedef Data* mapped_type;
-  typedef fusion::vector2<key_type, mapped_type> value_type;
-  typedef value_type* pointer;
-  typedef value_type const* const_pointer;
+  typedef Data value_type;
+  typedef Data* pointer;
+  typedef Data const* const_pointer;
+  typedef Data& reference;
+  typedef Data const& const_reference;
 
-  typedef ternary_search_tree_node<Char, Data> node;
+  typedef tst_node<Char, Data> node;
 
   ternary_search_tree (void);
 
   ~ternary_search_tree (void);
 
-  template<class Iterator>
-    pointer find (Iterator&, Iterator);
-  template<class Iterator>
-    const_pointer find (Iterator&, Iterator) const;
+  template<class Container>
+    reference operator[] (Container const& c);
+  template<class Container>
+    const_reference operator[] (Container const& c) const;
 
+  template<class Container>
+    pointer find (Container const& c);
+  template<class Iterator>
+    pointer find (Iterator& first, Iterator last);
+
+  template<class Container>
+    const_pointer find (Container const& c) const;
+  template<class Iterator>
+    const_pointer find (Iterator& first, Iterator last) const;
+
+  template<class Container, class Value>
+    pointer insert (Container const&, Value const&);
   template<class Iterator, class Value>
     pointer insert (Iterator, Iterator, Value const&);
 
+  template<class Container>
+    void erase (Container const&);
   template<class Iterator>
     void erase (Iterator, Iterator);
 
   void clear (void);
+  
+  template<class F>
+    void for_each (F);
 
  protected:
-  friend struct ternary_search_tree_node<Char, Data>;
+  friend struct tst_node<Char, Data>;
 
   node* new_node (id_type);
 
   template<class Iterator, class Value>
-    pointer new_data (Iterator, Iterator, Value const&);
+    typename disable_if<is_base_of<Data, Value>, pointer>::type
+    new_data (Iterator, Iterator, Value const&);
+
+  template<class Iterator, class Value>
+    typename enable_if<is_base_of<Data, Value>, pointer>::type
+    new_data (Iterator, Iterator, Value const&);
 
   void delete_node (node*);
 
@@ -285,7 +360,6 @@ class ternary_search_tree: private noncopyable {
  private:
   node* root;
 };
-//]
 
 template<class Char, class Data>
 ternary_search_tree<Char, Data>::ternary_search_tree (void): root(0) { }
@@ -296,9 +370,47 @@ ternary_search_tree<Char, Data>::~ternary_search_tree (void) {
 }
 
 template<class Char, class Data>
+template<class Container>
+typename ternary_search_tree<Char, Data>::reference
+ternary_search_tree<Char, Data>::operator[] (Container const& c) {
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
+  return *(typename node::find()(root, first, last));
+}
+
+template<class Char, class Data>
+template<class Container>
+typename ternary_search_tree<Char, Data>::const_reference
+ternary_search_tree<Char, Data>::operator[] (Container const& c) const {
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
+  return *(typename node::find()(root, first, last));
+}
+
+template<class Char, class Data>
+template<class Container>
+typename ternary_search_tree<Char, Data>::pointer
+ternary_search_tree<Char, Data>::find (Container const& c) {
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
+  return (root ? typename node::find()(root, first, last) : 0);
+}
+
+template<class Char, class Data>
 template<class Iterator>
 typename ternary_search_tree<Char, Data>::pointer
-ternary_search_tree<Char, Data>::find (Iterator& first, Iterator last) {
+ternary_search_tree<Char, Data>::find (
+  Iterator& first, Iterator last
+) {
+  return (root ? typename node::find()(root, first, last) : 0);
+}
+
+template<class Char, class Data>
+template<class Container>
+typename ternary_search_tree<Char, Data>::const_pointer
+ternary_search_tree<Char, Data>::find (Container const& c) const {
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
   return (root ? typename node::find()(root, first, last) : 0);
 }
 
@@ -306,16 +418,37 @@ template<class Char, class Data>
 template<class Iterator>
 typename ternary_search_tree<Char, Data>::const_pointer
 ternary_search_tree<Char, Data>::find (Iterator& first,
-                                    Iterator last) const {
+                                       Iterator last) const
+{
   return (root ? typename node::find()(root, first, last) : 0);
+}
+
+template<class Char, class Data>
+template<class Container, class Value>
+typename ternary_search_tree<Char, Data>::pointer
+ternary_search_tree<Char, Data>::insert (Container const& c,
+                                         Value const& val) 
+{
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
+  return typename node::insert()(root, first, last, val, this);
 }
 
 template<class Char, class Data>
 template<class Iterator, class Value>
 typename ternary_search_tree<Char, Data>::pointer
 ternary_search_tree<Char, Data>::insert (Iterator first, Iterator last,
-                                  Value const& val) {
+                                         Value const& val)
+{
   return typename node::insert()(root, first, last, val, this);
+}
+
+template<class Char, class Data>
+template<class Container>
+void ternary_search_tree<Char, Data>::erase (Container const& c) {
+  typedef typename spirit::result_of::begin<Container const>::type iterator;
+  iterator first = traits::begin(c), last = traits::end(c);
+  return typename node::erase()(root, first, last, this);
 }
 
 template<class Char, class Data>
@@ -333,6 +466,12 @@ void ternary_search_tree<Char, Data>::clear (void) {
 }
 
 template<class Char, class Data>
+template<class F>
+void ternary_search_tree<Char, Data>::for_each (F f) {
+  return typename node::for_each()(root, std::basic_string<Char>(), f);
+}
+
+template<class Char, class Data>
 typename ternary_search_tree<Char, Data>::node*
 ternary_search_tree<Char, Data>::new_node (id_type id) {
   return new node(id);
@@ -340,12 +479,20 @@ ternary_search_tree<Char, Data>::new_node (id_type id) {
 
 template<class Char, class Data>
 template<class Iterator, class Value>
-typename ternary_search_tree<Char, Data>::pointer
+typename disable_if<is_base_of<Data, Value>, Data*>::type
 ternary_search_tree<Char, Data>::new_data (Iterator first, Iterator last,
-                                    Value const& val) {
-  return new value_type(
-    new std::basic_string<Char>(first, last), new Value(val)
-  );
+                                           Value const& val)
+{
+  return new Data(val);
+}
+
+template<class Char, class Data>
+template<class Iterator, class Value>
+typename enable_if<is_base_of<Data, Value>, Data*>::type
+ternary_search_tree<Char, Data>::new_data (Iterator first, Iterator last,
+                                           Value const& val)
+{
+  return new Value(val);
 }
 
 template<class Char, class Data>
@@ -356,15 +503,8 @@ void ternary_search_tree<Char, Data>::delete_node (node* p) {
 
 template<class Char, class Data>
 void ternary_search_tree<Char, Data>::delete_data (pointer p) {
-  if (p) {
-    if (fusion::at_c<0>(*p))
-      delete fusion::at_c<0>(*p);
-
-    if (fusion::at_c<1>(*p))
-      delete fusion::at_c<1>(*p);
-
+  if (p) 
     delete p;
-  }
 }
 
 } // prana
