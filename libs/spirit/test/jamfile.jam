@@ -44,6 +44,7 @@ import testing ;
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
+      [ run prana/json_ir.cpp                 : : : : ]
     ;
   
   test-suite xml :

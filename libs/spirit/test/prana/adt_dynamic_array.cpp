@@ -18,9 +18,9 @@ int main (void) { try {
     array_type t;
 
     // insertion
-    t.push(1);
-    t.push(2);
-    t.push(3);
+    t.push_back(1);
+    t.push_back(2);
+    t.push_back(3);
     BOOST_TEST_EQ(t.size(), 3);
 
     // lookup
@@ -29,9 +29,9 @@ int main (void) { try {
     BOOST_TEST_EQ(t[2], 3);
 
     // removal
-    t.pop();
-    t.pop();
-    t.pop();
+    t.pop_back();
+    t.pop_back();
+    t.pop_back();
     BOOST_TEST_EQ(t.size(), 0);
   }
   
@@ -39,10 +39,10 @@ int main (void) { try {
     array_type t;
 
     // insertion
-    for (unsigned i = 0; i < 8; ++i) { t.push(i + 1); }
+    for (unsigned i = 0; i < 8; ++i) { t.push_back(i + 1); }
     BOOST_TEST_EQ(t.size(), 8);
     BOOST_TEST_EQ(t.capacity(), 8);
-    t.push(9);
+    t.push_back(9);
     BOOST_TEST_EQ(t.size(), 9);
     BOOST_TEST_EQ(t.capacity(), 16);
 
@@ -52,6 +52,39 @@ int main (void) { try {
     // removal
     t.clear();
     BOOST_TEST_EQ(t.size(), 0);
+  }
+
+  { 
+    array_type t0, t1;
+
+    // insertion
+    t0.push_back(1);
+    t0.push_back(2);
+    t0.push_back(3);
+    BOOST_TEST_EQ(t0.size(), 3);
+    BOOST_TEST_EQ(t1.size(), 0);
+
+    // copy
+    t1 = t0;
+    BOOST_TEST_EQ(t0.size(), 3);
+    BOOST_TEST_EQ(t1.size(), 3);
+
+    // clear first
+    t0.clear();
+    BOOST_TEST_EQ(t0.size(), 0);
+    BOOST_TEST_EQ(t1.size(), 3);
+
+    // lookup
+    BOOST_TEST_EQ(t1[0], 1);
+    BOOST_TEST_EQ(t1[1], 2);
+    BOOST_TEST_EQ(t1[2], 3);
+
+    // removal
+    t1.pop_back();
+    t1.pop_back();
+    t1.pop_back();
+    BOOST_TEST_EQ(t0.size(), 0);
+    BOOST_TEST_EQ(t1.size(), 0);
   }
   
   } catch (std::exception& e) {

@@ -35,6 +35,14 @@ struct expected_variant_type: dsir_exception {
   }
 };
 
+struct expected_valid_pointer: dsir_exception {
+  virtual ~expected_valid_pointer (void) throw() { }
+
+  virtual const char* what (void) const throw() {
+    return "'(expected-valid-pointer)";
+  }
+};
+
 } // prana
 } // spirit
 } // boost

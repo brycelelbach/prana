@@ -91,6 +91,52 @@ bool is_object (T const& t) {
   return is_object_predicate()(t);
 }
 
+struct is_array_predicate {
+  typedef bool result_type;
+ 
+  result_type operator() (utree const& ut) const {
+    return utree::visit(ut, *this);
+  }
+ 
+  template<typename Iterator>
+  result_type operator() (iterator_range<Iterator> const& range) const {
+    return !is_object(range);
+  }
+
+  template<typename T>
+  result_type operator() (T const& t) const {
+    return false;
+  }
+};
+
+template<typename T>
+bool is_array (T const& t) {
+  return is_array_predicate()(t);
+}
+
+struct is_list_predicate {
+  typedef bool result_type;
+ 
+  result_type operator() (utree const& ut) const {
+    return utree::visit(ut, *this);
+  }
+ 
+  template<typename Iterator>
+  result_type operator() (iterator_range<Iterator> const& range) const {
+    return true; 
+  }
+
+  template<typename T>
+  result_type operator() (T const& t) const {
+    return false;
+  }
+};
+
+template<typename T>
+bool is_list (T const& t) {
+  return is_list_predicate()(t);
+}
+
 } // prana
 } // spirit
 } // boost
