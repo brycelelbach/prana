@@ -78,13 +78,10 @@ struct json_ir_type {
   };
 };
 
-class json_ir:
-  public json_access_expr<proto::terminal<tag::json_root>::type, json_ir>
-{ 
+class json_ir { 
  protected:
   friend struct key_extractor;
-  
-  friend struct json_access_find<json_ir>;
+  friend struct json_access_find;
 
   typedef multi_index::multi_index_container<
     json_ir*,
@@ -101,7 +98,7 @@ class json_ir:
   typedef object_type::nth_index<0>::type object_zero_index;
   typedef object_type::nth_index<1>::type object_key_index;
 
-  typedef dynamic_array<json_ir, 4> array_type;
+  typedef dynamic_array<json_ir, 0> array_type;
 
   struct empty_type { };
   struct atom_type { }; 
@@ -153,13 +150,45 @@ class json_ir:
 
   void clear (void);
 
+  template<typename Arg>
+  typename proto::result_of::make_expr<
+    proto::tag::subscript, json_access_domain, json_ir const&, Arg const&
+  >::type const operator[] (Arg const&) const;
+
+  utree const& get (void) const;
+
   bool operator== (utree const&) const;
   bool operator== (json_ir const&) const;
 
   bool operator!= (json_ir const&) const;
   bool operator!= (utree const&) const;
 };
-  
+
+// expression wrapper
+template<class Expr>
+struct json_access_expr {
+  BOOST_PROTO_BASIC_EXTENDS(Expr, json_access_expr<Expr>, json_access_domain)
+
+  BOOST_PROTO_EXTENDS_SUBSCRIPT()
+
+  operator json_ir (void) const {
+    BOOST_MPL_ASSERT((proto::matches<Expr, json_access_grammar>));
+    return json_access_grammar()(*this);
+  }
+
+  utree const& get (void) const {
+    BOOST_MPL_ASSERT((proto::matches<Expr, json_access_grammar>));
+    return json_access_grammar()(*this).get();
+  }
+};
+
+template<class Expr>
+inline std::ostream&
+operator<< (std::ostream& out, json_access_expr<Expr> const& e) {
+  out << e.get();
+  return out;
+}
+ 
 utf8_symbol_range_type key_extractor::operator() (utree const& ut) const {
   if (!is_member_pair(ut))
     return utf8_symbol_range_type();
@@ -203,12 +232,13 @@ void json_ir::copy (utree const& ut) {
       index = member_pair_type();
     }
 
-    else /* is_array(ut) */ {
+    else /* is_array(ut) */ { 
       index = array_type();
-
+      array_type& a = boost::get<array_type>(index);
+      a.reserve(ut.size());
       BOOST_FOREACH(utree const& e, ut) {
-        boost::get<array_type>(index).push_back(json_ir(e));
-      } 
+        a.push_back(e);
+      }
     }
   }
 
@@ -278,7 +308,6 @@ json_ir::size_type json_ir::count (size_type s) const {
 
 json_ir const& json_ir::find (utf8_symbol_range_type const& key) const {
   return **object_by_keys().find(key);
-
 }
 
 json_ir const& json_ir::find (char const* first) const {
@@ -358,6 +387,22 @@ void json_ir::clear (void) {
   }
 
   index = empty_type();
+}
+
+template<typename Arg>
+typename proto::result_of::make_expr<
+  proto::tag::subscript, json_access_domain, json_ir const&, Arg const&
+>::type const json_ir::operator[] (Arg const& arg) const {
+  return proto::make_expr<proto::tag::subscript, json_access_domain>(
+    boost::ref(*this), boost::ref(arg)
+  ); 
+}
+
+utree const& json_ir::get (void) const {
+  if (type() == json_ir_type::member_pair_type)
+    return ast.back();
+  else
+    return ast;
 }
 
 bool json_ir::operator== (utree const& rhs) const {

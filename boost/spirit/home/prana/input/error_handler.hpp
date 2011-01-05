@@ -45,7 +45,8 @@ struct expected_component: parse_exception {
                       info const& w)
   {
     std::ostringstream oss;
-    oss << "(exception \"" << source << "\" " << ((line == -1) ? -1 : line)
+    oss << "(exception \"" << source << "\" "
+        << ((line == std::size_t(-1)) ? -1 : line)
         << " '(expected_component ";
 
     print_info_functor<std::ostringstream> pr(oss);
