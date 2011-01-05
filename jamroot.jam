@@ -15,5 +15,17 @@ local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
 variant valgrind : <testing.launcher>valgrind ;
 
 use-project /boost : $(BOOST_ROOT) ;
-use-project /prana : libs/spirit/test ;
 
+use-project /prana_test     : libs/spirit/test ;
+use-project /prana_example  : libs/spirit/example ;
+use-project /prana          : libs/spirit/src ;
+
+project 
+  : requirements
+    <include>./
+  : build-dir bin
+  ;
+
+build-project libs/spirit/test ;
+build-project libs/spirit/example ;
+build-project libs/spirit/src ;

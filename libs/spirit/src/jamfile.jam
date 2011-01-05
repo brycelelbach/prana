@@ -7,14 +7,7 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project 
-  : requirements
-    <toolset>clang:<cxxflags>-Wno-unused
-    <toolset>clang:<cxxflags>-Wno-tautological-compare
-    <include>../../../
-  : build-dir
-    ../../../bin
-  ;
+project ;
 
 {
   alias sexpr :
