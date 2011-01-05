@@ -17,27 +17,56 @@ int main (void) { try {
   using boost::spirit::prana::parse_json;
   using boost::spirit::prana::generate_json;
 
-  std::cout << "instantiation test: " << std::endl;
-
-  { 
-    json_ir ir;
-  }
-  
-  std::cout << std::endl << "basic array test: " << std::endl; 
+  std::cout << "basic array test: " << std::endl; 
   
   { 
     std::string in = "[[1, 2], [3]]";
     utree out;
 
     parse_json(in, out);
+   
+    std::cout << out << std::endl;
+    
+    json_ir ir(out);
+ 
+    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+      generate_json,
+      ((out)              (in))
+      (((ir[0]).get())    ("[1, 2]"))
+      (((ir[0][0]).get()) ("1"))
+      (((ir[0][1]).get()) ("2"))
+      (((ir[1]).get())    ("[3]"))
+      (((ir[1][0]).get()) ("3"))
+      (((ir[2]).get())    ("\"invalid\""))
+      (((ir[3][1]).get()) ("\"invalid\""))
+      (((ir[0][2]).get()) ("\"invalid\""))
+    )
+  }
+  
+  std::cout << "basic array test: " << std::endl; 
+
+  { 
+    std::string in = "{\"a\":{\"b\":1, \"c\":2}, \"d\":{\"e\":3}}";
+    utree out;
+
+    parse_json(in, out);
+    
+    std::cout << out << std::endl;
+
+    json_ir ir(out);
     
     BOOST_SPIRIT_PRANA_UTREE_TESTS(
       generate_json,
-      ((out) (in)))
-
-    json_ir ir(out);
-
-    std::cout << ir[0][1] << std::endl;
+      ((out)                  (in))
+      (((ir["a"]).get())      ("{\"b\":1, \"c\":2}"))
+      (((ir["a"]["b"]).get()) ("1"))
+      (((ir["a"]["c"]).get()) ("2"))
+      (((ir["d"]).get())      ("{\"e\":3}"))
+      (((ir["d"]["e"]).get()) ("3"))
+      (((ir["f"]).get())      ("\"invalid\""))
+      (((ir["g"]["h"]).get()) ("\"invalid\""))
+      (((ir["a"]["d"]).get()) ("\"invalid\""))
+    )
   }
 
   } catch (std::exception& e) {

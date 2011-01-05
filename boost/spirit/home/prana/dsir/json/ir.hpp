@@ -80,7 +80,6 @@ struct json_ir_type {
 
 class json_ir { 
  protected:
-  friend struct key_extractor;
   friend struct json_access_find;
 
   typedef multi_index::multi_index_container<
@@ -102,7 +101,8 @@ class json_ir {
 
   struct empty_type { };
   struct atom_type { }; 
-  struct member_pair_type { }; 
+
+  typedef json_ir* member_pair_type;
 
   typedef variant<
     empty_type, atom_type, member_pair_type, object_type, array_type
@@ -113,6 +113,12 @@ class json_ir {
   index_type index;
 
  protected:
+  array_type& array (void);
+  array_type const& array (void) const;
+
+  member_pair_type& member_pair (void);
+  member_pair_type const& member_pair (void) const;
+  
   object_zero_index& object_by_positions (void); 
   object_zero_index const& object_by_positions (void) const;
   
@@ -170,6 +176,11 @@ struct json_access_expr {
   BOOST_PROTO_BASIC_EXTENDS(Expr, json_access_expr<Expr>, json_access_domain)
 
   BOOST_PROTO_EXTENDS_SUBSCRIPT()
+  
+  operator utree (void) const {
+    BOOST_MPL_ASSERT((proto::matches<Expr, json_access_grammar>));
+    return json_access_grammar()(*this).get();
+  }
 
   operator json_ir (void) const {
     BOOST_MPL_ASSERT((proto::matches<Expr, json_access_grammar>));
@@ -193,12 +204,28 @@ utf8_symbol_range_type key_extractor::operator() (utree const& ut) const {
   if (!is_member_pair(ut))
     return utf8_symbol_range_type();
 
-  return ut.get<utf8_symbol_range_type>();
+  return ut.front().get<utf8_symbol_range_type>();
 }
  
 utf8_symbol_range_type key_extractor::operator() (json_ir const* ir) const {
-  return (ir ? (*this)(ir->ast) : utf8_symbol_range_type());
+  return (ir ? (*this)(ir->get()) : utf8_symbol_range_type());
 } 
+
+json_ir::array_type& json_ir::array (void) {
+  return boost::get<array_type>(index);
+}
+
+json_ir::array_type const& json_ir::array (void) const {
+  return boost::get<array_type>(index);
+}
+
+json_ir::member_pair_type& json_ir::member_pair (void) {
+  return boost::get<member_pair_type>(index);
+}
+
+json_ir::member_pair_type const& json_ir::member_pair (void) const {
+  return boost::get<member_pair_type>(index);
+}
 
 json_ir::object_zero_index& json_ir::object_by_positions (void) {
   return boost::get<object_type>(index).get<0>();
@@ -228,13 +255,12 @@ void json_ir::copy (utree const& ut) {
       } 
     }
 
-    else if (is_member_pair(ut)) {
-      index = member_pair_type();
-    }
+    else if (is_member_pair(ut)) 
+      index = new json_ir(ut.back());
 
     else /* is_array(ut) */ { 
       index = array_type();
-      array_type& a = boost::get<array_type>(index);
+      array_type& a = array();
       a.reserve(ut.size());
       BOOST_FOREACH(utree const& e, ut) {
         a.push_back(e);
@@ -242,9 +268,8 @@ void json_ir::copy (utree const& ut) {
     }
   }
 
-  else /* !is_list(ut) */ {
+  else /* !is_list(ut) */
     index = atom_type();
-  }
 }
 
 void json_ir::copy (json_ir const& ir) {
@@ -263,8 +288,11 @@ void json_ir::copy (json_ir const& ir) {
     }
   }
 
-  else /* type() != json_ir_type::object_type */
-    index = ir.index; 
+  else if (type() == json_ir_type::member_pair_type)
+    index = new json_ir(*ir.member_pair()); 
+
+  else 
+    index = ir.index;
 }
 
 json_ir::size_type json_ir::count (utf8_symbol_range_type const& key) const {
@@ -300,14 +328,14 @@ json_ir::size_type json_ir::count (size_type s) const {
     return s < object_by_positions().size(); 
 
   else if (type() == json_ir_type::array_type)
-    return s < boost::get<array_type>(index).size(); 
+    return s < array().size(); 
 
   else 
     return 0;
 }
 
 json_ir const& json_ir::find (utf8_symbol_range_type const& key) const {
-  return **object_by_keys().find(key);
+  return *(**object_by_keys().find(key)).member_pair();
 }
 
 json_ir const& json_ir::find (char const* first) const {
@@ -315,21 +343,23 @@ json_ir const& json_ir::find (char const* first) const {
   while (*last)
     last++;
 
-  return **object_by_keys().find(utf8_symbol_range_type(first, last));
+  utf8_symbol_range_type key(first, last);
+  return *(**object_by_keys().find(key)).member_pair();
 }
 
 json_ir const& json_ir::find (std::string const& str) const {
   char const* first = str.data();
   char const* last = &first[str.length()];
 
-  return **object_by_keys().find(utf8_symbol_range_type(first, last));
+  utf8_symbol_range_type key(first, last);
+  return *(**object_by_keys().find(key)).member_pair();
 }
 
 json_ir const& json_ir::find (size_type s) const {
   if (type() == json_ir_type::object_type)
-    return *object_by_positions()[s]; 
+    return *(*object_by_positions()[s]).member_pair(); 
 
-  return boost::get<array_type>(index)[s]; 
+  return array()[s]; 
 }
 
 json_ir::json_ir (void): ast(), index(empty_type()) { }
@@ -386,6 +416,11 @@ void json_ir::clear (void) {
     }
   }
 
+  else if (type() == json_ir_type::member_pair_type) {
+    json_ir* p = member_pair();
+    if (p) delete p;
+  }
+
   index = empty_type();
 }
 
@@ -399,10 +434,7 @@ typename proto::result_of::make_expr<
 }
 
 utree const& json_ir::get (void) const {
-  if (type() == json_ir_type::member_pair_type)
-    return ast.back();
-  else
-    return ast;
+  return ast;
 }
 
 bool json_ir::operator== (utree const& rhs) const {
