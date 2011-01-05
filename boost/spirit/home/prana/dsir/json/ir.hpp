@@ -288,7 +288,7 @@ void json_ir::copy (json_ir const& ir) {
     }
   }
 
-  else if (type() == json_ir_type::member_pair_type)
+  else if (ir.type() == json_ir_type::member_pair_type)
     index = new json_ir(*ir.member_pair()); 
 
   else 
@@ -413,12 +413,14 @@ void json_ir::clear (void) {
   if (type() == json_ir_type::object_type) {
     BOOST_FOREACH(json_ir* mp, object_by_positions()) {
       if (mp) delete mp;
+      mp = 0;
     }
   }
 
   else if (type() == json_ir_type::member_pair_type) {
     json_ir* p = member_pair();
     if (p) delete p;
+    p = 0;
   }
 
   index = empty_type();

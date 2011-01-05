@@ -139,6 +139,9 @@ dynamic_array<Data, Initial, Alloc>::~dynamic_array (void) {
   clear();
   if (_data && (_capacity != 0))
     _alloc.deallocate(_data, _capacity);
+  _size = 0;
+  _capacity = 0;
+  _data = 0;
 }
 
 template<class Data, uinthalf_t Initial, class Alloc>
