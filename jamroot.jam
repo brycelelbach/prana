@@ -22,6 +22,10 @@ use-project /prana          : libs/spirit/src ;
 
 project 
   : requirements
+    <toolset>pathscale:<cxxflags>-Wno-uninitialized
+    <toolset>gcc:<cxxflags>-ftemplate-depth-500
+    <toolset>clang:<cxxflags>-Wno-unused
+    <toolset>clang:<cxxflags>-Wno-tautological-compare
     <include>./
   : build-dir bin
   ;
