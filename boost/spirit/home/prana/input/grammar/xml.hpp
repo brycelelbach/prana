@@ -23,13 +23,16 @@ namespace prana {
 template<class Iterator>
 struct xml_white_space: qi::grammar<Iterator> {
   qi::rule<Iterator>
-    start;
+    start, comment;
 
   xml_white_space (void): xml_white_space::base_type(start) {
     using standard::space;
     using standard::char_;
 
-    start = space | ("<!--" >> *char_ >> "-->");
+    start = space | comment;
+
+    // [15] Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
+    comment = "<!--" >> *((char_ - '-') | ('-' >> (char_ - '-'))) >> "-->";
   }
 };
 
@@ -38,19 +41,16 @@ struct xml_parser:
   qi::grammar<Iterator, utree(void), xml_white_space<Iterator> >
 {
   qi::rule<Iterator, utree(void), xml_white_space<Iterator> >
-    start, empty, element, atom, value, attribute;
+    start, document, pi, empty, element, atom, value, attribute;
 
   qi::rule<Iterator, utree::list_type(void), xml_white_space<Iterator> >
     attributes, children;
-
-  qi::symbols<char, bool>
-    boolean;
 
   qi::rule<Iterator, utf8_symbol_type(void)>
     name;
 
   qi::rule<Iterator, utf8_string_type(void)>
-    char_data, attr_string;
+    char_data, attr_string, pi_string;
 
   phoenix::function<ErrorHandler> const
     error;
@@ -63,8 +63,9 @@ struct xml_parser:
   {
     using phoenix::front;
     using standard::char_;
-    using qi::repeat;
+    using qi::no_skip;
     using qi::omit;
+    using qi::bool_;
     using qi::int_;
     using qi::real_parser;
     using qi::strict_real_policies;
@@ -79,7 +80,11 @@ struct xml_parser:
     typedef real_parser<double, strict_real_policies<double> > real_type;
     real_type const real = real_type();
  
-    start = empty | element;
+    start = *pi >> document;
+
+    document = empty | element;
+
+    pi       = pos(_val, '<') >> no_skip['?'] >> name >> pi_string >> "?>";
 
     empty    = pos(_val, '<') >> name >> attributes >> "/>";
  
@@ -89,13 +94,13 @@ struct xml_parser:
 
     atom = real
          | int_
-         | boolean
+         | bool_
          | char_data
-         | start;
+         | document;
 
     value = real
           | int_
-          | boolean
+          | bool_
           | attr_string;
 
     attributes = *attribute;
@@ -104,16 +109,14 @@ struct xml_parser:
 
     children = pos.epsilon(_val) >> *atom;
 
-    boolean.add
-      ("true", true)
-      ("false", false);
-
     std::string name_start_char = ":A-Z_a-z";
     std::string name_char = ":A-Z_a-z-.0-9";
 
     name = char_(name_start_char) >> *char_(name_char);
     
     char_data = +(~char_("<&") - "</");
+    
+    pi_string = *(~char_ - "?>");
     
     attr_string = +~char_("<&\"");
 
