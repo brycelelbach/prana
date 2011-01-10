@@ -84,7 +84,6 @@ struct sexpr_parser:
     using qi::on_error;
     using qi::fail;
     using qi::int_;
-    using qi::attr_cast;
     using qi::lit;
     using qi::_val;
     using qi::_1;
@@ -109,7 +108,7 @@ struct sexpr_parser:
          | symbol
          | binary;
 
-    nil_ = attr_cast(lit("nil")); 
+    nil_ = qi::attr_cast(lit("nil")); 
 
     integer = lexeme[ no_case["#x"] >  hex]
             | lexeme[ no_case["#o"] >> oct]

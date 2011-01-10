@@ -29,9 +29,13 @@ struct push_line_pos_functor {
 
   template<class Range>
   void operator() (utree& ast, Range const& rng) const {
-    int n = get_line(rng.begin());
-    BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
-    ast.tag(n);
+    std::size_t n = get_line(rng.begin());
+    if (n != -1) {
+      BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
+      ast.tag(n);
+    }
+    else
+      ast.tag(-1);
   }
 };
 
