@@ -5,46 +5,86 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_TRAITS_HPP)
-#define BOOST_SPIRIT_PRANA_TRAITS_HPP
+#if !defined(BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP)
+#define BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
 
-#include <boost/type_traits/is_convertible.hpp>
-
-#include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/set.hpp>
 
-#include <boost/preprocessor/seq.hpp>
+#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/support/unused.hpp>
+#include <boost/spirit/include/support_utree.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
+namespace traits {
 
-#define BOOST_SPIRIT_PRANA_TRAIT(_, d, trait)                     \
-  BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(                              \
-    BOOST_PP_SEQ_ELEM(1, trait), BOOST_PP_SEQ_ELEM(0, trait), d)  \
-  /***/ 
+template<class Tag, class Enable/* = void*/>
+struct annotations_type: spirit::unused_type { };  
 
-#define BOOST_SPIRIT_PRANA_TRAITS(d, traits)                  \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_TRAIT, d, traits)  \
-  /***/
+template<class Tag, class Enable/* = void*/>
+struct has_source_locations: mpl::false_ { };
 
-//[concept_traits
-BOOST_SPIRIT_PRANA_TRAITS(
-  false,
-  ((visitable)       (is_visitable)) 
-  ((type_definition) (is_type_definition)) 
-  ((type_registry)   (is_type_registry))
-  ((tag_binder)      (is_tag_binder)) 
-  ((routine)         (is_routine))) 
-//]
+template<class Tag, class Enable/* = void*/>
+struct extract_source_location_from_node {
+  typedef std::size_t type; 
 
-template<class Definition, class T>
-struct is_convertible_to_data_definition:
-  mpl::bool_<is_convertible<typename Definition::data_type, T>::value> { };
+  template<class PT>
+  static type call (utree const& ut, PT const&) {
+    switch (ut.which()) {
+      case utree_type::string_type:
+      case utree_type::symbol_type:
+      case utree_type::binary_type:
+        return -1;
+      default:
+        return ut.tag();
+    }
+  }
+};
 
+template<class PT, class Enable/* = void*/>
+typename prana::result_of<typename PT::tag>::type
+extract_source_location (utree const& ut, PT const& pt) {
+  return extract_source_location_from_node<typename PT::tag>::call(ut, pt);
+}
+
+template<class Tag, class Enable/* = void*/>
+struct has_list_subtypes: mpl::false_ { }:
+
+template<class Tag, class Enable/* = void*/>
+struct list_subtypes: mpl::set<> { };
+
+template<class Tag, class Enable/* = void*/>
+struct extract_list_subtype_from_node {
+  typedef std::size_t type; 
+
+  template<class PT>
+  static type call (utree const&, PT const&) {
+    return -1;
+  }
+};
+
+template<class PT, class Enable/* = void*/>
+typename prana::result_of<typename PT::tag>::type
+extract_list_subtype (utree const& ut, PT const& pt) {
+  return extract_list_subtype_from_node<typename PT::tag>::call(ut, pt);
+}
+
+} // traits
+
+namespace result_of {
+
+template<class Tag, class Enable/* = void*/>
+struct extract_source_location: extract_source_location_from_node<Tag> { };
+
+template<class Tag, class Enable/* = void*/>
+struct extract_list_subtype: extract_list_subtype_from_node<Tag> { };
+
+} // result_of
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_TRAITS_HPP
+#endif // BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
 
