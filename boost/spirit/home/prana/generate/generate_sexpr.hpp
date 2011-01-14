@@ -14,8 +14,8 @@
 #include <boost/spirit/include/karma_list.hpp>
 #include <boost/spirit/include/support_ostream_iterator.hpp>
 
-#include <boost/spirit/home/prana/output/grammar/sexpr.hpp>
-#include <boost/spirit/home/prana/output/generate_sexpr_fwd.hpp>
+#include <boost/spirit/home/prana/generate/grammar/sexpr.hpp>
+#include <boost/spirit/home/prana/generate/generate_sexpr_fwd.hpp>
 
 namespace boost {
 namespace spirit {

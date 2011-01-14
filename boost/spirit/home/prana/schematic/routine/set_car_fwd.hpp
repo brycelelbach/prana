@@ -14,7 +14,7 @@
 #include <boost/spirit/home/prana/schematic/exception.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
 #include <boost/spirit/home/prana/schematic/core_fwd.hpp>
-#include <boost/spirit/home/prana/schematic/traits.hpp>
+#include <boost/spirit/home/prana/traits_fwd.hpp>
 
 namespace boost {
 namespace spirit {

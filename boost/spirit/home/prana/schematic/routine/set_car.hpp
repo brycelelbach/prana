@@ -39,8 +39,8 @@ template<class Tag>
 struct set_car<
   Tag, typename enable_if<
     mpl::and_<
-      is_heap_allocated_type<Tag>,
-      is_cons_type<Tag>
+      traits::is_heap_allocated_type<Tag>,
+      traits::is_cons_type<Tag>
     >
   >::type
 > {
@@ -86,8 +86,8 @@ template<class Tag>
 struct set_car<
   Tag, typename enable_if<
     mpl::and_<
-      is_stack_allocated_type<Tag>,
-      is_cons_type<Tag>
+      traits::is_stack_allocated_type<Tag>,
+      traits::is_cons_type<Tag>
     >
   >::type
 > {

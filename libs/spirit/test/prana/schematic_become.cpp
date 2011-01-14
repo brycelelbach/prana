@@ -20,7 +20,7 @@ int main (void) { try {
 
     become<schematic::boolean>(s); 
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("#f")))
     //]
   }
@@ -30,7 +30,7 @@ int main (void) { try {
 
     become<schematic::integer>(s);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("0")))
     //]
   }
@@ -40,7 +40,7 @@ int main (void) { try {
 
     become<schematic::ascii>(s);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("\"\"")))
     //]
   }

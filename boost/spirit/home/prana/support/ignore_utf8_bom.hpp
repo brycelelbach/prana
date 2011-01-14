@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SUPPORT_FILE_IO_HPP)
-#define BOOST_SPIRIT_PRANA_SUPPORT_FILE_IO_HPP
+#if !defined(BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP)
+#define BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP
 
 #include <string>
 #include <fstream>
@@ -85,5 +85,5 @@ void ignore_utf8_bom (std::ifstream& in, std::string const& fname) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SUPPORT_FILE_IO_HPP
+#endif // BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP
 

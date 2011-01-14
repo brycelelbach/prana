@@ -10,9 +10,9 @@
 
 #include <boost/spirit/include/support_utree.hpp>
 
-#include <boost/spirit/home/prana/input/grammar/string.hpp>
-#include <boost/spirit/home/prana/input/error_handler.hpp>
-#include <boost/spirit/home/prana/input/save_line_pos.hpp>
+#include <boost/spirit/home/prana/parse/grammar/string.hpp>
+#include <boost/spirit/home/prana/parse/error_handler.hpp>
+#include <boost/spirit/home/prana/parse/save_line_pos.hpp>
 
 #include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 

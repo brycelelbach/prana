@@ -42,8 +42,8 @@ template<class TagX, class TagY>
 struct set<
   TagX, TagY, typename enable_if<
     mpl::and_<
-      is_heap_allocated_type<TagY>,
-      is_cons_type<TagY>
+      traits::is_heap_allocated_type<TagY>,
+      traits::is_cons_type<TagY>
     > 
   >::type
 > {
@@ -93,8 +93,8 @@ template<class TagX, class TagY>
 struct set<
   TagX, TagY, typename enable_if<
     mpl::and_<
-      is_heap_allocated_type<TagY>,
-      is_dynamic_array_type<TagY>
+      traits::is_heap_allocated_type<TagY>,
+      traits::is_dynamic_array_type<TagY>
     > 
   >::type
 > {
@@ -143,7 +143,7 @@ struct set<
 //[set_visitable_definition
 template<class X, class Y>
 inline typename enable_if<
-  is_visitable<Y>,
+  traits::is_visitable<Y>,
 X&>::type set (X& x, Y const& y) {
   return dispatch<typename X::registry, routine::set, X, Y const>(x, y);
 }

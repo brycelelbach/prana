@@ -17,7 +17,7 @@ int main (void) { try {
   { //[integer_integer_pair
     schematic s(3, 5);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s)       ("(3 5)"))
       ((*car(s)) ("3")))
     //]
@@ -26,7 +26,7 @@ int main (void) { try {
   { //[ascii_integer_pair
     schematic s("foo", 17);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s)       ("(\"foo\" 17)"))
       ((*car(s)) ("\"foo\"")))
     //]

@@ -10,7 +10,7 @@
 
 #include <boost/throw_exception>
 
-#include <boost/spirit/home/prana/source_location.hpp>
+#include <boost/spirit/home/prana/adt/source_location.hpp>
 
 namespace boost {
 namespace spirit {

@@ -7,8 +7,8 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/input/parse_sexpr.hpp>
-#include <boost/spirit/home/prana/output/generate_sexpr.hpp>
+#include <boost/spirit/home/prana/parse/parse_sexpr.hpp>
+#include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
 int main (void) { try {
   using boost::spirit::utree;

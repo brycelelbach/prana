@@ -11,9 +11,9 @@
 
 #include <boost/spirit/include/support_utree.hpp>
 
-#include <boost/spirit/home/prana/input/grammar/string.hpp>
-#include <boost/spirit/home/prana/input/error_handler.hpp>
-#include <boost/spirit/home/prana/input/save_line_pos.hpp>
+#include <boost/spirit/home/prana/parse/grammar/string.hpp>
+#include <boost/spirit/home/prana/parse/error_handler.hpp>
+#include <boost/spirit/home/prana/parse/save_line_pos.hpp>
 
 #include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
@@ -78,6 +78,7 @@ struct sexpr_parser:
     using qi::hex;
     using qi::oct;
     using qi::no_case;
+    using qi::attr;
     using qi::real_parser;
     using qi::strict_real_policies;
     using qi::uint_parser;
@@ -108,7 +109,7 @@ struct sexpr_parser:
          | symbol
          | binary;
 
-    nil_ = qi::attr_cast(lit("nil")); 
+    nil_ = "nil" >> attr(spirit::nil); 
 
     integer = lexeme[ no_case["#x"] >  hex]
             | lexeme[ no_case["#o"] >> oct]

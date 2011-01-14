@@ -12,7 +12,7 @@
 
 #include <boost/spirit/home/prana/dispatch/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
-#include <boost/spirit/home/prana/schematic/traits.hpp>
+#include <boost/spirit/home/prana/traits_fwd.hpp>
 #include <boost/spirit/home/prana/schematic/core_fwd.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
 

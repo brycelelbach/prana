@@ -12,7 +12,7 @@
 #include <boost/spirit/include/support_utree.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
+//#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -50,6 +50,7 @@ struct sexpr_generator:
     using standard::string;
     using karma::uint_generator;
     using karma::double_;
+    using karma::omit;
     using karma::int_;
     using karma::attr_cast;
     using karma::lit;
@@ -77,8 +78,8 @@ struct sexpr_generator:
 
     binary = '#' << *right_align(2, '0')[hex2] << '#';
 
-    nil_ = attr_cast(lit("nil"));
-
+    nil_ = eps << "nil"; //attr_cast(lit("nil"));
+    
     boolean.add
       (true, "#t")
       (false, "#f");

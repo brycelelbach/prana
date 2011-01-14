@@ -19,13 +19,13 @@ int main (void) { try {
   { //[boolean
     schematic s;
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
 
     set(s, true);
     clear(s);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
     //]
   }
@@ -33,13 +33,13 @@ int main (void) { try {
   { //[ascii
     schematic s;
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
 
     set(s, "wxyz");
     clear(s);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
     //]
   }
@@ -47,13 +47,13 @@ int main (void) { try {
   { //[floating
     schematic s;
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
 
     set(s, 17.5); 
     clear(s);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s) ("nil")))
     //]
   }

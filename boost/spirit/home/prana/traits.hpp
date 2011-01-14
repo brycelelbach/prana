@@ -5,12 +5,14 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
+#if !defined(BOOST_SPIRIT_PRANA_TRAITS_HPP)
+#define BOOST_SPIRIT_PRANA_TRAITS_HPP
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/set.hpp>
 
+#include <boost/spirit/home/prana/adt/source_location.hpp>
+#include <boost/spirit/home/prana/adt/dynamic_array.hpp>
 #include <boost/spirit/home/prana/traits_fwd.hpp>
 #include <boost/spirit/home/support/unused.hpp>
 #include <boost/spirit/include/support_utree.hpp>
@@ -21,7 +23,7 @@ namespace prana {
 namespace traits {
 
 template<class Tag, class Enable/* = void*/>
-struct annotations_type: spirit::unused_type { };  
+struct annotations_type: dynamic_array<fusion::vector1<source_location> > { };  
 
 template<class Tag, class Enable/* = void*/>
 struct has_source_locations: mpl::false_ { };
@@ -43,14 +45,14 @@ struct extract_source_location_from_node {
   }
 };
 
-template<class PT, class Enable/* = void*/>
-typename prana::result_of<typename PT::tag>::type
+template<class PT>
+typename prana::result_of::extract_source_location<typename PT::tag>::type
 extract_source_location (utree const& ut, PT const& pt) {
   return extract_source_location_from_node<typename PT::tag>::call(ut, pt);
 }
 
 template<class Tag, class Enable/* = void*/>
-struct has_list_subtypes: mpl::false_ { }:
+struct has_list_subtypes: mpl::false_ { };
 
 template<class Tag, class Enable/* = void*/>
 struct list_subtypes: mpl::set<> { };
@@ -65,8 +67,8 @@ struct extract_list_subtype_from_node {
   }
 };
 
-template<class PT, class Enable/* = void*/>
-typename prana::result_of<typename PT::tag>::type
+template<class PT>
+typename prana::result_of::extract_list_subtype<typename PT::tag>::type
 extract_list_subtype (utree const& ut, PT const& pt) {
   return extract_list_subtype_from_node<typename PT::tag>::call(ut, pt);
 }
@@ -76,15 +78,17 @@ extract_list_subtype (utree const& ut, PT const& pt) {
 namespace result_of {
 
 template<class Tag, class Enable/* = void*/>
-struct extract_source_location: extract_source_location_from_node<Tag> { };
+struct extract_source_location:
+  traits::extract_source_location_from_node<Tag> { };
 
 template<class Tag, class Enable/* = void*/>
-struct extract_list_subtype: extract_list_subtype_from_node<Tag> { };
+struct extract_list_subtype:
+  traits::extract_list_subtype_from_node<Tag> { };
 
 } // result_of
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
+#endif // BOOST_SPIRIT_PRANA_TRAITS_HPP
 

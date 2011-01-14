@@ -16,8 +16,8 @@
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
-#include <boost/spirit/home/prana/input/grammar/sexpr.hpp>
-#include <boost/spirit/home/prana/input/parse_sexpr_fwd.hpp>
+#include <boost/spirit/home/prana/parse/grammar/sexpr.hpp>
+#include <boost/spirit/home/prana/parse/parse_sexpr_fwd.hpp>
 
 namespace boost {
 namespace spirit {

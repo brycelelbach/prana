@@ -38,12 +38,12 @@ template<class TagX>
 struct clear<
   TagX, typename enable_if<
     mpl::and_<
-      is_heap_allocated_type<TagX>, /*<- is_heap_allocated_type is an MPL
+      traits::is_heap_allocated_type<TagX>, /*<- traits::is_heap_allocated_type is an MPL
                                          metafunction predicate that returns
                                          true if it's subject is a member of a
                                          type definition category which is
                                          allocated on the heap. ->*/
-      is_cons_type<TagX> /*< is_cons_type is an MPL metafunction predicate which
+      traits::is_cons_type<TagX> /*< traits::is_cons_type is an MPL metafunction predicate which
                              uses has_xxx support to detect cons tags. >*/
     >
   >::type
@@ -83,8 +83,8 @@ template<class TagX>
 struct clear<
   TagX, typename enable_if<
     mpl::and_<
-      is_heap_allocated_type<TagX>, 
-      is_dynamic_array_type<TagX> 
+      traits::is_heap_allocated_type<TagX>, 
+      traits::is_dynamic_array_type<TagX> 
     >
   >::type
 > {

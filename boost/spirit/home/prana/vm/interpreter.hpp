@@ -12,7 +12,7 @@
 
 #include <boost/spirit/home/prana/vm/interpreter_fwd.hpp>
 #include <boost/spirit/home/prana/vm/compiler.hpp>
-#include <boost/spirit/home/prana/input/parse_sexpr.hpp>
+#include <boost/spirit/home/prana/parse/parse_sexpr.hpp>
 
 namespace boost {
 namespace spirit {

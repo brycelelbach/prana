@@ -30,8 +30,8 @@ struct extract_list_subtype;
 
 namespace traits {
 
-#define BOOST_SPIRIT_PRANA_TRAIT(name)                                \
-  BOOST_MPL_HAS_TRAIT_NAMED_DEF(BOOST_PP_CAT(is, name), name, false)  \
+#define BOOST_SPIRIT_PRANA_TRAIT(name)                                     \
+  BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(BOOST_PP_CAT(is_, name), name, false)  \
   /***/ 
 
 BOOST_SPIRIT_PRANA_TRAIT(visitable)
@@ -39,6 +39,14 @@ BOOST_SPIRIT_PRANA_TRAIT(type_definition)
 BOOST_SPIRIT_PRANA_TRAIT(type_registry)
 BOOST_SPIRIT_PRANA_TRAIT(tag_binder)
 BOOST_SPIRIT_PRANA_TRAIT(routine)
+
+BOOST_SPIRIT_PRANA_TRAIT(arithmetic_type) 
+BOOST_SPIRIT_PRANA_TRAIT(singleton_type) 
+BOOST_SPIRIT_PRANA_TRAIT(dynamic_array_type) 
+BOOST_SPIRIT_PRANA_TRAIT(cons_type) 
+
+BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_heap_allocated_type, heap, false) 
+BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_stack_allocated_type, stack, false) 
 
 template<class Tag, class Enable = void>
 struct annotations_type;
@@ -49,8 +57,8 @@ struct has_source_locations;
 template<class Tag, class Enable = void>
 struct extract_source_location_from_node;
 
-template<class PT, class Enable = void>
-typename prana::result_of<typename PT::tag>::type
+template<class PT>
+typename prana::result_of::extract_source_location<typename PT::tag>::type
 extract_source_location (utree const&, PT const&);
 
 template<class Tag, class Enable = void>
@@ -62,8 +70,8 @@ struct list_subtypes;
 template<class Tag, class Enable = void>
 struct extract_list_subtype_from_node;
 
-template<class PT, class Enable = void>
-typename prana::result_of<typename PT::tag>::type
+template<class PT>
+typename prana::result_of::extract_list_subtype<typename PT::tag>::type
 extract_list_subtype (utree const&, PT const&);
 
 } // traits

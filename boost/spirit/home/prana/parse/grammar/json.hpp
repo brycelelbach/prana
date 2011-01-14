@@ -11,11 +11,9 @@
 
 #include <boost/spirit/include/support_utree.hpp>
 
-#include <boost/spirit/home/prana/input/grammar/string.hpp>
-#include <boost/spirit/home/prana/input/error_handler.hpp>
-#include <boost/spirit/home/prana/input/save_line_pos.hpp>
-
-#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
+#include <boost/spirit/home/prana/parse/grammar/string.hpp>
+#include <boost/spirit/home/prana/parse/error_handler.hpp>
+#include <boost/spirit/home/prana/parse/save_line_pos.hpp>
 
 namespace boost {
 namespace spirit {
@@ -56,6 +54,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
     using standard::char_;
     using qi::lexeme;
     using qi::as;
+    using qi::attr;
     using qi::real_parser;
     using qi::strict_real_policies;
     using qi::on_error;
@@ -85,7 +84,7 @@ struct json_parser: qi::grammar<Iterator, utree(void), standard::space_type> {
           | empty_object
           | empty_array; 
     
-    null = qi::attr_cast(lit("null"));
+    null = "null" >> attr(spirit::nil); 
 
     object %= pos(_val, '{') >> (member_pair % ',') > '}';
 

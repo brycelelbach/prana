@@ -15,8 +15,8 @@
 #include <boost/spirit/include/karma_list.hpp>
 #include <boost/spirit/include/support_ostream_iterator.hpp>
 
-#include <boost/spirit/home/prana/output/visit/json.hpp>
-#include <boost/spirit/home/prana/output/generate_json_fwd.hpp>
+#include <boost/spirit/home/prana/generate/visit/json.hpp>
+#include <boost/spirit/home/prana/generate/generate_json_fwd.hpp>
 
 namespace boost {
 namespace spirit {

@@ -17,7 +17,7 @@ int main (void) { try {
   { //[floating_boolean_pair
     schematic s(19.95, true);
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s)       ("(19.95 #t)"))
       ((*cdr(s)) ("#t")))
     //]
@@ -26,7 +26,7 @@ int main (void) { try {
   { //[ascii_ascii_pair
     schematic s("bar", "bizz");
 
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s)       ("(\"bar\" \"bizz\")"))
       ((*cdr(s)) ("\"bizz\"")))
     //]

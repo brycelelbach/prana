@@ -202,7 +202,7 @@ struct serialize<schematic::vector> {
 template<class Tag>
 struct serialize<
   Tag, typename enable_if<
-    is_cons_type<Tag>
+    traits::is_cons_type<Tag>
   >::type
 > {
   struct routine; 

@@ -14,7 +14,7 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/preprocessor.hpp>
 
-#define BOOST_SPIRIT_PRANA_SEXPR_TEST(_, data, elem)                          \
+#define BOOST_SPIRIT_PRANA_SCHEMATIC_TEST(_, data, elem)                      \
   { std::string x = serialize(BOOST_PP_SEQ_ELEM(0, elem));                    \
     std::string y = BOOST_PP_SEQ_ELEM(1, elem);                               \
     ::boost::detail::test_eq_impl(                                            \
@@ -22,8 +22,8 @@
     ); }                                                                      \
   /***/
 
-#define BOOST_SPIRIT_PRANA_SEXPR_TESTS(tests)                             \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_SEXPR_TEST, _, tests)          \
+#define BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(tests)                             \
+  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_SCHEMATIC_TEST, _, tests)          \
   /***/
 
 #define BOOST_SPIRIT_PRANA_UTREE_TEST(_, data, elem)                          \

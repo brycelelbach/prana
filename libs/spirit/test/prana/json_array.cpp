@@ -7,8 +7,8 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/input/parse_json.hpp>
-#include <boost/spirit/home/prana/output/generate_json.hpp>
+#include <boost/spirit/home/prana/parse/parse_json.hpp>
+#include <boost/spirit/home/prana/generate/generate_json.hpp>
 
 int main (void) { try { 
   using boost::spirit::utree;

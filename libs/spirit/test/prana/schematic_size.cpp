@@ -17,7 +17,7 @@ int main (void) { try {
   { /*[size_0_ascii*/
     schematic s0("");
   
-    BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
       ((s0) ("\"\"")))
 
     BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
@@ -27,7 +27,7 @@ int main (void) { try {
   { /*[size_3_ascii*/
   schematic s1("bar");
   
-  BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+  BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
     ((s1) ("\"bar\"")))
 
   BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
@@ -37,7 +37,7 @@ int main (void) { try {
   { /*[size_8_ascii*/
   schematic s2("fizzbuzz");
   
-  BOOST_SPIRIT_PRANA_SEXPR_TESTS(
+  BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
     ((s2) ("\"fizzbuzz\"")))
 
   BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(

@@ -15,7 +15,7 @@
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/adt/tuple.hpp>
 #include <boost/spirit/home/prana/support/half_t.hpp>
-#include <boost/spirit/home/prana/schematic/traits.hpp>
+#include <boost/spirit/home/prana/traits_fwd.hpp>
 
 namespace boost {
 namespace spirit {

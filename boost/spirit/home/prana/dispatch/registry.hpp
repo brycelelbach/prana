@@ -28,7 +28,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/arithmetic/sub.hpp>
 
-#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/traits_fwd.hpp>
 #include <boost/spirit/home/prana/dispatch/exception.hpp>
 #include <boost/spirit/home/prana/support/nt2/preprocessor.hpp>
 
@@ -69,25 +69,27 @@ namespace prana {
 //[basic_registry
 template<typename RegistrySet>
 struct basic_registry: RegistrySet {
+  struct type_registry;
+
   typedef RegistrySet registry_set;
 
   struct which {
     typedef std::size_t result_type;
 
     template<class F>
-    typename enable_if<is_tag_binder<F>, std::size_t>::type
+    typename enable_if<traits::is_tag_binder<F>, std::size_t>::type
     operator() (F const& f) const {
       return (*this)(f.template get<0>());
     }
    
     template<class Visitable> 
-    typename enable_if<is_visitable<Visitable>, std::size_t>::type
+    typename enable_if<traits::is_visitable<Visitable>, std::size_t>::type
     operator() (Visitable const& v) const {
       return v.type;
     }
     
     template<class TagX> 
-    typename enable_if<is_type_definition<TagX>, std::size_t>::type
+    typename enable_if<traits::is_type_definition<TagX>, std::size_t>::type
     operator() (TagX const&) const {
       return TagX::value;
     }

@@ -15,15 +15,6 @@ namespace spirit {
 namespace traits { 
 
 template<>
-struct transform_attribute<utree::nil_type, unused_type, qi::domain> {
-  typedef unused_type type;
-
-  static unused_type pre (utree::nil_type&) { return unused_type(); }
-  static void post (utree::nil_type&, unused_type) { }
-  static void fail (utree::nil_type&) { }
-};
-
-template<>
 struct transform_attribute<utree::nil_type, unused_type, karma::domain> {
   typedef unused_type type;
 

@@ -39,7 +39,7 @@ struct cdr {
 template<class TagX>
 struct cdr<
   TagX, typename enable_if<
-    is_cons_type<TagX>
+    traits::is_cons_type<TagX>
   >::type
 > {
   struct routine; 
