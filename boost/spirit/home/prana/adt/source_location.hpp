@@ -16,10 +16,12 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/vector.hpp>
 
-#include <boost/spirit/include/karma_nonterminal.hpp>
 #include <boost/spirit/include/karma_stream.hpp>
 #include <boost/spirit/include/karma_generate.hpp>
+#include <boost/spirit/include/karma_format.hpp>
 #include <boost/spirit/include/karma_uint.hpp>
+#include <boost/spirit/include/karma_nonterminal.hpp>
+#include <boost/spirit/include/karma_omit.hpp>
 
 namespace boost {
 namespace spirit {
@@ -111,13 +113,14 @@ struct source_location {
   }
 };
 
-template<class Char, class traits>
-inline operator<< (std::basic_ostream<Char, Traits>& out, source_location loc) {
+template<class Char, class Traits>
+inline std::basic_ostream<Char, Traits>&
+operator<< (std::basic_ostream<Char, Traits>& out, source_location loc) {
   try {
     using karma::format;
     using karma::ostream_iterator;
 
-    typedef ostream_iterator<Char, Char, Traits iterator;
+    typedef ostream_iterator<Char, Char, Traits> iterator;
 
     location_generator<iterator> g;
 
@@ -128,7 +131,15 @@ inline operator<< (std::basic_ostream<Char, Traits>& out, source_location loc) {
     else
       throw;
   }
+
+  return out;
 } 
+
+inline source_location
+make_source_location (std::size_t line, std::size_t column) {
+  source_location loc = {line, column};
+  return loc;
+}
 
 } // prana
 } // spirit

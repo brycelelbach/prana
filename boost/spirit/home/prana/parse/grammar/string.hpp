@@ -74,44 +74,65 @@ struct push_esc_functor {
   }
 };
 
-template<class Iterator>
-struct string_parser: qi::grammar<Iterator, std::string(void)> {
+template<class Tag, class Iterator>
+struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
+  typedef typename traits::source_type<Tag>::type
+    source_type;
+
+  typedef typename traits::error_handler_type<Tag, Iterator>::type
+    error_handler_type;
+
   qi::rule<Iterator, void(std::string&)>
     escaped;
 
   qi::rule<Iterator, std::string(void)>
     start;
   
-  phoenix::function<push_utf8_functor>
+  phoenix::function<push_utf8_functor> const
     push_utf8;
 
-  phoenix::function<push_esc_functor>
+  phoenix::function<push_esc_functor> const
     push_esc;
+  
+  phoenix::function<error_handler_type> const
+    error;
 
-  string_parser (void): string_parser::base_type (start) {
-    using standard::char_;
+  utf8_string_parser (source_type const& source):
+    utf8_string_parser::base_type(start,
+      std::string(mpl::c_str<Tag::name>::value) + ":utf8-string"),
+    error(error_handler_type(source_))
+  {
+    using qi::char_;
     using qi::uint_parser;
+    using qi::on_error;
+    using qi::fail;
     using qi::_val;
     using qi::_r1;
     using qi::_1;
+    using qi::_3;
+    using qi::_4;
 
     uint_parser<uchar, 16, 4, 4> hex4;
     uint_parser<uchar, 16, 8, 8> hex8;
 
     escaped
       = '\\'
-      > (   ('u' > hex4)                 [push_utf8(_r1, _1)]
-        |   ('U' > hex8)                 [push_utf8(_r1, _1)]
-        |   char_("btnfr\\\"'")          [push_esc(_r1, _1)]
+      > ( ('u' > hex4)        [push_utf8(_r1, _1)]
+        | ('U' > hex8)        [push_utf8(_r1, _1)]
+        | char_("btnfr\\\"'") [push_esc(_r1, _1)]
         );
 
     start
       = '"'
-      > *(escaped(_val) | (~char_('"'))  [_val += _1])
+      > *(escaped(_val) | (~char_('"')) [_val += _1])
       > '"';
 
-    escaped.name("escaped_string");
-    start.name("string");
+    std::string name = mpl::c_str<Tag::name>::value;
+
+    start.name(name + ":utf8-string");
+    escaped.name(name + ":escaped-utf8-string");
+    
+    on_error<fail>(start, error(_3, _4));
   }
 };
 

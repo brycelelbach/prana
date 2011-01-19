@@ -9,83 +9,29 @@
 #if !defined(BOOST_SPIRIT_PRANA_INPUT_ERROR_HANDLER_HPP)
 #define BOOST_SPIRIT_PRANA_INPUT_ERROR_HANDLER_HPP
 
-#include <string>
-#include <sstream>
-
-#include <boost/spirit/home/support/info.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
+#include <boost/spirit/home/prana/exception.hpp>
+#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/adt/position_iterator.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
     
-template<class Out>
-struct print_info_functor {
-  typedef utf8_string string;
-
-  print_info_functor (Out& out): out(out) {}
-
-  void element (string const& tag, string const& value, int) const {
-    if (value == "")
-      out << ' ' << tag;
-    else
-      out << " \"" << value << '"';
-  }
-
-  Out& out;
-};
-
-struct parse_exception: std::exception { };
-
-struct expected_component: parse_exception {
-  std::string msg;
-
-  expected_component (std::string const& source, std::size_t line,
-                      info const& w)
-  {
-    std::ostringstream oss;
-    oss << "(exception \"" << source << "\" "
-        << ((line == std::size_t(-1)) ? -1 : line)
-        << " '(expected_component ";
-
-    print_info_functor<std::ostringstream> pr(oss);
-    basic_info_walker<print_info_functor<std::ostringstream> >
-      walker(pr, w.tag, 0);
-
-    boost::apply_visitor(walker, w.value);
-
-    oss << "))";
-
-    msg = oss.str();
-  }
-
-  virtual ~expected_component (void) throw() { }
-
-  virtual const char* what (void) const throw() {
-    return msg.c_str();
-  }
-};
-
-template<class Iterator>
+template<class Tag, class Iterator>
 struct error_handler {
+  typedef typename traits::source_type<Tag>::type source_type;
+
   template<class, class, class, class>
   struct result {
     typedef void type;
   };
 
-  std::string source;
+  source_type const& source;
 
-  error_handler (std::string const& source = "<string>"):
-    source(source) { }
+  error_handler (source_type const& source_): source(source_) { }
 
-  void operator() (Iterator first, Iterator last, Iterator err_pos,
-                   info const& what) const
-  {
-    Iterator eol = err_pos;
-    std::size_t line = get_line(err_pos);
-
-    throw expected_component(source, line, what);
+  void operator() (Iterator err_pos, info const& what) const {
+    throw expected_component(source, get_location(err_pos), what);
   }
 };
 

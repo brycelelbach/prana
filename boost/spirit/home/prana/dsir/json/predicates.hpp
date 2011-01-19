@@ -9,6 +9,7 @@
 #define BOOST_SPIRIT_PRANA_DSIR_JSON_PREDICATES_HPP
 
 #include <boost/spirit/include/support_utree.hpp>
+#include <boost/spirit/home/support/container.hpp>
 #include <boost/foreach.hpp>
 
 namespace boost {
@@ -46,7 +47,7 @@ struct is_member_pair_predicate {
 
   template<typename Iterator>
   result_type operator() (iterator_range<Iterator> const& range) const {
-    if (range.size() != 2)
+    if (traits::size(range) != 2)
       return false;
     
     return is_key(*range.begin());
