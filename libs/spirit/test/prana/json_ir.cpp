@@ -29,7 +29,7 @@ int main (void) { try {
     
     json_ir ir(out);
  
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out)              (in))
       (((ir[0]).get())    ("[1, 2]"))
@@ -55,7 +55,7 @@ int main (void) { try {
 
     json_ir ir(out);
     
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out)                  (in))
       (((ir["a"]).get())      ("{\"b\":1, \"c\":2}"))

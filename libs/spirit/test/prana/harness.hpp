@@ -26,7 +26,7 @@
   BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_SCHEMATIC_TEST, _, tests)          \
   /***/
 
-#define BOOST_SPIRIT_PRANA_UTREE_TEST(_, data, elem)                          \
+#define BOOST_SPIRIT_PRANA_STRINGIFY_TEST(_, data, elem)                      \
   { std::string x("");                                                        \
     data(BOOST_PP_SEQ_ELEM(0, elem), x);                                      \
     std::string y = BOOST_PP_SEQ_ELEM(1, elem);                               \
@@ -35,8 +35,8 @@
     ); }                                                                      \
   /***/
 
-#define BOOST_SPIRIT_PRANA_UTREE_TESTS(func, tests)                       \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_UTREE_TEST, func, tests)       \
+#define BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(func, tests)                       \
+  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_STRINGIFY_TEST, func, tests)       \
   /***/
   
 #define BOOST_SPIRIT_PRANA_BOOLEAN_TEST(_, data, elem)                    \

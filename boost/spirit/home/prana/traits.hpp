@@ -183,7 +183,7 @@ void build_annotations (parse_tree<Tag>& to, parse_tree<OtherTag> const& from) {
 template<class Tag, class Enable/* = void*/>
 struct utf_version: mpl::integral_c<unsigned char, 8> { };
 
-template<class Tag, class Enable/* = void*/>
+template<class Tag, class Iterator, class Enable/* = void*/>
 struct has_whitespace: mpl::true_ { };
 
 template<class Tag, class Iterator, class Enable/* = void*/>

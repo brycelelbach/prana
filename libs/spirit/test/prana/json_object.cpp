@@ -25,7 +25,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) ("[{}, {}]")))
 
@@ -43,7 +43,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
 
@@ -61,7 +61,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) ("{\"/\":273, \"+\":36, \"-\":-17, \"*\":45}")))
 
@@ -80,7 +80,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
 
@@ -101,7 +101,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
 
@@ -119,7 +119,7 @@ int main (void) { try {
     
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) ("{\"car\":1, \"cdr\":{\"two\":2, \"three\":3}}")))
 

@@ -8,6 +8,8 @@
 #if !defined(BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP)
 #define BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
 
+#include <string>
+
 #include <boost/mpl/has_xxx.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -17,13 +19,14 @@ namespace spirit {
 
 struct utree;
 
+namespace prana {
+
 template<class Tag>
 struct parse_tree;
 
 template<class Tag, class Iterator>
 struct error_handler;
 
-namespace prana {
 namespace result_of {
 
 template<class Tag, class Enable = void>

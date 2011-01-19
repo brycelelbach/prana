@@ -16,12 +16,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/vector.hpp>
 
-#include <boost/spirit/include/karma_stream.hpp>
-#include <boost/spirit/include/karma_generate.hpp>
-#include <boost/spirit/include/karma_format.hpp>
-#include <boost/spirit/include/karma_uint.hpp>
-#include <boost/spirit/include/karma_nonterminal.hpp>
-#include <boost/spirit/include/karma_omit.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace boost {
 namespace spirit {

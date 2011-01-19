@@ -25,7 +25,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
     //]  
@@ -41,7 +41,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
   }
@@ -56,7 +56,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
   }
@@ -71,7 +71,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
   }
@@ -86,7 +86,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_json,
       ((out) (in)))
   }

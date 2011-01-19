@@ -24,6 +24,8 @@ project ;
   alias adt :
       [ run prana/adt_ternary_search_tree.cpp : : : : ]
       [ run prana/adt_dynamic_array.cpp       : : : : ]
+      [ run prana/adt_source_location.cpp     : : : : ]
+      [ run prana/adt_position_iterator.cpp   : : : : ]
     ;
   
   alias sexpr :

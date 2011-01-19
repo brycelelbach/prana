@@ -21,7 +21,7 @@ namespace spirit {
 namespace prana {
     
 ///////////////////////////////////////////////////////////////////////////////
-struct exception: boost::exception {
+struct exception: std::exception {
   std::string msg;
 
   exception (void) {

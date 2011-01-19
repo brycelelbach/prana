@@ -25,7 +25,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -41,7 +41,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -57,7 +57,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -73,7 +73,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("16")))
     //]  
@@ -89,7 +89,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("8")))
     //]  
@@ -103,7 +103,7 @@ int main (void) { try {
 
     parse_sexpr(in, out);
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -119,7 +119,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -135,7 +135,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -151,7 +151,7 @@ int main (void) { try {
     
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")")))
     //]  
@@ -167,7 +167,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -183,7 +183,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -199,7 +199,7 @@ int main (void) { try {
     
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  
@@ -215,7 +215,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_UTREE_TESTS(
+    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
     //]  

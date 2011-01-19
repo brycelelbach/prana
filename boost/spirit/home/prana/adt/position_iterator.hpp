@@ -13,7 +13,7 @@
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#include <boost/spirit/home/prana/adt/position_iterator.hpp>
+#include <boost/spirit/home/prana/adt/source_location.hpp>
 
 namespace boost {
 namespace spirit {
@@ -28,7 +28,7 @@ class position_iterator: public iterator_adaptor<
     position_iterator::iterator_adaptor_(),
     loc(make_source_location(1, 0)), prev(0) { }
 
-  explicit position_iterator (Iterator);
+  explicit position_iterator (Iterator base):
     position_iterator::iterator_adaptor_(base),
     loc(make_source_location(1, 0)), prev(0) { }
 
@@ -94,11 +94,13 @@ class position_iterator: public iterator_adaptor<
   typename boost::detail::iterator_traits<Iterator>::value_type prev;
 };
 
+template<class Iterator>
 inline source_location get_location (Iterator i) {
   source_location loc = {-1, -1};
   return loc;
 }
 
+template<class Iterator>
 inline source_location get_location (position_iterator<Iterator> i) {
   return i.location();
 }
