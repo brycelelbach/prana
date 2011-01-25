@@ -7,12 +7,14 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_xml.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/xml.hpp>
 #include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
 int main (void) { try {
   using boost::spirit::utree;
-  using boost::spirit::prana::parse_xml;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::xml;
   using boost::spirit::prana::generate_sexpr;
 
   std::cout << "basic children test: " << std::endl;
@@ -23,15 +25,14 @@ int main (void) { try {
                      "  <e>2</e>\n"
                      "  <f>3</f>\n"
                      "</abc>\n";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () ((d () (1)) (e () (2)) (f () (3))))")))
+      ((pt.ast()) ("(abc () ((d () (1)) (e () (2)) (f () (3))))")))
     //]  
   }
   

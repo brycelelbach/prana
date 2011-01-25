@@ -13,10 +13,9 @@
 
 #include <boost/mpl/order.hpp>
 
-#include <boost/spirit/include/support_utree.hpp>
-
 #include <boost/spirit/home/prana/parse/grammar/string.hpp>
 #include <boost/spirit/home/prana/parse/error_handler.hpp>
+#include <boost/spirit/home/prana/parse/subtype_annotator.hpp>
 
 namespace boost {
 namespace spirit {
@@ -40,8 +39,11 @@ struct json_member_pair { };
 } // tag
  
 /////////////////////////////////////////////////////////////////////////////// 
-typedef mpl::set<tag::json_object, tag::json_array, tag::json_member_pair>
-  json_list_subtypes;
+typedef mpl::set<
+  tag::json_object,
+  tag::json_array,
+  tag::json_member_pair
+> json_list_subtypes;
 
 typedef dynamic_array<fusion::vector2<source_location, long> >
   json_annotations;
@@ -100,65 +102,6 @@ struct json_member_pair:
   mpl::order<json_list_subtypes, tag::json_member_pair>::type { };
 
 ///////////////////////////////////////////////////////////////////////////////
-template<class Tag>
-struct push_json_annotation {
-  typedef typename traits::annotations_type<Tag>::type
-    annotations_type;
-
-  template<class, class, class>
-  struct result {
-    typedef void type;
-  };
-
-  annotations_type& annotations;
-
-  push_json_annotation (annotations_type& annotations_):
-    annotations(annotations_) { }
-
-  template<class Range>
-  void operator() (utree& ast, long type, Range const& rng) const {
-    typedef typename annotations_type::value_type value_type;
-    typedef typename annotations_type::size_type size_type;
-
-    value_type v(get_location(rng.begin()), type);
-
-    annotations.push_back(v);  
-    size_type n = annotations.size() - 1;
-
-    BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
-    ast.tag(n);
-  }
-};
-
-template<class Tag, class Iterator>
-struct json_annotator: qi::grammar<Iterator, void(utree&, long)> {
-  typedef typename traits::annotations_type<Tag>::type
-    annotations_type;
-
-  typedef push_json_annotation<Tag>
-    pusher_type;
-
-  qi::rule<Iterator, void(utree&, long)>
-    start;
-  
-  phoenix::function<pusher_type> const
-    push;
-
-  json_annotator (annotations_type& annotations):
-    json_annotator::base_type(start), push(pusher_type(annotations))
-  {
-    using qi::omit;
-    using qi::raw;
-    using qi::eps;
-    using qi::_1;
-    using qi::_r1;
-    using qi::_r2;
-
-    start = omit[raw[eps] [push(_r1, _r2, _1)]];
-  }
-};
-
-///////////////////////////////////////////////////////////////////////////////
 template<class Tag, class Iterator, class Enable = void>
 struct json_parser;
 
@@ -191,7 +134,7 @@ struct json_parser<Tag, Iterator, typename enable_if<
   typedef typename traits::whitespace_type<Tag, Iterator>::type
     space_type;
 
-  typedef json_annotator<Tag, Iterator>
+  typedef subtype_annotator<Tag, Iterator>
     annotator_type; 
 
   typedef utf8_string_parser<Tag, Iterator>
@@ -240,14 +183,14 @@ struct json_parser<Tag, Iterator, typename enable_if<
     using qi::_3;
     using qi::_4;
 
-    real_parser<double, strict_real_policies<double> > strict_double;
+    real_parser<double, strict_real_policies<double> > real;
         
     as<utf8_symbol_type> as_symbol;
 
     start = value.alias();
 
     value = null
-          | strict_double
+          | real
           | int_
           | bool_
           | utf8
@@ -293,9 +236,12 @@ struct json_parser<Tag, Iterator, typename enable_if<
 ///////////////////////////////////////////////////////////////////////////////
 namespace traits {
 
-template<class Iterator>
-struct parser_type<tag::json, Iterator> {
-  typedef json_parser<tag::json, Iterator> type;
+template<class Tag, class Iterator>
+struct parser_type<Tag, Iterator, typename enable_if<
+    is_json_parser_tag<Tag>
+  >::type
+> {
+  typedef json_parser<Tag, Iterator> type;
 };
 
 } // traits

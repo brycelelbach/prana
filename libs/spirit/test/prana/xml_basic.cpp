@@ -7,27 +7,28 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_xml.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/xml.hpp>
 #include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
 int main (void) { try {
   using boost::spirit::utree;
-  using boost::spirit::prana::parse_xml;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::xml;
   using boost::spirit::prana::generate_sexpr;
 
   std::cout << "empty test: " << std::endl;
 
   { //[empty
     std::string in = "<abc />";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc ())")))
+      ((pt.ast()) ("(abc ())")))
     //]  
   }
   
@@ -35,15 +36,14 @@ int main (void) { try {
   
   { //[childless
     std::string in = "<abc></abc>";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () ())")))
+      ((pt.ast()) ("(abc () ())")))
     //]  
   }
   
@@ -51,15 +51,14 @@ int main (void) { try {
 
   { //[boolean
     std::string in = "<abc>true</abc>";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (#t))")))
+      ((pt.ast()) ("(abc () (#t))")))
     //]  
   }
 
@@ -67,15 +66,14 @@ int main (void) { try {
 
   { //[integer
     std::string in = "<abc>123</abc>";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (123))")))
+      ((pt.ast()) ("(abc () (123))")))
     //]  
   }
   
@@ -83,15 +81,14 @@ int main (void) { try {
 
   { //[floating
     std::string in = "<abc>1.23</abc>";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (1.23))")))
+      ((pt.ast()) ("(abc () (1.23))")))
     //]  
   }
 
@@ -99,15 +96,14 @@ int main (void) { try {
 
   { //[string
     std::string in = "<abc>def</abc>";
-    utree out;
 
-    parse_xml(in, out);
+    parse_tree<xml> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(abc () (\"def\"))")))
+      ((pt.ast()) ("(abc () (\"def\"))")))
     //]  
   }
   

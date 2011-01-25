@@ -7,27 +7,28 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_sexpr.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/sexpr.hpp>
 #include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
 int main (void) { try {
   using boost::spirit::utree;
-  using boost::spirit::prana::parse_sexpr;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::sexpr;
   using boost::spirit::prana::generate_sexpr;
 
   std::cout << "nil test: " << std::endl; 
 
   { //[nil
     std::string in = "nil";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -35,15 +36,14 @@ int main (void) { try {
 
   { //[boolean
     std::string in = "#t";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -51,15 +51,14 @@ int main (void) { try {
 
   { //[integer_dec
     std::string in = "10";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
   
@@ -67,15 +66,14 @@ int main (void) { try {
 
   { //[integer_hex
     std::string in = "#x10";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("16")))
+      ((pt.ast()) ("16")))
     //]  
   }
   
@@ -83,15 +81,14 @@ int main (void) { try {
 
   { //[integer_oct
     std::string in = "#o10";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("8")))
+      ((pt.ast()) ("8")))
     //]  
   }
   
@@ -99,13 +96,12 @@ int main (void) { try {
 
   { //[floating
     std::string in = "17.5";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -113,15 +109,14 @@ int main (void) { try {
 
   { //[string
     std::string in = "\"foo\"";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
   
@@ -129,15 +124,14 @@ int main (void) { try {
 
   { //[empty_string
     std::string in = "\"\"";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -145,15 +139,14 @@ int main (void) { try {
 
   { //[string_double_quote_character
     std::string in = "(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
     
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")")))
+      ((pt.ast()) ("(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")")))
     //]  
   }
 
@@ -161,15 +154,14 @@ int main (void) { try {
 
   { //[binary
     std::string in = "#\xDE\xAD\xBE\xEF#";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -177,15 +169,14 @@ int main (void) { try {
 
   { //[empty_binary
     std::string in = "##";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
   
@@ -193,15 +184,14 @@ int main (void) { try {
 
   { //[binary_hash_character
     std::string in = "(### #\xBE## ##\xEF# #\xBE#\xEF#)";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
     
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
 
@@ -209,15 +199,14 @@ int main (void) { try {
 
   { //[symbol
     std::string in = "bar";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
+      ((pt.ast()) (in)))
     //]  
   }
   

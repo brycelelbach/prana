@@ -7,30 +7,29 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_sexpr.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/sexpr.hpp>
 #include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
-int main (void) { try {
+int main (void) { try { 
   using boost::spirit::utree;
-  using boost::spirit::prana::parse_sexpr;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::sexpr;
   using boost::spirit::prana::generate_sexpr;
+  using boost::spirit::prana::traits::extract_source_location;
 
   std::cout << "empty list test: " << std::endl; 
 
   { //[empty_list
     std::string in = "(() ( ))";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(() ())")))
-
-    BSP_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) ("(() ())")))
     //]  
   }
 
@@ -38,18 +37,14 @@ int main (void) { try {
 
   { //[basic_list
     std::string in = "(1 2 3)";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
-
-    BSP_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
     //]  
   }
   
@@ -57,18 +52,14 @@ int main (void) { try {
 
   { //[list_skipping
     std::string in = "(1  2   3    4)";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(1 2 3 4)")))
-
-    BSP_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) ("(1 2 3 4)")))
     //]  
   }
 
@@ -76,18 +67,14 @@ int main (void) { try {
 
   { //[multi_type_list
     std::string in = "(nil #f 35 0.57 \"bizz\" #\xDE\xED# sizzle)";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
-
-    BSP_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
     //]  
   }
   
@@ -95,38 +82,34 @@ int main (void) { try {
 
   { //[nested_list
     std::string in = "(((1)) (-5003 #t) \"foobar\")";
-    utree out;
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) (in)))
-
-    BSP_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
     //]  
   }
   
-  std::cout << std::endl << "line position test: " << std::endl; 
+  std::cout << std::endl << "position test: " << std::endl; 
 
-  { //[line_position
-    std::string in = "(1\n(2 3)\n)";
-    utree out;
+  { //[position
+    std::string in = "   (1\n(2 3)\n)";
 
-    parse_sexpr(in, out);
+    parse_tree<sexpr> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
     BSP_STRINGIFY_TESTS(
       generate_sexpr,
-      ((out) ("(1 (2 3))")))
+      ((pt.ast()) ("(1 (2 3))")))
 
     BSP_BOOLEAN_TESTS(
-      ((out.tag())    (1))
-      ((out[1].tag()) (2)))
+      ((extract_source_location(pt.ast()[0], pt).column()) (3))
+      ((extract_source_location(pt.ast()[0], pt).line())   (1))
+      ((extract_source_location(pt.ast()[1], pt).line())   (2)))
     //]  
   }
   

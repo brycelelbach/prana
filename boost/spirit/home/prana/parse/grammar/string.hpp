@@ -17,7 +17,6 @@
 
 #include <boost/regex/pending/unicode_iterator.hpp>
 
-#include <boost/spirit/home/support/assert_msg.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_container.hpp>

@@ -136,7 +136,8 @@ struct parser_invoker {
   { 
     using qi::phrase_parse;
     typedef typename whitespace_type<Tag, Iterator>::type ws_type;
-    return phrase_parse(first, last, p, ws_type(), ast);
+    ws_type ws;
+    return phrase_parse(first, last, p, ws, ast);
   }
 };
 

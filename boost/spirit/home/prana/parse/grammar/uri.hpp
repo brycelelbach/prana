@@ -1,6 +1,6 @@
-template <typename Iterator, class Tag>
+template <typename Iterator>
 struct uri_grammar : qi::grammar<Iterator, uri_parts<Tag>()> {
-    uri_grammar() : uri_grammar::base_type(start, "uri") {
+    uri_grammar() : uri_grammar::base_type(start) {
         // gen-delims = ":" / "/" / "?" / "#" / "[" / "]" / "@"
         gen_delims %= qi::char_(":/?#[]@");
         // sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="

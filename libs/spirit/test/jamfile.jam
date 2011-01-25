@@ -7,9 +7,13 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
+variant test : <optimization>off <inlining>on <debug-symbols>off ;
+
 project
   : requirements
+    <variant>test
     <warnings>on
+    <toolset>clang:<cxxflags>-Wno-multichar
   ;
 
 {
@@ -40,7 +44,7 @@ project
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
-      [ run prana/json_ir.cpp                 : : : : ]
+     #[ run prana/json_ir.cpp                 : : : : ]
     ;
   
   alias xml :
