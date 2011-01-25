@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DISPATCH_REGISTRY_HPP)
-#define BOOST_SPIRIT_PRANA_DISPATCH_REGISTRY_HPP
+#if !defined(BSP_DISPATCH_REGISTRY_HPP)
+#define BSP_DISPATCH_REGISTRY_HPP
 
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
@@ -36,15 +36,15 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-#define BOOST_SPIRIT_PRANA_COLUMN(R, Column, Element)   \
+#define BSP_COLUMN(R, Column, Element)   \
   BOOST_PP_SEQ_ELEM(Column, Element)                    \
   /***/
 
-#define BOOST_SPIRIT_PRANA_DECLARE_TYPE(R, _, Element)  \
+#define BSP_DECLARE_TYPE(R, _, Element)  \
   struct BOOST_PP_SEQ_ELEM(0, Element);                 \
   /***/
 
-#define BOOST_SPIRIT_PRANA_DEFINE_TYPE(R, Data, Element)                      \
+#define BSP_DEFINE_TYPE(R, Data, Element)                      \
   struct BOOST_PP_SEQ_ELEM(0, Element) {                                      \
     struct type_definition;                                                   \
     struct BOOST_PP_CAT(BOOST_PP_SEQ_ELEM(2, Element), _type);                \
@@ -57,13 +57,13 @@ namespace prana {
   };                                                                          \
   /***/
 
-#define BOOST_SPIRIT_PRANA_REGISTRY_SET(ValueType, RegistrySet, Tags)         \
+#define BSP_REGISTRY_SET(ValueType, RegistrySet, Tags)         \
   BOOST_PP_SEQ_FOR_EACH(                                                      \
-    BOOST_SPIRIT_PRANA_DECLARE_TYPE, _, Tags)                                 \
+    BSP_DECLARE_TYPE, _, Tags)                                 \
   typedef boost::mpl::set<BOOST_PP_SEQ_ENUM(                                  \
-    BOOST_PP_SEQ_TRANSFORM(BOOST_SPIRIT_PRANA_COLUMN, 0, Tags))> RegistrySet; \
+    BOOST_PP_SEQ_TRANSFORM(BSP_COLUMN, 0, Tags))> RegistrySet; \
   BOOST_PP_SEQ_FOR_EACH(                                                      \
-    BOOST_SPIRIT_PRANA_DEFINE_TYPE, (ValueType) (RegistrySet), Tags)          \
+    BSP_DEFINE_TYPE, (ValueType) (RegistrySet), Tags)          \
   /***/
 
 //[basic_registry
@@ -111,5 +111,5 @@ struct basic_registry: RegistrySet {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_DISPATCH_REGISTRY_HPP
+#endif // BSP_DISPATCH_REGISTRY_HPP
 

@@ -12,7 +12,7 @@
 int main (void) { try {
   using boost::spirit::prana::schematic;
 
-  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+  BSP_BOOLEAN_TESTS(
     //[arithmetic_types
     ((sizeof(schematic::boolean::data_type))  (sizeof(void*[2])))
     ((sizeof(schematic::integer::data_type))  (sizeof(void*[2])))

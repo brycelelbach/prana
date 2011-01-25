@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP)
-#define BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP
+#if !defined(BSP_ADT_DYNAMIC_ARRAY_HPP)
+#define BSP_ADT_DYNAMIC_ARRAY_HPP
 
 #include <memory>
 #include <algorithm>
@@ -390,5 +390,5 @@ void dynamic_array<Data, Initial, Alloc>::copy (Iterator first, Iterator last) {
 } // spirit
 } // boost 
 
-#endif // BOOST_SPIRIT_PRANA_ADT_DYNAMIC_ARRAY_HPP
+#endif // BSP_ADT_DYNAMIC_ARRAY_HPP
 

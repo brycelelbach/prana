@@ -7,22 +7,22 @@
 ==============================================================================*/
 
 #if !defined(BOOST_PP_IS_ITERATING)
-  #if !defined(BOOST_SPIRIT_PRANA_VM_COMPOSITE_CALL_HPP)
-  #define BOOST_SPIRIT_PRANA_VM_COMPOSITE_CALL_HPP
+  #if !defined(BSP_VM_COMPOSITE_CALL_HPP)
+  #define BSP_VM_COMPOSITE_CALL_HPP
 
   #include <boost/preprocessor/iterate.hpp>
   #include <boost/preprocessor/repetition/enum_params.hpp>
   #include <boost/preprocessor/repetition/enum_binary_params.hpp>
   #include <boost/preprocessor/repetition/repeat.hpp>
 
-  #if !defined(BOOST_SPIRIT_PRANA_COMPOSITE_LIMIT)
-    #define BOOST_SPIRIT_PRANA_COMPOSITE_LIMIT 8
+  #if !defined(BSP_COMPOSITE_LIMIT)
+    #define BSP_COMPOSITE_LIMIT 8
   #endif
 
   #define BSP_PUSH_ELEMENT(z, n, _) elements.push_back(as_function(_##n));
 
   #define BOOST_PP_ITERATION_PARAMS_1                         \
-    (3, (3, BOOST_PP_DEC(BOOST_SPIRIT_PRANA_COMPOSITE_LIMIT), \
+    (3, (3, BOOST_PP_DEC(BSP_COMPOSITE_LIMIT), \
     <boost/spirit/home/prana/vm/composite_call.hpp>))         \
     /***/
 
@@ -30,7 +30,7 @@
 
   #undef BSP_PUSH_ELEMENT
 
-  #endif // BOOST_SPIRIT_PRANA_VM_COMPOSITE_CALL_HPP
+  #endif // BSP_VM_COMPOSITE_CALL_HPP
 
 #else // defined(BOOST_PP_IS_ITERATING)
   #define BSP_N BOOST_PP_ITERATION()

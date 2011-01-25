@@ -5,8 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_PARSE_TREE_HPP)
-#define BOOST_SPIRIT_PRANA_PARSE_TREE_HPP
+#if !defined(BSP_PARSE_TREE_HPP)
+#define BSP_PARSE_TREE_HPP
 
 #include <ios>
 #include <iostream>
@@ -220,5 +220,5 @@ class parse_tree {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_PARSE_TREE_HPP
+#endif // BSP_PARSE_TREE_HPP
 

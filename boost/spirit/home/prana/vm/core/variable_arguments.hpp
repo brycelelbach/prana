@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP)
-#define BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
+#if !defined(BSP_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP)
+#define BSP_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
 
 #include <boost/config.hpp>
 #include <boost/ref.hpp>
@@ -87,15 +87,15 @@ vararg<true> const varg = { };
 // unscoped varg
 vararg<false> const unscoped_varg = { };
 
-#if !defined(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT)
-  #define BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT 8
+#if !defined(BSP_ARGUMENT_LIMIT)
+  #define BSP_ARGUMENT_LIMIT 8
 #endif
 
 #define BSP_UNSCOPED_VARG(z, n, data)                             \
   function const BOOST_PP_CAT(BOOST_PP_CAT(_, n), _) = data(n);   \
   /***/
 
-BOOST_PP_REPEAT(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT,
+BOOST_PP_REPEAT(BSP_ARGUMENT_LIMIT,
                 BSP_UNSCOPED_VARG,
                 unscoped_varg)
 
@@ -105,5 +105,5 @@ BOOST_PP_REPEAT(BOOST_SPIRIT_PRANA_ARGUMENT_LIMIT,
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
+#endif // BSP_VM_CORE_NARY_VARIABLE_ARGUMENTS_HPP
 

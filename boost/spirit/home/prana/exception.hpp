@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_EXCEPTION_HPP)
-#define BOOST_SPIRIT_PRANA_EXCEPTION_HPP
+#if !defined(BSP_EXCEPTION_HPP)
+#define BSP_EXCEPTION_HPP
 
 #include <sstream>
 
@@ -21,14 +21,14 @@ namespace spirit {
 namespace prana {
     
 ///////////////////////////////////////////////////////////////////////////////
-struct exception: std::exception {
+struct exception {
   std::string msg;
 
   exception (void) {
     msg = "(unknown-exception)";
   }
  
-  template<class Source 
+  template<class Source> 
   exception (Source const& source, source_location loc,
              std::string const& exception)
   {
@@ -36,16 +36,14 @@ struct exception: std::exception {
   }
 
   template<class Source>
-  virtual void set (Source const& source, source_location loc,
-                    std::string const& exception)
+  void set (Source const& source, source_location loc,
+            std::string const& exception)
   {
     msg = "(exception \"" + source + "\" " + loc.get() + " '" + exception + ")";    
   }
 
-  virtual ~exception (void) throw() { }
-
-  virtual const char* what (void) const throw() {
-    return msg.c_str();
+  std::string const& what (void) const {
+    return msg;
   }
 };
 
@@ -99,7 +97,7 @@ struct info_printer {
   Out& out;
 };
 
-struct expected_component: parse::exception {
+struct expected_component: prana::exception {
   static std::string make (info const& w) {
     std::ostringstream oss;
     oss << "(expected-component ";
@@ -122,5 +120,5 @@ struct expected_component: parse::exception {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_EXCEPTION_HPP
+#endif // BSP_EXCEPTION_HPP
 

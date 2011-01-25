@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_CORE_UNARY_FUNCTION_HPP)
-#define BOOST_SPIRIT_PRANA_VM_CORE_UNARY_FUNCTION_HPP
+#if !defined(BSP_VM_CORE_UNARY_FUNCTION_HPP)
+#define BSP_VM_CORE_UNARY_FUNCTION_HPP
 
 #include <boost/spirit/home/prana/vm/core/composite.hpp>
 
@@ -48,5 +48,5 @@ struct unary_composite: composite<unary_composite<Function> > {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_CORE_UNARY_FUNCTION_HPP
+#endif // BSP_VM_CORE_UNARY_FUNCTION_HPP
 

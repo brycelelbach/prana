@@ -6,8 +6,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_OUTPUT_GENERATE_SEXPR_HPP)
-#define BOOST_SPIRIT_PRANA_OUTPUT_GENERATE_SEXPR_HPP
+#if !defined(BSP_OUTPUT_GENERATE_SEXPR_HPP)
+#define BSP_OUTPUT_GENERATE_SEXPR_HPP
 
 #include <boost/spirit/include/karma_generate.hpp>
 #include <boost/spirit/include/karma_char.hpp>
@@ -48,5 +48,5 @@ bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_OUTPUT_GENERATE_SEXPR_HPP
+#endif // BSP_OUTPUT_GENERATE_SEXPR_HPP
 

@@ -25,11 +25,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(() ())")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag()) (1)))
     //]  
   }
@@ -44,11 +44,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag()) (1)))
     //]  
   }
@@ -63,11 +63,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(1 2 3 4)")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag()) (1)))
     //]  
   }
@@ -82,11 +82,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag()) (1)))
     //]  
   }
@@ -101,11 +101,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) (in)))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag()) (1)))
     //]  
   }
@@ -120,11 +120,11 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(1 (2 3))")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((out.tag())    (1))
       ((out[1].tag()) (2)))
     //]  

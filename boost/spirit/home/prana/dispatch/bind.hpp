@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_BIND_HPP)
-#define BOOST_SPIRIT_PRANA_BIND_HPP
+#if !defined(BSP_BIND_HPP)
+#define BSP_BIND_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
@@ -244,5 +244,5 @@ dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_BIND_HPP
+#endif // BSP_BIND_HPP
 

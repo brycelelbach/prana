@@ -6,14 +6,17 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP
+#if !defined(BSP_3F8BC114_2C2D_4BA3_9181_B2E9D9A22675)
+#define BSP_3F8BC114_2C2D_4BA3_9181_B2E9D9A22675
+
+#include <limits>
+
+#include <boost/mpl/order.hpp>
 
 #include <boost/spirit/include/support_utree.hpp>
 
 #include <boost/spirit/home/prana/parse/grammar/string.hpp>
 #include <boost/spirit/home/prana/parse/error_handler.hpp>
-#include <boost/spirit/home/prana/parse/save_line_pos.hpp>
 
 namespace boost {
 namespace spirit {
@@ -46,7 +49,7 @@ typedef dynamic_array<fusion::vector2<source_location, long> >
 /////////////////////////////////////////////////////////////////////////////// 
 namespace traits {
 
-BOOST_SPIRIT_PRANA_TRAIT(json_parser_tag)
+BSP_TRAIT(json_parser_tag)
 
 template<class Tag>
 struct annotations_type<Tag,
@@ -88,13 +91,13 @@ struct extract_list_subtype_from_node<Tag,
 
 /////////////////////////////////////////////////////////////////////////////// 
 struct json_object:
-  mpl::order<json_list_subtypes, tag::json_object> { };
+  mpl::order<json_list_subtypes, tag::json_object>::type { };
 
 struct json_array:
-  mpl::order<json_list_subtypes, tag::json_array> { };
+  mpl::order<json_list_subtypes, tag::json_array>::type { };
 
 struct json_member_pair:
-  mpl::order<json_list_subtypes, tag::json_member_pair> { };
+  mpl::order<json_list_subtypes, tag::json_member_pair>::type { };
 
 ///////////////////////////////////////////////////////////////////////////////
 template<class Tag>
@@ -114,15 +117,15 @@ struct push_json_annotation {
 
   template<class Range>
   void operator() (utree& ast, long type, Range const& rng) const {
-    typedef json_annotations::value_type value_type;
-    typedef annotations_type::size_type size_type
+    typedef typename annotations_type::value_type value_type;
+    typedef typename annotations_type::size_type size_type;
 
     value_type v(get_location(rng.begin()), type);
 
     annotations.push_back(v);  
     size_type n = annotations.size() - 1;
 
-    BOOST_ASSERT(n <= (boost::detail::numeric_limits<short>::max)());
+    BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
     ast.tag(n);
   }
 };
@@ -165,7 +168,7 @@ struct json_parser<Tag, Iterator, typename enable_if<
   >::type
 > {
   BOOST_SPIRIT_ASSERT_MSG(
-    (traits::has_whitespace<Tag, Iterator>),
+    (traits::has_whitespace<Tag, Iterator>::value),
     json_parser_requires_whitespace_parser, (Tag, Iterator));
 };
 
@@ -174,7 +177,7 @@ struct json_parser<Tag, Iterator, typename enable_if<
     traits::has_whitespace<Tag, Iterator>
   >::type
 >: qi::grammar<
-  Iterator, utree(void), typename whitespace_type<Tag, Iterator>::type
+  Iterator, utree(void), typename traits::whitespace_type<Tag, Iterator>::type
 > {
   typedef typename traits::source_type<Tag>::type
     source_type;
@@ -219,8 +222,8 @@ struct json_parser<Tag, Iterator, typename enable_if<
     annotate;
 
   json_parser (source_type const& source, annotations_type& annotations):
-    json_parser::base_type(start, mpl::c_str<Tag::name>::value), utf8(source),
-    error(error_handler_type(source)), annotate(annotations)
+    json_parser::base_type(start, mpl::c_str<typename Tag::name>::value),
+    utf8(source), error(error_handler_type(source)), annotate(annotations)
   {
     using qi::char_;
     using qi::lexeme;
@@ -271,7 +274,7 @@ struct json_parser<Tag, Iterator, typename enable_if<
     
     empty_array = char_('[') > char_(']');
 
-    std::string name = mpl::c_str<Tag::name>::value;
+    std::string name = mpl::c_str<typename Tag::name>::value;
  
     start.name(name);
     value.name(name + ":value");
@@ -287,9 +290,19 @@ struct json_parser<Tag, Iterator, typename enable_if<
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+namespace traits {
+
+template<class Iterator>
+struct parser_type<tag::json, Iterator> {
+  typedef json_parser<tag::json, Iterator> type;
+};
+
+} // traits
+
 } // prana
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMAR_JSON_HPP
+#endif // BSP_3F8BC114_2C2D_4BA3_9181_B2E9D9A22675
 

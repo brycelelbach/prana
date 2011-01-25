@@ -8,8 +8,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DISPATCH_TRAMPOLINE_HPP)
-#define BOOST_SPIRIT_PRANA_DISPATCH_TRAMPOLINE_HPP
+#if !defined(BSP_DISPATCH_TRAMPOLINE_HPP)
+#define BSP_DISPATCH_TRAMPOLINE_HPP
 
 #include <boost/config.hpp>
 #include <boost/utility/result_of.hpp>
@@ -31,16 +31,16 @@
 #include <boost/spirit/home/prana/dispatch/bind.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
 
-#ifndef BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT
-  #define BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT 32
+#ifndef BSP_TRAMPOLINE_LIMIT
+  #define BSP_TRAMPOLINE_LIMIT 32
 #endif
 
-#if BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT > BOOST_PP_LIMIT_REPEAT
-  #error BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT exceeds Boost.Preprocessor limit
+#if BSP_TRAMPOLINE_LIMIT > BOOST_PP_LIMIT_REPEAT
+  #error BSP_TRAMPOLINE_LIMIT exceeds Boost.Preprocessor limit
 #endif
 
-#if BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT > BOOST_PP_LIMIT_ITERATION
-  #error BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT exceeds Boost.Preprocessor limit
+#if BSP_TRAMPOLINE_LIMIT > BOOST_PP_LIMIT_ITERATION
+  #error BSP_TRAMPOLINE_LIMIT exceeds Boost.Preprocessor limit
 #endif
 
 namespace boost {
@@ -134,7 +134,7 @@ struct trampoline;
   };                                                                          \
   /***/
 
-#define BOOST_PP_LOCAL_LIMITS (1, BOOST_SPIRIT_PRANA_TRAMPOLINE_LIMIT)
+#define BOOST_PP_LOCAL_LIMITS (1, BSP_TRAMPOLINE_LIMIT)
 #define BOOST_PP_LOCAL_MACRO(n) BSP_TRAMPOLINE(1, n, _)
 
 #include BOOST_PP_LOCAL_ITERATE()
@@ -244,5 +244,5 @@ BSP_FN(dispatch, ((A0)(const)) ((A1)(const)), 2);
 } // spirit 
 } // boost 
 
-#endif // BOOST_SPIRIT_PRANA_DISPATCH_TRAMPOLINE_HPP
+#endif // BSP_DISPATCH_TRAMPOLINE_HPP
 

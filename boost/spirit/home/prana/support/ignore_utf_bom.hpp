@@ -7,8 +7,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP)
-#define BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP
+#if !defined(BSP_SUPPORT_IGNORE_UTF8_BOM_HPP)
+#define BSP_SUPPORT_IGNORE_UTF8_BOM_HPP
 
 #include <ios>
 #include <iostream>
@@ -54,5 +54,5 @@ struct ignore_utf_bom<8> {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SUPPORT_IGNORE_UTF8_BOM_HPP
+#endif // BSP_SUPPORT_IGNORE_UTF8_BOM_HPP
 

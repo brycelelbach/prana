@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCHEMATIC_CAST_CAR_HPP)
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_CAST_CAR_HPP
+#if !defined(BSP_SCHEMATIC_CAST_CAR_HPP)
+#define BSP_SCHEMATIC_CAST_CAR_HPP
 
 #include <boost/spirit/home/prana/domain.hpp>
 
@@ -68,5 +68,5 @@ inline typename TagX::data_type const* cast (X const& x) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCHEMATIC_CAST_CAR_HPP
+#endif // BSP_SCHEMATIC_CAST_CAR_HPP
 

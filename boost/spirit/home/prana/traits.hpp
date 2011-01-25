@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_TRAITS_HPP)
-#define BOOST_SPIRIT_PRANA_TRAITS_HPP
+#if !defined(BSP_TRAITS_HPP)
+#define BSP_TRAITS_HPP
 
 #include <boost/foreach.hpp>
 
@@ -117,19 +117,23 @@ template<class Tag, class Iterator, class Enable/* = void*/>
 struct parser_invoker {
   typedef typename parser_type<Tag, Iterator>::type parser_type;
 
-  static bool call (Iterator& first, Iterator last, parser_type p, utree& ast) {
+  static bool call (Iterator& first, Iterator last, parser_type& p,
+                    utree& ast)
+  {
     typedef typename has_whitespace<Tag, Iterator>::type predicate;
-    call(first, last, p, ast, predicate());
+    return call(first, last, p, ast, predicate());
   }
 
-  static bool call (Iterator& first, Iterator last, parser_type p,
-                    utree& ast, mpl::false_) {
+  static bool call (Iterator& first, Iterator last, parser_type& p,
+                    utree& ast, mpl::false_)
+  {
     using qi::parse;
     return parse(first, last, p, ast);
   }
   
-  static bool call (Iterator& first, Iterator last, parser_type p,
-                    utree& ast, mpl::true_) {
+  static bool call (Iterator& first, Iterator last, parser_type& p,
+                    utree& ast, mpl::true_)
+  { 
     using qi::phrase_parse;
     typedef typename whitespace_type<Tag, Iterator>::type ws_type;
     return phrase_parse(first, last, p, ws_type(), ast);
@@ -138,7 +142,7 @@ struct parser_invoker {
 
 template<class Tag, class Iterator>
 bool invoke (Iterator& first, Iterator last,
-             typename parser_type<Tag, Iterator>::type p, utree& ast)
+             typename parser_type<Tag, Iterator>::type& p, utree& ast)
 {
   return parser_invoker<Tag, Iterator>::call(first, last, p, ast);
 }
@@ -213,5 +217,5 @@ struct extract_list_subtype:
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_TRAITS_HPP
+#endif // BSP_TRAITS_HPP
 

@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SUPPORT_UTREE_HASH_HPP)
-#define BOOST_SPIRIT_PRANA_SUPPORT_UTREE_HASH_HPP
+#if !defined(BSP_SUPPORT_UTREE_HASH_HPP)
+#define BSP_SUPPORT_UTREE_HASH_HPP
 
 #include <boost/functional/hash.hpp>
 
@@ -100,5 +100,5 @@ std::size_t hash_value (utree const& ut) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SUPPORT_UTREE_HASH_HPP
+#endif // BSP_SUPPORT_UTREE_HASH_HPP
 

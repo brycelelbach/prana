@@ -17,24 +17,24 @@ int main (void) { try {
   { 
     schematic s(true, false);
     
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(#t #f)")))
 
     set_car(s, 4);
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(4 #f)")))
   }
   
   { 
     schematic s("pingpong", 312.12);
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(\"pingpong\" 312.12)")))
 
     set_car(s, "fizz");
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(\"fizz\" 312.12)")))
   }
   

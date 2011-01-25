@@ -5,8 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DSIR_JSON_IR_HPP)
-#define BOOST_SPIRIT_PRANA_DSIR_JSON_IR_HPP
+#if !defined(BSP_DSIR_JSON_IR_HPP)
+#define BSP_DSIR_JSON_IR_HPP
 
 #include <functional>
 
@@ -459,5 +459,5 @@ bool json_ir::operator!= (json_ir const& rhs) const {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_DSIR_JSON_IR_HPP
+#endif // BSP_DSIR_JSON_IR_HPP
 

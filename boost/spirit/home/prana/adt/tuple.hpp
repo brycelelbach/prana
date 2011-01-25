@@ -7,8 +7,8 @@
 
 #if !BOOST_PP_IS_ITERATING
 
-  #if !defined(BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP)
-  #define BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP
+  #if !defined(BSP_ADT_TUPLE_HPP)
+  #define BSP_ADT_TUPLE_HPP
 
   #include <boost/mpl/at.hpp>
   #include <boost/mpl/vector.hpp>
@@ -47,7 +47,7 @@
   } // spirit
   } // boost
 
-  #endif // BOOST_SPIRIT_PRANA_ADT_TUPLE_HPP
+  #endif // BSP_ADT_TUPLE_HPP
 
 #else
 

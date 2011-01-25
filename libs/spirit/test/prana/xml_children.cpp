@@ -29,7 +29,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () ((d () (1)) (e () (2)) (f () (3))))")))
     //]  

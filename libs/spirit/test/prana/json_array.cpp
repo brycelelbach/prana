@@ -7,121 +7,103 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_json.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/json.hpp>
 #include <boost/spirit/home/prana/generate/generate_json.hpp>
 
 int main (void) { try { 
   using boost::spirit::utree;
-  using boost::spirit::prana::parse_json;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::json;
   using boost::spirit::prana::generate_json;
+  using boost::spirit::prana::traits::extract_source_location;
 
   std::cout << "empty array test: " << std::endl;
 
   { 
     std::string in = "[[], [ ]]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) ("[[], []]")))
-
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) ("[[], []]")))
   }
 
   std::cout << std::endl << "basic array test: " << std::endl; 
 
   { 
     std::string in = "[null, null, null]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
     
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) (in)))
-
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
   }
   
   std::cout << std::endl << "array skipping test: " << std::endl; 
   
   { 
     std::string in = "[\"a\",\"b\", \"c\",  \"d\"]\n";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
     
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) ("[\"a\", \"b\", \"c\", \"d\"]")))
-
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) ("[\"a\", \"b\", \"c\", \"d\"]")))
   }
   
   std::cout << std::endl << "multi type array test: " << std::endl; 
   
   { 
     std::string in = "[13053, null, 16.3, \"xyz\", false]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) (in)))
-
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
   }
   
   std::cout << std::endl << "nested array test: " << std::endl; 
   
   { 
     std::string in = "[[-1, -2, -3], true, [[[\"abc\"]]]]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) (in)))
-
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag()) (1)))
+      ((pt.ast()) (in)))
   }
   
   std::cout << std::endl << "line position test: " << std::endl; 
 
   { 
     std::string in = "[[true, false],\ntrue\n]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
 
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out) ("[[true, false], true]")))
+      ((pt.ast()) ("[[true, false], true]")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
-      ((out.tag())    (1))
-      ((out[1].tag()) (2)))
+    BSP_BOOLEAN_TESTS(
+      ((extract_source_location(pt.ast()[0], pt).line()) (1))
+      ((extract_source_location(pt.ast()[1], pt).line()) (2)))
   }
   
   } catch (std::exception& e) {

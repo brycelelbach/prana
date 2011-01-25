@@ -25,7 +25,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc ())")))
     //]  
@@ -41,7 +41,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () ())")))
     //]  
@@ -57,7 +57,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () (#t))")))
     //]  
@@ -73,7 +73,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () (123))")))
     //]  
@@ -89,7 +89,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () (1.23))")))
     //]  
@@ -105,7 +105,7 @@ int main (void) { try {
 
     std::cout << out << std::endl;
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       generate_sexpr,
       ((out) ("(abc () (\"def\"))")))
     //]  

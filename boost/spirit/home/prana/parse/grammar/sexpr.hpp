@@ -6,21 +6,37 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP
+#if !defined(BSP_99FBA54B_F9AA_4FC6_B4BF_FE7A434D25AD)
+#define BSP_99FBA54B_F9AA_4FC6_B4BF_FE7A434D25AD
 
 #include <boost/spirit/include/support_utree.hpp>
 
 #include <boost/spirit/home/prana/parse/grammar/string.hpp>
 #include <boost/spirit/home/prana/parse/error_handler.hpp>
-#include <boost/spirit/home/prana/parse/save_line_pos.hpp>
-
-#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
+///////////////////////////////////////////////////////////////////////////////
+namespace tag {
+
+struct sexpr {
+  typedef mpl::string<'sexpr'> name; 
+  struct parser_tag;
+  struct sexpr_parser_tag;
+};
+
+} // tag
+ 
+/////////////////////////////////////////////////////////////////////////////// 
+typedef mpl::set<>
+  json_list_subtypes;
+
+typedef dynamic_array<fusion::vector1<source_location> >
+  json_annotations;
+
+///////////////////////////////////////////////////////////////////////////////
 template<class Iterator>
 struct sexpr_white_space: qi::grammar<Iterator> {
   qi::rule<Iterator>
@@ -34,6 +50,21 @@ struct sexpr_white_space: qi::grammar<Iterator> {
     start = space | (';' >> *(char_ - eol) >> eol);
   }
 };
+
+/////////////////////////////////////////////////////////////////////////////// 
+namespace traits {
+
+BSP_TRAIT(sexpr_parser_tag)
+
+template<class Tag, class Iterator>
+struct whitespace_type<Tag, Iterator, typename enable_if<
+    is_sexpr_parser_tag<Tag>
+  >::type
+> {
+  typedef sexpr_white_space<Iterator> type;
+}; 
+
+} // traits
 
 template<class Iterator, class ErrorHandler = error_handler<Iterator> >
 struct sexpr_parser:
@@ -143,5 +174,5 @@ struct sexpr_parser:
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMAR_SEXPR_HPP
+#endif // BSP_99FBA54B_F9AA_4FC6_B4BF_FE7A434D25AD
 

@@ -17,30 +17,30 @@ int main (void) { try {
   { /*[size_0_ascii*/
     schematic s0("");
   
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s0) ("\"\"")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((size(s0)) (0)))
   /*]*/ }
   
   { /*[size_3_ascii*/
   schematic s1("bar");
   
-  BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+  BSP_SCHEMATIC_TESTS(
     ((s1) ("\"bar\"")))
 
-  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+  BSP_BOOLEAN_TESTS(
     ((size(s1)) (3)))
   /*]*/ }
   
   { /*[size_8_ascii*/
   schematic s2("fizzbuzz");
   
-  BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+  BSP_SCHEMATIC_TESTS(
     ((s2) ("\"fizzbuzz\"")))
 
-  BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+  BSP_BOOLEAN_TESTS(
     ((size(s2)) (8)))
   /*]*/ }
   

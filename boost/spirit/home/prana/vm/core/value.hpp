@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_CORE_VALUE_HPP)
-#define BOOST_SPIRIT_PRANA_VM_CORE_VALUE_HPP
+#if !defined(BSP_VM_CORE_VALUE_HPP)
+#define BSP_VM_CORE_VALUE_HPP
 
 #include <boost/ref.hpp>
 
@@ -46,5 +46,5 @@ inline function protect (function const& f) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_CORE_VALUE_HPP
+#endif // BSP_VM_CORE_VALUE_HPP
 

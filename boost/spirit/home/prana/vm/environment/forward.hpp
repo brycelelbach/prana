@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_ENVIRONMENT_FORWARD_HPP)
-#define BOOST_SPIRIT_PRANA_VM_ENVIRONMENT_FORWARD_HPP
+#if !defined(BSP_VM_ENVIRONMENT_FORWARD_HPP)
+#define BSP_VM_ENVIRONMENT_FORWARD_HPP
 
 #include <boost/function.hpp>
 
@@ -49,5 +49,5 @@ struct forward_environment: basic_environment<forward_environment, function*> {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_ENVIRONMENT_FORWARD_HPP
+#endif // BSP_VM_ENVIRONMENT_FORWARD_HPP
 

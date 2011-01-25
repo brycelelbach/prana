@@ -17,24 +17,24 @@ int main (void) { try {
   { 
     schematic s(17, 53.5);
     
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(17 53.5)")))
 
     set_cdr(s, 1);
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(17 1)")))
   }
   
   { 
     schematic s("foo", "bar");
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(\"foo\" \"bar\")")))
 
     set_cdr(s, true);
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("(\"foo\" #t)")))
   }
   

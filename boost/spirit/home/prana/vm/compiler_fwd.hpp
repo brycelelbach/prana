@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_COMPILER_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_VM_COMPILER_FWD_HPP
+#if !defined(BSP_VM_COMPILER_FWD_HPP)
+#define BSP_VM_COMPILER_FWD_HPP
 
 #include <string>
 #include <vector>
@@ -77,5 +77,5 @@ inline void compile_program (utree const& ast, compiler_environment& env,
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_VM_COMPILER_FWD_HPP
+#endif // BSP_VM_COMPILER_FWD_HPP
 

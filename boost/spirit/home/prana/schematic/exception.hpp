@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCHEMATIC_EXCEPTION_HPP)
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_EXCEPTION_HPP
+#if !defined(BSP_SCHEMATIC_EXCEPTION_HPP)
+#define BSP_SCHEMATIC_EXCEPTION_HPP
 
 #include <boost/throw_exception.hpp>
 
@@ -94,5 +94,5 @@ struct storage_unavailable: schematic_exception {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCHEMATIC_EXCEPTION_HPP
+#endif // BSP_SCHEMATIC_EXCEPTION_HPP
 

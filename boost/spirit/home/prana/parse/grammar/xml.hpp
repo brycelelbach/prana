@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMAR_XML_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_GRAMAR_XML_HPP
+#if !defined(BSP_INPUT_GRAMAR_XML_HPP)
+#define BSP_INPUT_GRAMAR_XML_HPP
 
 #include <boost/spirit/include/support_utree.hpp>
 
@@ -135,5 +135,5 @@ struct xml_parser:
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMAR_XML_HPP
+#endif // BSP_INPUT_GRAMAR_XML_HPP
 

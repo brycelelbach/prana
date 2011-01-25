@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_FWD_HPP
+#if !defined(BSP_SCHEMATIC_ROUTINE_CDR_FWD_HPP)
+#define BSP_SCHEMATIC_ROUTINE_CDR_FWD_HPP
 
 #include <boost/spirit/home/prana/dispatch/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
@@ -40,5 +40,5 @@ struct cdr;
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_FWD_HPP
+#endif // BSP_SCHEMATIC_ROUTINE_CDR_FWD_HPP
 

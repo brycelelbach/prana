@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_ADT_SOURCE_LOCATION_HPP)
-#define BOOST_SPIRIT_PRANA_ADT_SOURCE_LOCATION_HPP
+#if !defined(BSP_ADT_SOURCE_LOCATION_HPP)
+#define BSP_ADT_SOURCE_LOCATION_HPP
 
 #include <iosfwd>
 
@@ -145,5 +145,5 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::size_t, line)
   (std::size_t, column))
 
-#endif // BOOST_SPIRIT_PRANA_ADT_SOURCE_LOCATION_HPP
+#endif // BSP_ADT_SOURCE_LOCATION_HPP
 

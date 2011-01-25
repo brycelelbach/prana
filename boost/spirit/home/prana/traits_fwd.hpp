@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
+#if !defined(BSP_TRAITS_FWD_HPP)
+#define BSP_TRAITS_FWD_HPP
 
 #include <string>
 
@@ -17,12 +17,12 @@
 namespace boost {
 namespace spirit {
 
-struct utree;
+class utree;
 
 namespace prana {
 
 template<class Tag>
-struct parse_tree;
+class parse_tree;
 
 template<class Tag, class Iterator>
 struct error_handler;
@@ -39,22 +39,22 @@ struct extract_list_subtype;
 
 namespace traits {
 
-#define BOOST_SPIRIT_PRANA_TRAIT(name)                                     \
+#define BSP_TRAIT(name)                                     \
   BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(BOOST_PP_CAT(is_, name), name, false)  \
   /***/ 
 
-BOOST_SPIRIT_PRANA_TRAIT(visitable)
-BOOST_SPIRIT_PRANA_TRAIT(type_definition)
-BOOST_SPIRIT_PRANA_TRAIT(type_registry)
-BOOST_SPIRIT_PRANA_TRAIT(tag_binder)
-BOOST_SPIRIT_PRANA_TRAIT(routine)
+BSP_TRAIT(visitable)
+BSP_TRAIT(type_definition)
+BSP_TRAIT(type_registry)
+BSP_TRAIT(tag_binder)
+BSP_TRAIT(routine)
 
-BOOST_SPIRIT_PRANA_TRAIT(arithmetic_type) 
-BOOST_SPIRIT_PRANA_TRAIT(singleton_type) 
-BOOST_SPIRIT_PRANA_TRAIT(dynamic_array_type) 
-BOOST_SPIRIT_PRANA_TRAIT(cons_type) 
+BSP_TRAIT(arithmetic_type) 
+BSP_TRAIT(singleton_type) 
+BSP_TRAIT(dynamic_array_type) 
+BSP_TRAIT(cons_type) 
 
-BOOST_SPIRIT_PRANA_TRAIT(parser_tag)
+BSP_TRAIT(parser_tag)
 
 BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_heap_allocated_type, heap, false) 
 BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_stack_allocated_type, stack, false) 
@@ -104,8 +104,8 @@ template<class Tag, class Iterator, class Enable = void>
 struct parser_invoker;
 
 template<class Tag, class Iterator>
-bool invoke (Iterator&, Iterator, typename parser_type<Tag, Iterator>::type,
-             utree&); 
+bool invoke (Iterator&, Iterator,
+             typename parser_type<Tag, Iterator>::type&, utree&); 
 
 template<class Tag, class OtherTag, class Enable = void>
 struct annotations_builder;
@@ -130,5 +130,5 @@ struct error_handler_type;
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_TRAITS_FWD_HPP
+#endif // BSP_TRAITS_FWD_HPP
 

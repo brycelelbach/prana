@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCHEMATIC_CORE_FWD_HPP)
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_CORE_FWD_HPP
+#if !defined(BSP_SCHEMATIC_CORE_FWD_HPP)
+#define BSP_SCHEMATIC_CORE_FWD_HPP
 
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
@@ -27,7 +27,7 @@ struct schematic {
 
   typedef std::size_t size_type;
 
-  BOOST_SPIRIT_PRANA_REGISTRY_SET( /*< Define the s-expression RegistrySet,
+  BSP_REGISTRY_SET( /*< Define the s-expression RegistrySet,
                                        which is an MPL set. >*/
     size_type,        /*< The value_type for each TypeDefinition. >*/
     type_definitions, /*< The name for the RegistrySet. >*/
@@ -92,5 +92,5 @@ struct schematic {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCHEMATIC_CORE_FWD_HPP
+#endif // BSP_SCHEMATIC_CORE_FWD_HPP
 

@@ -6,8 +6,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_ERROR_HANDLER_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_ERROR_HANDLER_HPP
+#if !defined(BSP_INPUT_ERROR_HANDLER_HPP)
+#define BSP_INPUT_ERROR_HANDLER_HPP
 
 #include <boost/spirit/home/prana/exception.hpp>
 #include <boost/spirit/home/prana/traits.hpp>
@@ -21,7 +21,7 @@ template<class Tag, class Iterator>
 struct error_handler {
   typedef typename traits::source_type<Tag>::type source_type;
 
-  template<class, class, class, class>
+  template<class, class>
   struct result {
     typedef void type;
   };
@@ -39,5 +39,5 @@ struct error_handler {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_ERROR_HANDLER_HPP
+#endif // BSP_INPUT_ERROR_HANDLER_HPP
 

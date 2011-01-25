@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_HPP)
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_HPP
+#if !defined(BSP_SCHEMATIC_ROUTINE_CDR_HPP)
+#define BSP_SCHEMATIC_ROUTINE_CDR_HPP
 
 #include <boost/spirit/home/prana/schematic/routine/cdr_fwd.hpp>
 
@@ -76,5 +76,5 @@ inline X const* cdr (X const& x) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_SCHEMATIC_ROUTINE_CDR_HPP
+#endif // BSP_SCHEMATIC_ROUTINE_CDR_HPP
 

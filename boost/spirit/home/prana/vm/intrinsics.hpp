@@ -7,8 +7,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_VM_INTRINSICS_HPP)
-#define BOOST_SPIRIT_PRANA_VM_INTRINSICS_HPP
+#if !defined(BSP_VM_INTRINSICS_HPP)
+#define BSP_VM_INTRINSICS_HPP
 
 #include <boost/spirit/home/prana/vm/intrinsics/begin.hpp>
 #include <boost/spirit/home/prana/vm/intrinsics/if.hpp>
@@ -17,5 +17,5 @@
 #include <boost/spirit/home/prana/vm/intrinsics/unary.hpp>
 #include <boost/spirit/home/prana/vm/intrinsics/binary.hpp>
 
-#endif // BOOST_SPIRIT_PRANA_VM_INTRINSICS_HPP
+#endif // BSP_VM_INTRINSICS_HPP
 

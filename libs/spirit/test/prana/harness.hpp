@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_HARNESS_HPP)
-#define BOOST_SPIRIT_PRANA_HARNESS_HPP
+#if !defined(BSP_HARNESS_HPP)
+#define BSP_HARNESS_HPP
 
 #include <exception>
 #include <sstream>
@@ -14,7 +14,7 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/preprocessor.hpp>
 
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_TEST(_, data, elem)                      \
+#define BSP_SCHEMATIC_TEST(_, data, elem)                      \
   { std::string x = serialize(BOOST_PP_SEQ_ELEM(0, elem));                    \
     std::string y = BOOST_PP_SEQ_ELEM(1, elem);                               \
     ::boost::detail::test_eq_impl(                                            \
@@ -22,11 +22,11 @@
     ); }                                                                      \
   /***/
 
-#define BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(tests)                             \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_SCHEMATIC_TEST, _, tests)          \
+#define BSP_SCHEMATIC_TESTS(tests)                             \
+  BOOST_PP_SEQ_FOR_EACH(BSP_SCHEMATIC_TEST, _, tests)          \
   /***/
 
-#define BOOST_SPIRIT_PRANA_STRINGIFY_TEST(_, data, elem)                      \
+#define BSP_STRINGIFY_TEST(_, data, elem)                      \
   { std::string x("");                                                        \
     data(BOOST_PP_SEQ_ELEM(0, elem), x);                                      \
     std::string y = BOOST_PP_SEQ_ELEM(1, elem);                               \
@@ -35,17 +35,17 @@
     ); }                                                                      \
   /***/
 
-#define BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(func, tests)                       \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_STRINGIFY_TEST, func, tests)       \
+#define BSP_STRINGIFY_TESTS(func, tests)                       \
+  BOOST_PP_SEQ_FOR_EACH(BSP_STRINGIFY_TEST, func, tests)       \
   /***/
   
-#define BOOST_SPIRIT_PRANA_BOOLEAN_TEST(_, data, elem)                    \
+#define BSP_BOOLEAN_TEST(_, data, elem)                    \
   BOOST_TEST_EQ(BOOST_PP_SEQ_ELEM(1, elem), BOOST_PP_SEQ_ELEM(1, elem));  \
   /***/
 
-#define BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(tests)                           \
-  BOOST_PP_SEQ_FOR_EACH(BOOST_SPIRIT_PRANA_BOOLEAN_TEST, _, tests)        \
+#define BSP_BOOLEAN_TESTS(tests)                           \
+  BOOST_PP_SEQ_FOR_EACH(BSP_BOOLEAN_TEST, _, tests)        \
   /***/
 
-#endif /*<- BOOST_SPIRIT_PRANA_HARNESS_HPP ->*/
+#endif /*<- BSP_HARNESS_HPP ->*/
 

@@ -19,7 +19,7 @@ int main (void) { try {
     
     set(s, "abc");
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("\"abc\"")))
     //]
   }
@@ -29,7 +29,7 @@ int main (void) { try {
     
     set(s, 5);
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("5")))
     //]
   }

@@ -5,8 +5,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DSIR_JSON_DSEL_HPP)
-#define BOOST_SPIRIT_PRANA_DSIR_JSON_DSEL_HPP
+#if !defined(BSP_DSIR_JSON_DSEL_HPP)
+#define BSP_DSIR_JSON_DSEL_HPP
 
 #include <boost/proto/core.hpp>
 #include <boost/proto/transform.hpp>
@@ -83,5 +83,5 @@ struct json_access_domain:
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_DSIR_JSON_DSEL_HPP
+#endif // BSP_DSIR_JSON_DSEL_HPP
 

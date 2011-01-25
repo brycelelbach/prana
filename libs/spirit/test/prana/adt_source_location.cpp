@@ -27,11 +27,11 @@ int main (void) { try {
 
     std::cout << loc << std::endl;
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((loc.line()) (-1))
       ((loc.column()) (-1)))
 
-    BOOST_SPIRIT_PRANA_STRINGIFY_TESTS(
+    BSP_STRINGIFY_TESTS(
       stringify_location,
       ((loc) ("(? ?)")))
   }

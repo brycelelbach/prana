@@ -6,20 +6,25 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_INPUT_GRAMMAR_STRING_HPP)
-#define BOOST_SPIRIT_PRANA_INPUT_GRAMMAR_STRING_HPP
+#if !defined(BSP_INPUT_GRAMMAR_STRING_HPP)
+#define BSP_INPUT_GRAMMAR_STRING_HPP
 
 #include <string>
+
+#include <boost/mpl/string.hpp>
 
 #include <boost/cstdint.hpp>
 
 #include <boost/regex/pending/unicode_iterator.hpp>
 
+#include <boost/spirit/home/support/assert_msg.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_container.hpp>
 #include <boost/spirit/include/phoenix_statement.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
+
+#include <boost/spirit/home/prana/traits.hpp>
 
 namespace boost {
 namespace spirit {
@@ -97,9 +102,9 @@ struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
   phoenix::function<error_handler_type> const
     error;
 
-  utf8_string_parser (source_type const& source):
+  utf8_string_parser (source_type const& source_):
     utf8_string_parser::base_type(start,
-      std::string(mpl::c_str<Tag::name>::value) + ":utf8-string"),
+      std::string(mpl::c_str<typename Tag::name>::value) + ":utf8-string"),
     error(error_handler_type(source_))
   {
     using qi::char_;
@@ -127,7 +132,7 @@ struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
       > *(escaped(_val) | (~char_('"')) [_val += _1])
       > '"';
 
-    std::string name = mpl::c_str<Tag::name>::value;
+    std::string name = mpl::c_str<typename Tag::name>::value;
 
     start.name(name + ":utf8-string");
     escaped.name(name + ":escaped-utf8-string");
@@ -140,5 +145,5 @@ struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_INPUT_GRAMMAR_STRING_HPP
+#endif // BSP_INPUT_GRAMMAR_STRING_HPP
 

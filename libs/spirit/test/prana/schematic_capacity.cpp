@@ -17,10 +17,10 @@ int main (void) { try {
   { //[capacity_2_ascii
     schematic s("f");
     
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("\"f\"")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((capacity(s)) (2)))
     //]
   }
@@ -28,10 +28,10 @@ int main (void) { try {
   { //[capacity_4_ascii
     schematic s("bar");
     
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("\"bar\"")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((capacity(s)) (4)))
     //]
   }
@@ -39,10 +39,10 @@ int main (void) { try {
   { //[capacity_16_ascii
     schematic s("fizzbuzz");
 
-    BOOST_SPIRIT_PRANA_SCHEMATIC_TESTS(
+    BSP_SCHEMATIC_TESTS(
       ((s) ("\"fizzbuzz\"")))
 
-    BOOST_SPIRIT_PRANA_BOOLEAN_TESTS(
+    BSP_BOOLEAN_TESTS(
       ((capacity(s)) (16)))
     //]
   }

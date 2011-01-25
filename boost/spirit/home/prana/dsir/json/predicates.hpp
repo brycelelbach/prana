@@ -5,11 +5,11 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BOOST_SPIRIT_PRANA_DSIR_JSON_PREDICATES_HPP)
-#define BOOST_SPIRIT_PRANA_DSIR_JSON_PREDICATES_HPP
+#if !defined(BSP_DSIR_JSON_PREDICATES_HPP)
+#define BSP_DSIR_JSON_PREDICATES_HPP
 
 #include <boost/spirit/include/support_utree.hpp>
-#include <boost/spirit/home/support/container.hpp>
+#include <boost/spirit/home/support/attributes.hpp>
 #include <boost/foreach.hpp>
 
 namespace boost {
@@ -47,7 +47,7 @@ struct is_member_pair_predicate {
 
   template<typename Iterator>
   result_type operator() (iterator_range<Iterator> const& range) const {
-    if (traits::size(range) != 2)
+    if (spirit::traits::size(range) != 2)
       return false;
     
     return is_key(*range.begin());
@@ -142,5 +142,5 @@ bool is_list (T const& t) {
 } // spirit
 } // boost
 
-#endif // BOOST_SPIRIT_PRANA_DSIR_JSON_PREDICATES_HPP
+#endif // BSP_DSIR_JSON_PREDICATES_HPP
 
