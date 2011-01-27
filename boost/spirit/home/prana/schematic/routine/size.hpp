@@ -34,7 +34,7 @@ struct size {
 template<class TagX>
 struct size<
   TagX, typename enable_if<
-    traits::is_dynamic_array_type<TagX>
+    magic::is_dynamic_array_type<TagX>
   >::type
 > {
   struct routine; 

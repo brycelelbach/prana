@@ -7,31 +7,25 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_SCHEMATIC_ROUTINE_SERIALIZE_FWD_HPP)
-#define BSP_SCHEMATIC_ROUTINE_SERIALIZE_FWD_HPP
+#if !defined(BSP_C2213C5D_15C2_48A8_85F6_30FA8897837A)
+#define BSP_C2213C5D_15C2_48A8_85F6_30FA8897837A
 
 #include <boost/spirit/home/prana/dispatch/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/schematic/core_fwd.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
-
-#include <boost/spirit/include/karma.hpp> 
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[serialize_declaration
 inline std::basic_string<char> serialize (schematic const&);
-//]
 
 namespace routine {
 
-//[routine_serialize_declaration
 template<class Tag, class Dummy = void>
 struct serialize;
-//]
 
 } // routine
 
@@ -39,5 +33,5 @@ struct serialize;
 } // spirit
 } // boost
 
-#endif // BSP_SCHEMATIC_ROUTINE_SERIALIZE_FWD_HPP
+#endif // BSP_C2213C5D_15C2_48A8_85F6_30FA8897837A
 

@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_SCHEMATIC_CORE_FWD_HPP)
-#define BSP_SCHEMATIC_CORE_FWD_HPP
+#if !defined(BSP_0F2597A3_2DE0_44C2_9305_998888BCF2A5)
+#define BSP_0F2597A3_2DE0_44C2_9305_998888BCF2A5
 
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
@@ -15,22 +15,20 @@
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/adt/tuple.hpp>
 #include <boost/spirit/home/prana/support/half_t.hpp>
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[schematic
 struct schematic {
-  struct visitable; /*< Indicates that schematic fulfills Visitable. >*/
+  struct visitable; // indicates that schematic fulfills Visitable
 
   typedef std::size_t size_type;
 
-  BSP_REGISTRY_SET( /*< Define the s-expression RegistrySet,
-                                       which is an MPL set. >*/
-    size_type,        /*< The value_type for each TypeDefinition. >*/
-    type_definitions, /*< The name for the RegistrySet. >*/
+  BSP_REGISTRY_SET(   // define the s-expression RegistrySet (an MPL set)
+    size_type,        // the value_type for each TypeDefinition
+    type_definitions, // the name for the RegistrySet
 
     ((boolean)  ((bool))     (arithmetic) (stack))
     ((integer)  ((intmax_t)) (arithmetic) (stack))
@@ -48,49 +46,43 @@ struct schematic {
       (dynamic_array) (heap))
     ((symbol) ((tuple3<uinthalf_t, uinthalf_t, char*>))
       (dynamic_array) (heap))
-    //]
   )
 
   typedef basic_registry<type_definitions> registry;
 
-  typedef uintmax_t typeinfo; /*< sizeof(void*) bytes of storage for
-                                  typeinfo. >*/
+  typedef uintmax_t typeinfo; // sizeof(void*) bytes of storage for typeinfo
 
   typeinfo type;
   void*    data [2];
 
-  schematic (void); /*< Default ctor sets schematic to sentinel type. >*/
+  schematic (void); // default ctor sets schematic to sentinel type
 
-  ~schematic (void); /*< Forwards to clear. >*/
+  ~schematic (void); // forwards to clear
 
-  //[set_forwarders
+  // set forwarders
   template<class Value>
     schematic (Value const&);
   template<class Value>
     schematic& operator= (Value const&);
   template<class Value>
     void assign (Value const&);
-  //]
 
-  //[schematic_list_interface
+  // list interface
   schematic (tuple2<schematic*, schematic*> const&);
   
   void assign (tuple2<schematic*, schematic*> const&);
-  //]
 
-  //[schematic_pair_interface
+  // pair interface
   template<class Car, class Cdr>
     schematic (Car, Cdr);
 
   template<class Car, class Cdr>
     void assign (Car, Cdr);
-  //]
 };
-//]
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BSP_SCHEMATIC_CORE_FWD_HPP
+#endif // BSP_0F2597A3_2DE0_44C2_9305_998888BCF2A5
 

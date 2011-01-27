@@ -18,7 +18,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/support_utree.hpp>
 
-#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 
 namespace boost {
 namespace spirit {
@@ -26,7 +26,7 @@ namespace prana {
 
 template<class Tag>
 struct push_subtype_annotation {
-  typedef typename traits::annotations_type<Tag>::type
+  typedef typename magic::annotations_type<Tag>::type
     annotations_type;
 
   template<class, class, class>
@@ -49,6 +49,7 @@ struct push_subtype_annotation {
     annotations.push_back(v);  
     size_type n = annotations.size() - 1;
 
+    // TODO: make this an exception
     BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
     ast.tag(n);
   }
@@ -56,7 +57,7 @@ struct push_subtype_annotation {
 
 template<class Tag, class Iterator>
 struct subtype_annotator: qi::grammar<Iterator, void(utree&, long)> {
-  typedef typename traits::annotations_type<Tag>::type
+  typedef typename magic::annotations_type<Tag>::type
     annotations_type;
 
   typedef push_subtype_annotation<Tag>

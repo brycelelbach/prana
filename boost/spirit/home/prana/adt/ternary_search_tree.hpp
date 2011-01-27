@@ -6,8 +6,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_ADT_TERNARY_SEARCH_TREE_HPP)
-#define BSP_ADT_TERNARY_SEARCH_TREE_HPP
+#if !defined(BSP_02F9C65B_5F53_4423_AAD7_F1042C036EBB)
+#define BSP_02F9C65B_5F53_4423_AAD7_F1042C036EBB
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
@@ -514,5 +514,5 @@ void ternary_search_tree<Char, Data>::delete_data (pointer p) {
 } // spirit
 } // boost
 
-#endif // BSP_ADT_TERNARY_SEARCH_TREE_HPP 
+#endif // BSP_02F9C65B_5F53_4423_AAD7_F1042C036EBB 
 

@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_ADT_DYNAMIC_ARRAY_HPP)
-#define BSP_ADT_DYNAMIC_ARRAY_HPP
+#if !defined(BSP_A2D2F9A3_07E5_4AB3_9FBF_E03A0FAA2F5C)
+#define BSP_A2D2F9A3_07E5_4AB3_9FBF_E03A0FAA2F5C
 
 #include <memory>
 #include <algorithm>
@@ -422,5 +422,5 @@ void dynamic_array<Data, Initial, Alloc>::copy (Iterator first, Iterator last) {
 } // spirit
 } // boost 
 
-#endif // BSP_ADT_DYNAMIC_ARRAY_HPP
+#endif // BSP_A2D2F9A3_07E5_4AB3_9FBF_E03A0FAA2F5C
 

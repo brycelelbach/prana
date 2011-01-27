@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_ADT_SOURCE_LOCATION_HPP)
-#define BSP_ADT_SOURCE_LOCATION_HPP
+#if !defined(BSP_2510808C_5F86_494E_B271_D132CE35DD25)
+#define BSP_2510808C_5F86_494E_B271_D132CE35DD25
 
 #include <iosfwd>
 
@@ -145,5 +145,5 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::size_t, line)
   (std::size_t, column))
 
-#endif // BSP_ADT_SOURCE_LOCATION_HPP
+#endif // BSP_2510808C_5F86_494E_B271_D132CE35DD25
 

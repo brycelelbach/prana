@@ -19,6 +19,8 @@
 namespace boost {
 namespace spirit {
 namespace prana {
+
+// TODO: make prana exceptions boost.exception compatible
     
 ///////////////////////////////////////////////////////////////////////////////
 struct exception {

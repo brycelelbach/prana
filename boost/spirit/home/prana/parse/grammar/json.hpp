@@ -49,7 +49,7 @@ typedef dynamic_array<fusion::vector2<source_location, long> >
   json_annotations;
 
 /////////////////////////////////////////////////////////////////////////////// 
-namespace traits {
+namespace magic {
 
 BSP_TRAIT(json_parser_tag)
 
@@ -89,7 +89,7 @@ struct extract_list_subtype_from_node<Tag,
   }
 };
 
-} // traits
+} // magic
 
 /////////////////////////////////////////////////////////////////////////////// 
 struct json_object:
@@ -107,31 +107,31 @@ struct json_parser;
 
 template<class Tag, class Iterator>
 struct json_parser<Tag, Iterator, typename enable_if<
-    mpl::not_<traits::has_whitespace<Tag, Iterator> >
+    mpl::not_<magic::has_whitespace<Tag, Iterator> >
   >::type
 > {
   BOOST_SPIRIT_ASSERT_MSG(
-    (traits::has_whitespace<Tag, Iterator>::value),
+    (magic::has_whitespace<Tag, Iterator>::value),
     json_parser_requires_whitespace_parser, (Tag, Iterator));
 };
 
 template<class Tag, class Iterator>
 struct json_parser<Tag, Iterator, typename enable_if<
-    traits::has_whitespace<Tag, Iterator>
+    magic::has_whitespace<Tag, Iterator>
   >::type
 >: qi::grammar<
-  Iterator, utree(void), typename traits::whitespace_type<Tag, Iterator>::type
+  Iterator, utree(void), typename magic::whitespace_type<Tag, Iterator>::type
 > {
-  typedef typename traits::source_type<Tag>::type
+  typedef typename magic::source_type<Tag>::type
     source_type;
 
-  typedef typename traits::annotations_type<Tag>::type
+  typedef typename magic::annotations_type<Tag>::type
     annotations_type;
 
-  typedef typename traits::error_handler_type<Tag, Iterator>::type
+  typedef typename magic::error_handler_type<Tag, Iterator>::type
     error_handler_type;
 
-  typedef typename traits::whitespace_type<Tag, Iterator>::type
+  typedef typename magic::whitespace_type<Tag, Iterator>::type
     space_type;
 
   typedef subtype_annotator<Tag, Iterator>
@@ -234,7 +234,7 @@ struct json_parser<Tag, Iterator, typename enable_if<
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace traits {
+namespace magic {
 
 template<class Tag, class Iterator>
 struct parser_type<Tag, Iterator, typename enable_if<
@@ -244,7 +244,7 @@ struct parser_type<Tag, Iterator, typename enable_if<
   typedef json_parser<Tag, Iterator> type;
 };
 
-} // traits
+} // magic
 
 } // prana
 } // spirit

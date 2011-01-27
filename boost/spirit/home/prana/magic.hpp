@@ -23,12 +23,32 @@
 
 #include <boost/spirit/home/prana/adt/source_location.hpp>
 #include <boost/spirit/home/prana/adt/dynamic_array.hpp>
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic_fwd.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
-namespace traits {
+namespace magic {
+
+#define BSP_TRAIT(name)                                                    \
+  BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(BOOST_PP_CAT(is_, name), name, false)  \
+  /***/ 
+
+BSP_TRAIT(visitable)
+BSP_TRAIT(type_definition)
+BSP_TRAIT(type_registry)
+BSP_TRAIT(tag_binder)
+BSP_TRAIT(routine)
+
+BSP_TRAIT(arithmetic_type) 
+BSP_TRAIT(singleton_type) 
+BSP_TRAIT(dynamic_array_type) 
+BSP_TRAIT(cons_type) 
+
+BSP_TRAIT(parser_tag)
+
+BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_heap_allocated_type, heap, false) 
+BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_stack_allocated_type, stack, false) 
 
 template<class Tag, class Enable/* = void*/>
 struct annotations_type {
@@ -87,7 +107,7 @@ struct extract_source_location_from_node {
 };
 
 template<class Tag>
-typename prana::result_of::extract_source_location<Tag>::type
+typename extract_source_location_from_node<Tag>::type
 extract_source_location (utree const& ut, parse_tree<Tag> const& pt) {
   return extract_source_location_from_node<Tag>::call(ut, pt);
 }
@@ -108,7 +128,7 @@ struct extract_list_subtype_from_node {
 };
 
 template<class Tag>
-typename prana::result_of::extract_list_subtype<Tag>::type
+typename extract_list_subtype_from_node<Tag>::type
 extract_list_subtype (utree const& ut, parse_tree<Tag> const& pt) {
   return extract_list_subtype_from_node<Tag>::call(ut, pt);
 }
@@ -201,19 +221,7 @@ struct error_handler_type {
   typedef prana::error_handler<Tag, Iterator> type;
 }; 
 
-} // traits
-
-namespace result_of {
-
-template<class Tag, class Enable/* = void*/>
-struct extract_source_location:
-  traits::extract_source_location_from_node<Tag> { };
-
-template<class Tag, class Enable/* = void*/>
-struct extract_list_subtype:
-  traits::extract_list_subtype_from_node<Tag> { };
-
-} // result_of
+} // magic
 } // prana
 } // spirit
 } // boost

@@ -15,7 +15,7 @@
 #include <boost/spirit/home/prana/dispatch/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/adt/tuple.hpp>
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
 #include <boost/spirit/home/prana/schematic/routine/clear.hpp>
 

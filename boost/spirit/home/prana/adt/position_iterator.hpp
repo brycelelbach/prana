@@ -6,8 +6,8 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_ADT_SUPPORT_POSITION_ITERATOR)
-#define BSP_ADT_SUPPORT_POSITION_ITERATOR
+#if !defined(BSP_2C88356C_6695_4DD2_B8B4_02ADFB80CE3F)
+#define BSP_2C88356C_6695_4DD2_B8B4_02ADFB80CE3F
 
 #include <boost/detail/iterator.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
@@ -109,4 +109,4 @@ inline source_location get_location (position_iterator<Iterator> i) {
 } // spirit
 } // boost
 
-#endif // BSP_ADT_SUPPORT_POSITION_ITERATOR
+#endif // BSP_2C88356C_6695_4DD2_B8B4_02ADFB80CE3F

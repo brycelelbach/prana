@@ -6,21 +6,18 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_OUTPUT_GRAMMAR_SEXPR_HPP)
-#define BSP_OUTPUT_GRAMMAR_SEXPR_HPP
+#if !defined(BSP_82B08A89_C8DD_4E3F_8579_874DE74AE40D)
+#define BSP_82B08A89_C8DD_4E3F_8579_874DE74AE40D
 
 #include <boost/spirit/include/support_utree.hpp>
 #include <boost/spirit/include/karma.hpp>
-
-//#include <boost/spirit/home/prana/support/utree_nil_traits.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 template<class Iterator>
-struct sexpr_generator:
-  karma::grammar<Iterator, utree(void)>
+struct sexpr_generator: karma::grammar<Iterator, utree(void)>
 {
   typedef iterator_range<utree::const_iterator> utree_list;
 
@@ -42,12 +39,13 @@ struct sexpr_generator:
   karma::rule<Iterator, binary_range_type(void)>
     binary;
 
+  // TODO: replace with bool_generator and custom bool policies
   karma::symbols<bool, char const*>
     boolean;
 
   sexpr_generator (void): sexpr_generator::base_type(start) {
-    using standard::char_;
-    using standard::string;
+    using karma::char_;
+    using karma::string;
     using karma::uint_generator;
     using karma::double_;
     using karma::omit;
@@ -78,7 +76,7 @@ struct sexpr_generator:
 
     binary = '#' << *right_align(2, '0')[hex2] << '#';
 
-    nil_ = eps << "nil"; //attr_cast(lit("nil"));
+    nil_ = eps << "nil"; 
     
     boolean.add
       (true, "#t")
@@ -98,5 +96,5 @@ struct sexpr_generator:
 } // spirit
 } // boost
 
-#endif // BSP_OUTPUT_GRAMMAR_SEXPR_HPP
+#endif // BSP_82B08A89_C8DD_4E3F_8579_874DE74AE40D
 

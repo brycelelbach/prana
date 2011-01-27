@@ -53,7 +53,7 @@ struct sexpr_white_space: qi::grammar<Iterator> {
 };
 
 /////////////////////////////////////////////////////////////////////////////// 
-namespace traits {
+namespace magic {
 
 BSP_TRAIT(sexpr_parser_tag)
 
@@ -65,7 +65,7 @@ struct whitespace_type<Tag, Iterator, typename enable_if<
   typedef sexpr_white_space<Iterator> type;
 }; 
 
-} // traits
+} // magic
 
 ///////////////////////////////////////////////////////////////////////////////
 template<class Tag, class Iterator, class Enable = void>
@@ -73,31 +73,31 @@ struct sexpr_parser;
 
 template<class Tag, class Iterator>
 struct sexpr_parser<Tag, Iterator, typename enable_if<
-    mpl::not_<traits::has_whitespace<Tag, Iterator> >
+    mpl::not_<magic::has_whitespace<Tag, Iterator> >
   >::type
 > {
   BOOST_SPIRIT_ASSERT_MSG(
-    (traits::has_whitespace<Tag, Iterator>::value),
+    (magic::has_whitespace<Tag, Iterator>::value),
     sexpr_parser_requires_whitespace_parser, (Tag, Iterator));
 };
 
 template<class Tag, class Iterator>
 struct sexpr_parser<Tag, Iterator, typename enable_if<
-    traits::has_whitespace<Tag, Iterator>
+    magic::has_whitespace<Tag, Iterator>
   >::type
 >: qi::grammar<
-  Iterator, utree(void), typename traits::whitespace_type<Tag, Iterator>::type
+  Iterator, utree(void), typename magic::whitespace_type<Tag, Iterator>::type
 > {
-  typedef typename traits::source_type<Tag>::type
+  typedef typename magic::source_type<Tag>::type
     source_type;
 
-  typedef typename traits::annotations_type<Tag>::type
+  typedef typename magic::annotations_type<Tag>::type
     annotations_type;
 
-  typedef typename traits::error_handler_type<Tag, Iterator>::type
+  typedef typename magic::error_handler_type<Tag, Iterator>::type
     error_handler_type;
 
-  typedef typename traits::whitespace_type<Tag, Iterator>::type
+  typedef typename magic::whitespace_type<Tag, Iterator>::type
     space_type;
 
   typedef annotator<Tag, Iterator>
@@ -209,7 +209,7 @@ struct sexpr_parser<Tag, Iterator, typename enable_if<
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace traits {
+namespace magic {
 
 template<class Tag, class Iterator>
 struct parser_type<Tag, Iterator, typename enable_if<
@@ -219,7 +219,7 @@ struct parser_type<Tag, Iterator, typename enable_if<
   typedef sexpr_parser<Tag, Iterator> type;
 };
 
-} // traits
+} // magic
 
 } // prana
 } // spirit

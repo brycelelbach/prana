@@ -16,7 +16,7 @@ int main (void) { try {
   using boost::spirit::prana::parse_tree;
   using boost::spirit::prana::tag::sexpr;
   using boost::spirit::prana::generate_sexpr;
-  using boost::spirit::prana::traits::extract_source_location;
+  using boost::spirit::prana::magic::extract_source_location;
 
   std::cout << "empty list test: " << std::endl; 
 

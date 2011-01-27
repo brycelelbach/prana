@@ -5,17 +5,17 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_PARSE_TREE_HPP)
-#define BSP_PARSE_TREE_HPP
+#if !defined(BSP_2B628554_191E_4CC1_9CFA_0B45B4FB2C3F)
+#define BSP_2B628554_191E_4CC1_9CFA_0B45B4FB2C3F
 
 #include <ios>
-#include <iostream>
+#include <istream>
 
 #include <boost/spirit/home/support/assert_msg.hpp>
 #include <boost/spirit/include/support_istream_iterator.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 
-#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/support/ignore_utf_bom.hpp>
 
 namespace boost {
@@ -25,8 +25,8 @@ namespace prana {
 template<class Tag>
 class parse_tree {
  public:
-  typedef typename traits::source_type<Tag>::type source_type;
-  typedef typename traits::annotations_type<Tag>::type annotations_type;
+  typedef typename magic::source_type<Tag>::type source_type;
+  typedef typename magic::annotations_type<Tag>::type annotations_type;
 
  private:
   utree _ast;
@@ -41,15 +41,15 @@ class parse_tree {
     typedef line_pos_iterator<stream_iterator_type>
       iterator_type;
 
-    typedef typename traits::parser_type<Tag, iterator_type>::type
+    typedef typename magic::parser_type<Tag, iterator_type>::type
       parser_type;
 
     // no white space skipping in the stream
     in.unsetf(std::ios::skipws);
 
     // ignore the UTF bom created by windows (no-op if Tag doesn't support UTF)
-    ignore_utf_bom<traits::utf_version<Tag>::value>::call(
-      in, traits::stringify_source(_source)
+    ignore_utf_bom<magic::utf_version<Tag>::value>::call(
+      in, magic::stringify_source(_source)
     );
 
     parser_type p(_source, _annotations);
@@ -59,7 +59,7 @@ class parse_tree {
     iterator_type first(sfirst);
     iterator_type last(slast);
 
-    return traits::invoke<Tag>(first, last, p, _ast);
+    return magic::invoke<Tag>(first, last, p, _ast);
   } 
  
   template<class Range> 
@@ -68,7 +68,7 @@ class parse_tree {
     typedef line_pos_iterator<typename Range::const_iterator>
       iterator_type;
 
-    typedef typename traits::parser_type<Tag, iterator_type>::type
+    typedef typename magic::parser_type<Tag, iterator_type>::type
       parser_type;
 
     parser_type p(_source, _annotations);
@@ -76,7 +76,7 @@ class parse_tree {
     iterator_type first(in.begin());
     iterator_type last(in.end());
 
-    return traits::invoke<Tag>(first, last, p, _ast);
+    return magic::invoke<Tag>(first, last, p, _ast);
   }
 
   bool set (utree const& in) {
@@ -93,16 +93,16 @@ class parse_tree {
   void copy (parse_tree<OtherTag> const& other) {
     BOOST_SPIRIT_ASSERT_MSG(
       (mpl::eval_if<
-        traits::has_source_locations<Tag>,
-        traits::has_source_locations<OtherTag>,
+        magic::has_source_locations<Tag>,
+        magic::has_source_locations<OtherTag>,
         mpl::true_
       >::type),
       incompatible_parse_tree_tags, (Tag, OtherTag));
 
     _ast = other._ast;
-    _source = traits::stringify_source<Tag>(other._source);
+    _source = magic::stringify_source<Tag>(other._source);
 
-    traits::build_annotations(*this, other);
+    magic::build_annotations(*this, other);
   }
 
   bool equal (parse_tree const& other) const {
@@ -113,10 +113,10 @@ class parse_tree {
 
  public:
   parse_tree (void):
-    _ast(), _annotations(), _source(traits::default_source<Tag>::value) { }
+    _ast(), _annotations(), _source(magic::default_source<Tag>::value) { }
 
   template<class In>
-  parse_tree (In in, source_type const& s = traits::default_source<Tag>::value):
+  parse_tree (In in, source_type const& s = magic::default_source<Tag>::value):
     _ast(), _annotations(), _source(s)
   {
     set(in);
@@ -151,7 +151,7 @@ class parse_tree {
   parse_tree& operator= (In in) {
     _ast.clear();
     _annotations.clear();
-    _source = traits::default_source<Tag>::value;
+    _source = magic::default_source<Tag>::value;
     set(in);
   }
   
@@ -169,7 +169,7 @@ class parse_tree {
   
   template<class In>
   void assign (In in, source_type const& s =
-                        traits::default_source<Tag>::value)
+                        magic::default_source<Tag>::value)
   {
     _ast.clear();
     _annotations.clear();
@@ -220,5 +220,5 @@ class parse_tree {
 } // spirit
 } // boost
 
-#endif // BSP_PARSE_TREE_HPP
+#endif // BSP_2B628554_191E_4CC1_9CFA_0B45B4FB2C3F
 

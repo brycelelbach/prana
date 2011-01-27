@@ -6,8 +6,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_INPUT_GRAMMAR_STRING_HPP)
-#define BSP_INPUT_GRAMMAR_STRING_HPP
+#if !defined(BSP_07EDB260_F086_44EE_9353_B37608849EFF)
+#define BSP_07EDB260_F086_44EE_9353_B37608849EFF
 
 #include <string>
 
@@ -23,7 +23,7 @@
 #include <boost/spirit/include/phoenix_statement.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 
 namespace boost {
 namespace spirit {
@@ -31,6 +31,7 @@ namespace prana {
 
 typedef boost::uint32_t uchar;
 
+///////////////////////////////////////////////////////////////////////////////
 struct push_utf8_functor {
   template<class, class>
   struct result {
@@ -45,6 +46,7 @@ struct push_utf8_functor {
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////
 struct push_esc_functor {
   template<class, class>
   struct result {
@@ -78,12 +80,13 @@ struct push_esc_functor {
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////
 template<class Tag, class Iterator>
 struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
-  typedef typename traits::source_type<Tag>::type
+  typedef typename magic::source_type<Tag>::type
     source_type;
 
-  typedef typename traits::error_handler_type<Tag, Iterator>::type
+  typedef typename magic::error_handler_type<Tag, Iterator>::type
     error_handler_type;
 
   qi::rule<Iterator, void(std::string&)>
@@ -144,5 +147,5 @@ struct utf8_string_parser: qi::grammar<Iterator, std::string(void)> {
 } // spirit
 } // boost
 
-#endif // BSP_INPUT_GRAMMAR_STRING_HPP
+#endif // BSP_07EDB260_F086_44EE_9353_B37608849EFF
 

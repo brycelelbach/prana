@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_DISPATCH_REGISTRY_HPP)
-#define BSP_DISPATCH_REGISTRY_HPP
+#if !defined(BSP_2BE1B0EF_A840_49A5_B31D_83E4E3F24EA0)
+#define BSP_2BE1B0EF_A840_49A5_B31D_83E4E3F24EA0
 
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
@@ -28,7 +28,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/arithmetic/sub.hpp>
 
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/dispatch/exception.hpp>
 #include <boost/spirit/home/prana/support/nt2/preprocessor.hpp>
 
@@ -37,36 +37,35 @@ namespace spirit {
 namespace prana {
 
 #define BSP_COLUMN(R, Column, Element)   \
-  BOOST_PP_SEQ_ELEM(Column, Element)                    \
+  BOOST_PP_SEQ_ELEM(Column, Element)     \
   /***/
 
 #define BSP_DECLARE_TYPE(R, _, Element)  \
-  struct BOOST_PP_SEQ_ELEM(0, Element);                 \
+  struct BOOST_PP_SEQ_ELEM(0, Element);  \
   /***/
 
-#define BSP_DEFINE_TYPE(R, Data, Element)                      \
-  struct BOOST_PP_SEQ_ELEM(0, Element) {                                      \
-    struct type_definition;                                                   \
-    struct BOOST_PP_CAT(BOOST_PP_SEQ_ELEM(2, Element), _type);                \
-    struct BOOST_PP_SEQ_ELEM(3, Element);                                     \
-    typedef BOOST_PP_SEQ_ELEM(0, Data) value_type;                            \
-    BOOST_STATIC_CONSTANT(value_type, value = (mpl::order<                    \
-      BOOST_PP_SEQ_ELEM(1, Data), BOOST_PP_SEQ_ELEM(0, Element)               \
-    >::type::value));                                                         \
-    typedef NT2_PP_STRIP(BOOST_PP_SEQ_ELEM(1, Element)) data_type;            \
-  };                                                                          \
+#define BSP_DEFINE_TYPE(R, Data, Element)                           \
+  struct BOOST_PP_SEQ_ELEM(0, Element) {                            \
+    struct type_definition;                                         \
+    struct BOOST_PP_CAT(BOOST_PP_SEQ_ELEM(2, Element), _type);      \
+    struct BOOST_PP_SEQ_ELEM(3, Element);                           \
+    typedef BOOST_PP_SEQ_ELEM(0, Data) value_type;                  \
+    BOOST_STATIC_CONSTANT(value_type, value = (mpl::order<          \
+      BOOST_PP_SEQ_ELEM(1, Data), BOOST_PP_SEQ_ELEM(0, Element)     \
+    >::type::value));                                               \
+    typedef NT2_PP_STRIP(BOOST_PP_SEQ_ELEM(1, Element)) data_type;  \
+  };                                                                \
   /***/
 
 #define BSP_REGISTRY_SET(ValueType, RegistrySet, Tags)         \
-  BOOST_PP_SEQ_FOR_EACH(                                                      \
+  BOOST_PP_SEQ_FOR_EACH(                                       \
     BSP_DECLARE_TYPE, _, Tags)                                 \
-  typedef boost::mpl::set<BOOST_PP_SEQ_ENUM(                                  \
+  typedef boost::mpl::set<BOOST_PP_SEQ_ENUM(                   \
     BOOST_PP_SEQ_TRANSFORM(BSP_COLUMN, 0, Tags))> RegistrySet; \
-  BOOST_PP_SEQ_FOR_EACH(                                                      \
+  BOOST_PP_SEQ_FOR_EACH(                                       \
     BSP_DEFINE_TYPE, (ValueType) (RegistrySet), Tags)          \
   /***/
 
-//[basic_registry
 template<typename RegistrySet>
 struct basic_registry: RegistrySet {
   struct type_registry;
@@ -77,19 +76,19 @@ struct basic_registry: RegistrySet {
     typedef std::size_t result_type;
 
     template<class F>
-    typename enable_if<traits::is_tag_binder<F>, std::size_t>::type
+    typename enable_if<magic::is_tag_binder<F>, std::size_t>::type
     operator() (F const& f) const {
       return (*this)(f.template get<0>());
     }
    
     template<class Visitable> 
-    typename enable_if<traits::is_visitable<Visitable>, std::size_t>::type
+    typename enable_if<magic::is_visitable<Visitable>, std::size_t>::type
     operator() (Visitable const& v) const {
       return v.type;
     }
     
     template<class TagX> 
-    typename enable_if<traits::is_type_definition<TagX>, std::size_t>::type
+    typename enable_if<magic::is_type_definition<TagX>, std::size_t>::type
     operator() (TagX const&) const {
       return TagX::value;
     }
@@ -105,11 +104,10 @@ struct basic_registry: RegistrySet {
     };
   };
 };
-//]
 
 } // prana
 } // spirit
 } // boost
 
-#endif // BSP_DISPATCH_REGISTRY_HPP
+#endif // BSP_2BE1B0EF_A840_49A5_B31D_83E4E3F24EA0
 

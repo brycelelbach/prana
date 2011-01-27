@@ -12,6 +12,8 @@
 
 #include <boost/spirit/home/prana/schematic/routine/serialize_fwd.hpp>
 
+#include <boost/spirit/include/karma.hpp> 
+
 namespace boost {
 namespace spirit {
 namespace prana {
@@ -23,13 +25,6 @@ struct serialize {
   struct routine; 
 
   typedef std::basic_string<char> result_type;
-
-  #if 0
-  template<class X>
-  result_type operator() (X const&) {
-    return result_type();
-  }
-  #endif
 };
 
 //[routine_serialize_boolean_specialization
@@ -202,7 +197,7 @@ struct serialize<schematic::vector> {
 template<class Tag>
 struct serialize<
   Tag, typename enable_if<
-    traits::is_cons_type<Tag>
+    magic::is_cons_type<Tag>
   >::type
 > {
   struct routine; 

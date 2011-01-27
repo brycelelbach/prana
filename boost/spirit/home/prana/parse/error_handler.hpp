@@ -6,11 +6,11 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_INPUT_ERROR_HANDLER_HPP)
-#define BSP_INPUT_ERROR_HANDLER_HPP
+#if !defined(BSP_00137D0A_45CC_4269_8FF9_FF767C4751AB)
+#define BSP_00137D0A_45CC_4269_8FF9_FF767C4751AB
 
 #include <boost/spirit/home/prana/exception.hpp>
-#include <boost/spirit/home/prana/traits.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/adt/position_iterator.hpp>
 
 namespace boost {
@@ -19,7 +19,7 @@ namespace prana {
     
 template<class Tag, class Iterator>
 struct error_handler {
-  typedef typename traits::source_type<Tag>::type source_type;
+  typedef typename magic::source_type<Tag>::type source_type;
 
   template<class, class>
   struct result {
@@ -39,5 +39,5 @@ struct error_handler {
 } // spirit
 } // boost
 
-#endif // BSP_INPUT_ERROR_HANDLER_HPP
+#endif // BSP_00137D0A_45CC_4269_8FF9_FF767C4751AB
 

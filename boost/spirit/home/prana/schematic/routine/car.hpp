@@ -39,7 +39,7 @@ struct car {
 template<class TagX>
 struct car<
   TagX, typename enable_if<
-    traits::is_cons_type<TagX>
+    magic::is_cons_type<TagX>
   >::type
 > {
   struct routine; 

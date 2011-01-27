@@ -47,7 +47,7 @@ struct is_member_pair_predicate {
 
   template<typename Iterator>
   result_type operator() (iterator_range<Iterator> const& range) const {
-    if (spirit::traits::size(range) != 2)
+    if (traits::size(range) != 2)
       return false;
     
     return is_key(*range.begin());

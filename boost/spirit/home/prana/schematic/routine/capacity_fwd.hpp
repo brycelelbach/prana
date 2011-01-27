@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_SCHEMATIC_ROUTINE_CAPACITY_FWD_HPP)
-#define BSP_SCHEMATIC_ROUTINE_CAPACITY_FWD_HPP
+#if !defined(BSP_0129896A_8627_458D_82F1_5D15A818842D)
+#define BSP_0129896A_8627_458D_82F1_5D15A818842D
 
 #include <boost/spirit/home/prana/dispatch/trampoline.hpp>
 #include <boost/spirit/home/prana/domain.hpp>
@@ -14,23 +14,19 @@
 #include <boost/spirit/home/prana/support/half_t.hpp>
 #include <boost/spirit/home/prana/schematic/exception.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
-#include <boost/spirit/home/prana/traits_fwd.hpp>
+#include <boost/spirit/home/prana/magic.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-//[capacity_declaration
 template<class X>
 inline uinthalf_t capacity (X const& x);
-//]
 
 namespace routine {
 
-//[routine_capacity_declaration
 template<class TagX, class Dummy = void>
 struct capacity;
-//]
 
 } // routine
 
@@ -38,5 +34,5 @@ struct capacity;
 } // spirit
 } // boost
 
-#endif // BSP_SCHEMATIC_ROUTINE_CAPACITY_FWD_HPP
+#endif // BSP_0129896A_8627_458D_82F1_5D15A818842D
 
