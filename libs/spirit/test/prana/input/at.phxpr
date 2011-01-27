@@ -1,0 +1,22 @@
+;   Copyright (c) 2001-2011 Joel de Guzman
+;   Copyright (c) 2001-2011 Hartmut Kaiser
+;   Copyright (c) 2010-2011 Bryce Lelbach
+;
+;   Distributed under the Boost Software License, Version 1.0. (See accompanying
+;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+(load "boost/test.phxpr") 
+
+(test-suite 'prana-unit-test-at
+  ; basic
+  ((define l '(1 2 3))
+
+   (test-eq (at (list 1 2 3) 1) 2)
+   (test-eq ((lambda (x) (at (list 1 2 3) x)) 2) 3)
+   (test-eq ((lambda (x) (at x 1)) l) 2)
+   (test-eq ((lambda (x y) (at x y)) l 2) 3)
+
+  ; 0 index
+   (test-eq ((lambda (x) (at (list 1 2 3) x)) 0) 1)
+   (test-eq ((lambda (x y) (at x y)) l 0) 1)))
+

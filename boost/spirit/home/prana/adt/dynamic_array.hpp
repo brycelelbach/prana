@@ -41,7 +41,9 @@ class dynamic_array {
   dynamic_array (size_type init = Initial);
   dynamic_array (dynamic_array const&);
   template<class Container>
-    dynamic_array (Container const&);
+    dynamic_array (Container const&, typename enable_if<
+                    traits::is_container<Container>
+                  >::type* dummy = 0);
   template<class Iterator>
     dynamic_array (Iterator, Iterator);
 
@@ -72,15 +74,19 @@ class dynamic_array {
 
         iterator begin (void);
   const_iterator begin (void) const;
+  const_iterator cbegin (void) const;
 
         iterator end (void);
   const_iterator end (void) const;
+  const_iterator cend (void) const;
 
         reference front (void);
   const_reference front (void) const;
+  const_reference cfront (void) const;
         
         reference back (void);
   const_reference back (void) const;
+  const_reference cback (void) const;
         
         reference operator[] (size_type);
   const_reference operator[] (size_type) const;
@@ -119,7 +125,9 @@ dynamic_array<Data, Initial, Alloc>::dynamic_array (dynamic_array const& da):
 
 template<class Data, uinthalf_t Initial, class Alloc>
 template<class Container>
-dynamic_array<Data, Initial, Alloc>::dynamic_array (Container const& c):
+dynamic_array<Data, Initial, Alloc>::dynamic_array (Container const& c,
+  typename enable_if<traits::is_container<Container> >::type* dummy
+):
   _size(0), _capacity(0), _alloc(), _data(0)
 {
   copy(c.begin(), c.end());
@@ -199,7 +207,7 @@ dynamic_array<Data, Initial, Alloc>::capacity (void) const {
 
 template<class Data, uinthalf_t Initial, class Alloc>
 bool dynamic_array<Data, Initial, Alloc>::empty (void) const {
-  return _size;
+  return _size == 0;
 }
 
 template<class Data, uinthalf_t Initial, class Alloc>
@@ -257,6 +265,12 @@ dynamic_array<Data, Initial, Alloc>::begin (void) const {
 }
 
 template<class Data, uinthalf_t Initial, class Alloc>
+typename dynamic_array<Data, Initial, Alloc>::const_iterator
+dynamic_array<Data, Initial, Alloc>::cbegin (void) const {
+  return &_data[0];
+}
+
+template<class Data, uinthalf_t Initial, class Alloc>
 typename dynamic_array<Data, Initial, Alloc>::iterator
 dynamic_array<Data, Initial, Alloc>::end (void) {
   return &_data[_size];
@@ -265,6 +279,12 @@ dynamic_array<Data, Initial, Alloc>::end (void) {
 template<class Data, uinthalf_t Initial, class Alloc>
 typename dynamic_array<Data, Initial, Alloc>::const_iterator
 dynamic_array<Data, Initial, Alloc>::end (void) const {
+  return &_data[_size];
+}
+
+template<class Data, uinthalf_t Initial, class Alloc>
+typename dynamic_array<Data, Initial, Alloc>::const_iterator
+dynamic_array<Data, Initial, Alloc>::cend (void) const {
   return &_data[_size];
 }
 
@@ -281,6 +301,12 @@ dynamic_array<Data, Initial, Alloc>::front (void) const {
 }
 
 template<class Data, uinthalf_t Initial, class Alloc>
+typename dynamic_array<Data, Initial, Alloc>::const_reference
+dynamic_array<Data, Initial, Alloc>::cfront (void) const {
+  return _data[0];
+}
+
+template<class Data, uinthalf_t Initial, class Alloc>
 typename dynamic_array<Data, Initial, Alloc>::reference
 dynamic_array<Data, Initial, Alloc>::back (void) {
   return _data[_size - 1];
@@ -289,6 +315,12 @@ dynamic_array<Data, Initial, Alloc>::back (void) {
 template<class Data, uinthalf_t Initial, class Alloc>
 typename dynamic_array<Data, Initial, Alloc>::const_reference
 dynamic_array<Data, Initial, Alloc>::back (void) const {
+  return _data[_size - 1];
+}
+
+template<class Data, uinthalf_t Initial, class Alloc>
+typename dynamic_array<Data, Initial, Alloc>::const_reference
+dynamic_array<Data, Initial, Alloc>::cback (void) const {
   return _data[_size - 1];
 }
 

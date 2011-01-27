@@ -1,0 +1,26 @@
+;   Copyright (c) 2001-2011 Joel de Guzman
+;   Copyright (c) 2001-2011 Hartmut Kaiser
+;   Copyright (c) 2010-2011 Bryce Lelbach
+;
+;   Distributed under the Boost Software License, Version 1.0. (See accompanying
+;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+(load "boost/test.phxpr") 
+
+(test-suite 'prana-unit-test-add
+  ; binary
+  ((test-eq                   (- 2 4)                       -2)
+   (test-eq ((lambda (x)      (- 2 x))            4)        -2)
+   (test-eq ((lambda (x y)    (- x y))            2 4)      -2)
+   (test-eq ((lambda (x y)    (- 2 (- x y)))      4 8)      6)
+
+  ; nary
+   (test-eq                   (- 2 4 8)                     -10)
+   (test-eq ((lambda (x)      (- 2 4 x))          8)        -10)
+   (test-eq ((lambda (x y)    (- 2 x y))          4 8)      -10)
+   (test-eq ((lambda (x y z)  (- 2 4 (- x y z)))  8 16 32)  38)
+
+  ; negative
+   (test-eq                   (- -2 4)                      -6)
+   (test-eq ((lambda (x)      (- x 4))            -2)       -6)))
+

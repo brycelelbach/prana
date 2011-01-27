@@ -29,12 +29,12 @@ inline X rest (X const& x) {
 
 inline utree rest (utree& x) {
   utree::iterator i = x.begin(); ++i;
-  return utree(utree::range(i, x.end()), shallow);
+  return utree(utree::range(i, x.end()));
 }
 
 inline utree rest (utree const& x) {
   utree::const_iterator i = x.begin(); ++i;
-  return utree(utree::const_range(i, x.end()), shallow);
+  return utree(utree::const_range(i, x.end()));
 }
 
 } // spirit

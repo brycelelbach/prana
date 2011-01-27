@@ -7,31 +7,32 @@
 
 #include "harness.hpp"
 
-#include <boost/spirit/home/prana/parse/parse_json.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/json.hpp>
 #include <boost/spirit/home/prana/generate/generate_json.hpp>
 #include <boost/spirit/home/prana/dsir/json/ir.hpp>
 
 int main (void) { try { 
   using boost::spirit::utree;
   using boost::spirit::prana::json_ir;
-  using boost::spirit::prana::parse_json;
+  using boost::spirit::prana::parse_tree;
+  using boost::spirit::prana::tag::json;
   using boost::spirit::prana::generate_json;
 
   std::cout << "basic array test: " << std::endl; 
   
   { 
     std::string in = "[[1, 2], [3]]";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
    
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
     
-    json_ir ir(out);
+    json_ir ir(pt.ast());
  
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out)              (in))
+      ((pt.ast())         (in))
       (((ir[0]).get())    ("[1, 2]"))
       (((ir[0][0]).get()) ("1"))
       (((ir[0][1]).get()) ("2"))
@@ -47,17 +48,16 @@ int main (void) { try {
 
   { 
     std::string in = "{\"a\":{\"b\":1, \"c\":2}, \"d\":{\"e\":3}}";
-    utree out;
 
-    parse_json(in, out);
+    parse_tree<json> pt(in);
     
-    std::cout << out << std::endl;
+    std::cout << pt.ast() << std::endl;
 
-    json_ir ir(out);
+    json_ir ir(pt.ast());
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((out)                  (in))
+      ((pt.ast())             (in))
       (((ir["a"]).get())      ("{\"b\":1, \"c\":2}"))
       (((ir["a"]["b"]).get()) ("1"))
       (((ir["a"]["c"]).get()) ("2"))

@@ -40,11 +40,29 @@ project
       [ run prana/sexpr_list.cpp              : : : : ]
     ;
 
+  alias phxpr : 
+      [ run prana/phxpr_cxx_add.cpp           : : : : ]
+      [ run prana/phxpr_cxx_at.cpp            : : : : ]
+      [ run prana/phxpr_cxx_back.cpp          : : : : ]
+      [ run prana/phxpr_cxx_div.cpp           : : : : ]
+      [ run prana/phxpr_cxx_eq.cpp            : : : : ]
+      [ run prana/phxpr_cxx_front.cpp         : : : : ]
+      [ run prana/phxpr_cxx_if.cpp            : : : : ]
+      [ run prana/phxpr_cxx_lambda.cpp        : : : : ]
+      [ run prana/phxpr_cxx_list.cpp          : : : : ]
+      [ run prana/phxpr_cxx_lt.cpp            : : : : ]
+      [ run prana/phxpr_cxx_lte.cpp           : : : : ]
+      [ run prana/phxpr_cxx_min.cpp           : : : : ]
+      [ run prana/phxpr_cxx_mul.cpp           : : : : ]
+      [ run prana/phxpr_cxx_not.cpp           : : : : ]
+      [ run prana/phxpr_cxx_rest.cpp          : : : : ]
+    ;
+
   alias json :
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
-     #[ run prana/json_ir.cpp                 : : : : ]
+      [ run prana/json_ir.cpp                 : : : : ]
     ;
   
   alias xml :
