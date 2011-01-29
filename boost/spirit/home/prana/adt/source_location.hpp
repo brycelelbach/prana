@@ -136,6 +136,10 @@ make_source_location (std::size_t line, std::size_t column) {
   return loc;
 }
 
+inline bool valid_location (source_location const& loc) {
+  return (loc.line != -1) && (loc.column != -1);
+}
+
 } // prana
 } // spirit
 } // boost

@@ -5,8 +5,8 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(BSP_BIND_HPP)
-#define BSP_BIND_HPP
+#if !defined(BSP_1DADB60F_DE0B_47AA_89B8_C3AF2DBE2458)
+#define BSP_1DADB60F_DE0B_47AA_89B8_C3AF2DBE2458
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
@@ -174,7 +174,6 @@ BSP_FN(bind_tag_fn, ((A0)(const)) ((A1)),        2, bind_2x2_tag_fn)
 BSP_FN(bind_tag_fn, ((A0))        ((A1)(const)), 2, bind_2x2_tag_fn)
 BSP_FN(bind_tag_fn, ((A0)(const)) ((A1)(const)), 2, bind_2x2_tag_fn)
 
-//[dispatch_binder
 template<class TagX, class F, class Dummy = void>
 class dispatch_binder {
  private:
@@ -210,9 +209,7 @@ class dispatch_binder {
     return f(TagX(), TagY());
   }
 };
-//]
 
-//[dispatch_bind
 template<class TagX, class F>
 dispatch_binder<TagX, F> dispatch_bind (F& f) {
   return dispatch_binder<TagX, F>(f);
@@ -222,7 +219,6 @@ template<class TagX, class F>
 dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
   return dispatch_binder<TagX, F const>(f);
 }
-//]
 
 #undef BSP_LEFTMOST
 #undef BSP_RIGHTMOST
@@ -244,5 +240,5 @@ dispatch_binder<TagX, F const> dispatch_bind (F const& f) {
 } // spirit
 } // boost
 
-#endif // BSP_BIND_HPP
+#endif // BSP_1DADB60F_DE0B_47AA_89B8_C3AF2DBE2458
 

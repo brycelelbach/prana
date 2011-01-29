@@ -29,7 +29,7 @@
 #include <boost/preprocessor/arithmetic/sub.hpp>
 
 #include <boost/spirit/home/prana/magic.hpp>
-#include <boost/spirit/home/prana/dispatch/exception.hpp>
+#include <boost/spirit/home/prana/exception.hpp>
 #include <boost/spirit/home/prana/support/nt2/preprocessor.hpp>
 
 namespace boost {
@@ -100,7 +100,7 @@ struct basic_registry: RegistrySet {
 
     template<class F>
     result_type operator() (F const& f) const {
-      BOOST_THROW_EXCEPTION(invalid_type_information(which()(f)));
+      BOOST_THROW_EXCEPTION(invalid_visitable_typeinfo(which()(f)));
     };
   };
 };

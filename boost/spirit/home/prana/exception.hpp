@@ -14,16 +14,15 @@
 
 #include <boost/spirit/home/support/info.hpp>
 
+#include <boost/spirit/home/prana/magic.hpp>
 #include <boost/spirit/home/prana/adt/source_location.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
-// TODO: make prana exceptions boost.exception compatible
-    
 ///////////////////////////////////////////////////////////////////////////////
-struct exception {
+struct exception: std::exception {
   std::string msg;
 
   exception (void) {
@@ -41,28 +40,46 @@ struct exception {
   void set (Source const& source, source_location loc,
             std::string const& exception)
   {
-    msg = "(exception \"" + source + "\" " + loc.get() + " '" + exception + ")";    
+    msg = "(exception (";
+
+    typename magic::get_string_from_type<Source const>::type source_ =
+      magic::stringify(source);
+
+    if (!source_.empty())
+      msg += "\"" + source_ + "\"";
+
+    if (valid_location(loc))
+      msg += " " + loc.get();
+
+    msg += ") '" + exception + ")";
   }
 
-  std::string const& what (void) const {
-    return msg;
+  const char* what (void) const throw() {
+    return msg.c_str();
   }
+
+  ~exception (void) throw() { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 struct unexpected_character_data: prana::exception {
   template<class Source>
-  unexpected_character_data (Source const& source):
+  unexpected_character_data (Source const& source,
+                             std::string e = "unexpected-character-data"):
     prana::exception(source, make_source_location(-1, -1),
-                     "(unexpected-character-data)") { }
+                     std::string("(") + e + ")") { }
+  
+  ~unexpected_character_data (void) throw() { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-struct invalid_list_subtype: prana::exception {
+struct invalid_typeinfo: prana::exception {
   template<class Typeinfo>
-  static std::string make (Typeinfo type) {
+  static std::string make (Typeinfo type, std::string const& e) {
     using karma::uint_generator;
+    using karma::lit;
     using karma::generate;
+
     uint_generator<Typeinfo, 10> typeinfo_;
 
     typedef std::back_insert_iterator<std::string> sink_type;
@@ -70,16 +87,36 @@ struct invalid_list_subtype: prana::exception {
     std::string output;
     sink_type sink(output);
 
-    if (generate(sink, "(invalid-list-subtype " << typeinfo_ << ')', type))
+    if (generate(sink, lit('(') << e << ' ' << typeinfo_ << ')', type))
       return output;
     else
-      return "(invalid-list-subtype)"; 
+      return std::string("(") + e + ")"; 
   }
 
   template<class Source, class Typeinfo>
+  invalid_typeinfo (Source const& source, source_location loc,
+                    Typeinfo type, std::string e = "invalid-typeinfo"):
+    prana::exception(source, loc, make(type, e)) { }
+  
+  ~invalid_typeinfo (void) throw() { }
+};
+
+struct invalid_list_subtype: invalid_typeinfo {
+  template<class Source, class Typeinfo>
   invalid_list_subtype (Source const& source, source_location loc,
                         Typeinfo type):
-    prana::exception(source, loc, make(type)) { }
+    invalid_typeinfo(source, loc, type, "invalid-list-subtype") { }
+
+  ~invalid_list_subtype (void) throw() { }
+};
+
+struct invalid_visitable_typeinfo: invalid_typeinfo {
+  template<class Typeinfo>
+  invalid_visitable_typeinfo (Typeinfo type):
+    invalid_typeinfo("", make_source_location(-1, -1), type,
+                     "invalid-visitable-typeinfo") { }
+
+  ~invalid_visitable_typeinfo (void) throw() { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,9 +137,9 @@ struct info_printer {
 };
 
 struct expected_component: prana::exception {
-  static std::string make (info const& w) {
+  static std::string make (info const& w, std::string const& e) {
     std::ostringstream oss;
-    oss << "(expected-component ";
+    oss << "(" << e << " ";
 
     prana::info_printer<std::ostringstream> pr(oss);
     basic_info_walker<info_printer<std::ostringstream> > walker(pr, w.tag, 0);
@@ -114,8 +151,11 @@ struct expected_component: prana::exception {
   }
 
   template<class Source>
-  expected_component (Source const& source, source_location loc, info const& w):
-    prana::exception(source, loc, make(w)) { }
+  expected_component (Source const& source, source_location loc, info const& w,
+                      std::string e = "expected-component"):
+    prana::exception(source, loc, make(w, e)) { }
+  
+  ~expected_component (void) throw() { }
 };
 
 } // prana

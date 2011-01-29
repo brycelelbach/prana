@@ -47,6 +47,12 @@ struct get_string_from_source;
 template<class Tag>
 std::string stringify_source (typename source_type<Tag>::type const&);
 
+template<class T, class Enable = void>
+struct get_string_from_type;
+
+template<class T>
+typename get_string_from_type<T>::type stringify (T&);
+
 template<class Tag, class Enable = void>
 struct extract_source_location_from_node;
 

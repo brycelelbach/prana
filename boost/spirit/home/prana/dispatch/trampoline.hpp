@@ -47,8 +47,6 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-//[trampoline
-
 // My strategy here is based on the original visit implementation for utree and
 // Steven Watanabe's switch_ and case_ mplementation (available in the Boost
 // sandbox). Joel Falcou's NT2 functor code was also a major source of
@@ -57,7 +55,6 @@ namespace prana {
 template<std::size_t Size, class Registry, class Result, class F,
          class Dummy = void>
 struct trampoline;
-//]
 
 #define BSP_SINGLE_DISPATCH(z, m, n)                                          \
   typedef typename BOOST_PP_IF(m,                                             \

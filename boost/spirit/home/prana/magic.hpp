@@ -88,6 +88,58 @@ std::string stringify_source (typename source_type<Tag>::type const& s) {
   return get_string_from_source<Tag>::call(s);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+template<class T, class Enable/* = void*/>
+struct get_string_from_type {
+  typedef std::string type;
+
+  static type call (T& s) {
+    return std::string(s);
+  }
+};
+
+template<>
+struct get_string_from_type<std::string> {
+  typedef std::string& type;
+
+  static type call (std::string& s) {
+    return s;
+  }
+};
+
+template<>
+struct get_string_from_type<std::string const> {
+  typedef std::string const& type;
+
+  static type call (std::string const& s) {
+    return s;
+  }
+};
+
+template<>
+struct get_string_from_type<char const*> {
+  typedef std::string type;
+
+  static type call (char const* s) {
+    return std::string(s);
+  }
+};
+
+template<>
+struct get_string_from_type<char*> {
+  typedef std::string type;
+
+  static type call (char* s) {
+    return std::string(s);
+  }
+};
+
+template<class T>
+typename get_string_from_type<T>::type stringify (T& s) {
+  return get_string_from_type<T>::call(s); 
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template<class Tag, class Enable/* = void*/>
 struct extract_source_location_from_node {
   typedef source_location type; 
