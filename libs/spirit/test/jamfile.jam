@@ -42,6 +42,7 @@ project
 
   alias phxpr : 
       [ run prana/phxpr_cxx_add.cpp           : : : : ]
+      [ run prana/phxpr_cxx_and.cpp           : : : : ]
       [ run prana/phxpr_cxx_at.cpp            : : : : ]
       [ run prana/phxpr_cxx_back.cpp          : : : : ]
       [ run prana/phxpr_cxx_div.cpp           : : : : ]
@@ -55,6 +56,7 @@ project
       [ run prana/phxpr_cxx_min.cpp           : : : : ]
       [ run prana/phxpr_cxx_mul.cpp           : : : : ]
       [ run prana/phxpr_cxx_not.cpp           : : : : ]
+      [ run prana/phxpr_cxx_or.cpp            : : : : ]
       [ run prana/phxpr_cxx_rest.cpp          : : : : ]
     ;
 

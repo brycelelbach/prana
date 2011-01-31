@@ -32,10 +32,11 @@ struct nary_function: actor<nary_function<Derived> > {
     return *static_cast<Derived const*>(this);
   }
 
-  nary_function (boost::shared_ptr<actor_list> const& elements):
-    elements(elements)
+  nary_function (boost::shared_ptr<actor_list> const& elements,
+                 scope::size_type minimum_arity = 0): elements(elements)
   {
     BOOST_ASSERT(elements);
+    BOOST_ASSERT(elements->size() >= minimum_arity);
     BOOST_FOREACH(function const& element, *elements) {
       BOOST_ASSERT(!element.empty());
     }

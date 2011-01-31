@@ -103,7 +103,7 @@ struct set_cdr<
  
   template<class Value>
   result_type operator() (schematic& s, Value const&) const {
-    BOOST_THROW_EXCEPTION(storage_unavailable(s));
+    BOOST_THROW_EXCEPTION(expected_storage(s));
   }
   
   result_type operator() (schematic& s, schematic* const& v) const {

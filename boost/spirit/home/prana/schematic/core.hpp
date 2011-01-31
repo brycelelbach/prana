@@ -14,6 +14,7 @@
 #include <boost/spirit/home/prana/schematic/routine/set.hpp>
 #include <boost/spirit/home/prana/schematic/routine/set_car.hpp>
 #include <boost/spirit/home/prana/schematic/routine/set_cdr.hpp>
+#include <boost/spirit/home/prana/schematic/routine/serialize.hpp>
 
 namespace boost {
 namespace spirit {
@@ -73,6 +74,13 @@ void schematic::assign (Car car, Cdr cdr) {
   become<pair>(*this);
   set_car(*this, car);
   set_cdr(*this, cdr); 
+}
+
+template<class Char, class Traits>
+inline std::basic_ostream<Char, Traits>&
+operator<< (std::basic_ostream<Char, Traits>& out, schematic const& s) {
+  out << prana::serialize(s);
+  return out;
 }
 
 } // prana

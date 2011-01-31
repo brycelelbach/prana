@@ -25,7 +25,7 @@ namespace phxpr {
                                                                       \
     typedef utree result_type;                                        \
                                                                       \
-    utree eval (utree const& left, utree const& right) const {        \
+    result_type eval (utree const& left, utree const& right) const {  \
       return expression;                                              \
     }                                                                 \
   };                                                                  \
@@ -35,7 +35,12 @@ namespace phxpr {
   name##_composite const name = name##_composite();                   \
   /***/
 
-BSP_BINARY_INTRINSIC(at, spirit::index(left, right))
+BSP_BINARY_INTRINSIC(at,    spirit::index(left, right))
+BSP_BINARY_INTRINSIC(eq,    left == right)
+BSP_BINARY_INTRINSIC(lt,    left < right)
+BSP_BINARY_INTRINSIC(lte,   left <= right)
+BSP_BINARY_INTRINSIC(and_,  left && right)
+BSP_BINARY_INTRINSIC(or_,   left || right)
 
 #undef BSP_BINARY_INTRINSIC
 

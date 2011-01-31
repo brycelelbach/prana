@@ -12,7 +12,7 @@
 #include <boost/spirit/home/prana/domain.hpp>
 #include <boost/spirit/home/prana/adt/tuple.hpp>
 #include <boost/spirit/home/prana/support/half_t.hpp>
-#include <boost/spirit/home/prana/schematic/exception.hpp>
+#include <boost/spirit/home/prana/exception.hpp>
 #include <boost/spirit/home/prana/schematic/cast.hpp>
 #include <boost/spirit/home/prana/magic.hpp>
 

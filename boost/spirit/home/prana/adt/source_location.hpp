@@ -140,6 +140,8 @@ inline bool valid_location (source_location const& loc) {
   return (loc.line != -1) && (loc.column != -1);
 }
 
+source_location const invalid_location = {-1, -1};
+
 } // prana
 } // spirit
 } // boost

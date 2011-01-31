@@ -158,6 +158,104 @@ struct expected_component: prana::exception {
   ~expected_component (void) throw() { }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+struct expected: prana::exception {
+  template<class Got>
+  static std::string make (Got const& got, std::string const& e) {
+    std::ostringstream oss;
+    oss << "(" << e << " " << got << ")"; 
+    return oss.str();
+  }
+
+  template<class Expect, class Got>
+  static std::string make (Expect const& expect, Got const& got,
+                           std::string const& e)
+  {
+    std::ostringstream oss;
+    oss << "(" << e << " " << expect << " " << got << ")"; 
+    return oss.str();
+  }
+  
+  template<class Got>
+  expected (std::string e):
+    prana::exception("", make_source_location(-1, -1),
+                     std::string("(") + e + ")") { }
+
+  template<class Got>
+  expected (Got const& got, std::string e):
+    prana::exception("", make_source_location(-1, -1), make(got, e)) { }
+
+  template<class Expect, class Got>
+  expected (Expect const& expect, Got const& got, std::string e):
+    prana::exception("", make_source_location(-1, -1), make(expect, got, e)) { }
+
+  virtual ~expected (void) throw() { }
+};
+
+struct expected_variant_type: expected {
+  template<class Got>
+  expected_variant_type (Got const& got):
+    expected(got, "expected-variant-type") { }
+  
+  virtual ~expected_variant_type (void) throw() { }
+};
+
+struct expected_valid_pointer: expected {
+  template<class Got>
+  expected_valid_pointer (Got const& got):
+    expected(got, "expected-valid-pointer") { }
+  
+  virtual ~expected_valid_pointer (void) throw() { }
+};
+
+struct expected_dynamic_array: expected {
+  template<class Got>
+  expected_dynamic_array (Got const& got):
+    expected(got, "expected-dynamic-array") { }
+
+  template<class Expect, class Got>
+  expected_dynamic_array (Expect const& expect, Got const& got):
+    expected(expect, got, "expected-dynamic-array") { }
+
+  virtual ~expected_dynamic_array (void) throw() { }
+};
+
+struct expected_cons: expected {
+  template<class Got>
+  expected_cons (Got const& got):
+    expected(got, "expected-cons") { }
+
+  template<class Expect, class Got>
+  expected_cons (Expect const& expect, Got const& got):
+    expected(expect, got, "expected-cons") { }
+
+  virtual ~expected_cons (void) throw() { }
+};
+
+struct expected_composite: expected {
+  template<class Got>
+  expected_composite (Got const& got):
+    expected(got, "expected-composite") { }
+
+  template<class Expect, class Got>
+  expected_composite (Expect const& expect, Got const& got):
+    expected(expect, got, "expected-composite") { }
+
+  virtual ~expected_composite (void) throw() { }
+};
+
+struct expected_storage: expected {
+  template<class Got>
+  expected_storage (Got const& got):
+    expected(got, "expected-storage") { }
+
+  template<class Expect, class Got>
+  expected_storage (Expect const& expect, Got const& got):
+    expected(expect, got, "expected-storage") { }
+
+  virtual ~expected_storage (void) throw() { }
+};
+
 } // prana
 } // spirit
 } // boost

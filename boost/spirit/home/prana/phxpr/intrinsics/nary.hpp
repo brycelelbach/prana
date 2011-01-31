@@ -17,11 +17,10 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
-// TODO: enable short circut evaluation here.
-#define BSP_NARY_INTRINSIC(name, expression)                          \
+#define BSP_NARY_INTRINSIC(name, expression, size)                    \
   struct name##_function: nary_function<name##_function> {            \
     name##_function (boost::shared_ptr<actor_list> const& elements):  \
-      base_type(elements) { }                                         \
+      base_type(elements, size) { }                                   \
                                                                       \
     typedef bool result_type;                                         \
                                                                       \
@@ -36,17 +35,13 @@ namespace phxpr {
   name##_composite const name = name##_composite();                   \
   /***/
 
-BSP_NARY_INTRINSIC(add,   result = result + element)
-BSP_NARY_INTRINSIC(min,   result = result - element)
-BSP_NARY_INTRINSIC(mul,   result = result * element)
-BSP_NARY_INTRINSIC(div,   result = result / element)
-BSP_NARY_INTRINSIC(eq,    result = result == element)
-BSP_NARY_INTRINSIC(lt,    result = result < element)
-BSP_NARY_INTRINSIC(lte,   result = result <= element)
-BSP_NARY_INTRINSIC(and_,  result = result && element)
-BSP_NARY_INTRINSIC(or_,   result = result || element)
+BSP_NARY_INTRINSIC(add,   result = result + element, 2)
+BSP_NARY_INTRINSIC(min,   result = result - element, 2)
+BSP_NARY_INTRINSIC(mul,   result = result * element, 2)
+BSP_NARY_INTRINSIC(div,   result = result / element, 2)
 
 #undef BSP_NARY_INTRINSIC
+#undef BSP_SHORT_CIRCUITED_NARY_INTRINSIC
 
 } // phxpr
 } // prana

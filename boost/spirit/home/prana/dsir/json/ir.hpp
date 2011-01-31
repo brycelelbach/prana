@@ -23,7 +23,7 @@
 #include <boost/spirit/home/prana/adt/dynamic_array.hpp>
 #include <boost/spirit/home/prana/dsir/json/dsel.hpp>
 #include <boost/spirit/home/prana/dsir/json/predicates.hpp>
-#include <boost/spirit/home/prana/dsir/exception.hpp>
+#include <boost/spirit/home/prana/exception.hpp>
 
 namespace boost {
 namespace spirit {
@@ -283,7 +283,7 @@ void json_ir::copy (json_ir const& ir) {
 
     for (; it != end; ++it) {
       if (!(*it))
-        BOOST_THROW_EXCEPTION(expected_valid_pointer());
+        BOOST_THROW_EXCEPTION(expected_valid_pointer(*it));
       object_by_positions().push_back(new json_ir(**it));
     }
   }
