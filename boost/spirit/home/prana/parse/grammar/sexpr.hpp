@@ -107,7 +107,10 @@ struct sexpr_parser<Tag, Iterator, typename enable_if<
     utf8_type;
 
   qi::rule<Iterator, utree(void), space_type>
-    start, element, list;
+    start, element;
+
+  qi::rule<Iterator, utree::list_type(void), space_type>
+    list;
 
   qi::rule<Iterator, utree(void)>
     atom;
