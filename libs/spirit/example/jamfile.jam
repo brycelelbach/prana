@@ -10,8 +10,8 @@
 project ;
 
 {
-  alias json :
-      [ exe json_itunes_store : prana/json_itunes_store.cpp  ]
-    ;
+  #alias json :
+  #    [ exe json_itunes_store : prana/json_itunes_store.cpp  ]
+  #  ;
 }
 
