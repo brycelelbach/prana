@@ -18,15 +18,14 @@ use-project /boost : $(BOOST_ROOT) ;
 
 use-project /prana_test     : libs/spirit/test ;
 use-project /prana_example  : libs/spirit/example ;
-use-project /prana          : libs/spirit/src ;
 
 project 
   : requirements
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
     <include>./
-  : build-dir bin
+  : build-dir bin.v2
   ;
 
 build-project libs/spirit/test ;
 build-project libs/spirit/example ;
-build-project libs/spirit/src ;
+
