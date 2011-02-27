@@ -11,7 +11,6 @@ variant test : <optimization>off <inlining>on <debug-symbols>off ;
 
 project
   : requirements
-    <variant>test
     <warnings>on
     <toolset>clang:<cxxflags>-Wno-multichar
   ;
@@ -53,10 +52,12 @@ project
       [ run prana/phxpr_cxx_list.cpp          : : : : ]
       [ run prana/phxpr_cxx_lt.cpp            : : : : ]
       [ run prana/phxpr_cxx_lte.cpp           : : : : ]
+      [ run prana/phxpr_cxx_macro.cpp         : : : : ]
       [ run prana/phxpr_cxx_min.cpp           : : : : ]
       [ run prana/phxpr_cxx_mul.cpp           : : : : ]
       [ run prana/phxpr_cxx_not.cpp           : : : : ]
       [ run prana/phxpr_cxx_or.cpp            : : : : ]
+      [ run prana/phxpr_cxx_pattern.cpp       : : : : ]
       [ run prana/phxpr_cxx_rest.cpp          : : : : ]
     ;
 
