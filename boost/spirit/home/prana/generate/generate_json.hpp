@@ -23,21 +23,25 @@ namespace spirit {
 namespace prana {
 
 template<class Char>
-bool generate_json (utree const& in, std::basic_ostream<Char>& out) {
-  json_printer<std::basic_ostream<Char> > print(out);
+bool generate_json (parse_tree<tag::json> const& in,
+                    std::basic_ostream<Char>& out)
+{
+  json_printer<std::basic_ostream<Char> > print(out, in.annotations());
 
-  utree::visit(in, print);
+  print(in.ast());
 
   return true; 
 }
 
 template<class Char>
-bool generate_json (utree const& in, std::basic_string<Char>& out) {
+bool generate_json (parse_tree<tag::json> const& in,
+                    std::basic_string<Char>& out)
+{
   std::basic_stringstream<Char> oss;
 
-  json_printer<std::basic_stringstream<Char> > print(oss);
+  json_printer<std::basic_stringstream<Char> > print(oss, in.annotations());
 
-  utree::visit(in, print);
+  print(in.ast());
 
   out = oss.str();
 

@@ -8,7 +8,10 @@
 #if !defined(BSP_OUTPUT_VISIT_JSON_HPP)
 #define BSP_OUTPUT_VISIT_JSON_HPP
 
-#include <boost/spirit/home/prana/dsir/json/predicates.hpp>
+#include <boost/fusion/include/at_c.hpp>
+
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/json.hpp>
 
 namespace boost {
 namespace spirit {
@@ -17,24 +20,26 @@ namespace prana {
 template<class Out>
 struct json_printer {
   typedef void result_type;
+  typedef parse_tree<tag::json>::annotations_type annotations_type;
 
   Out& out;
+  annotations_type annotations;
 
-  json_printer (Out& out): out(out) { }
+  json_printer (Out& out_, annotations_type const& annotations_):
+    out(out_), annotations(annotations_) { }
 
-  template<typename Iterator>
-  void print_object (iterator_range<Iterator> const& range) const {
-    typedef typename iterator_range<Iterator>::const_iterator iterator;
+  void print_object (utree const& ut) const {
+    typedef utree::const_iterator iterator;
 
-    iterator it = range.begin(), end = range.end();
+    iterator it = ut.front().begin(), end = ut.front().end();
 
     (*this)('{');
 
-    print_member_pair(*it); ++it;
+    (*this)(*it); ++it;
 
     for (; it != end; ++it) {
       out << ", ";
-      print_member_pair(*it);
+      (*this)(*it);
     }
     
     (*this)('}');
@@ -43,7 +48,7 @@ struct json_printer {
   void print_member_pair (utree const& ut) const {
     print_key(ut[0]);
     out << ':';
-    utree::visit(ut[1], *this);
+    (*this)(ut[1]);
   }
 
   void print_key (utree const& ut) const {
@@ -61,19 +66,18 @@ struct json_printer {
     out << '"';
   } 
 
-  template<typename Iterator>
-  void print_array (iterator_range<Iterator> const& range) const {
-    typedef typename iterator_range<Iterator>::const_iterator iterator;
+  void print_array (utree const& ut) const {
+    typedef utree::const_iterator iterator;
 
-    iterator it = range.begin(), end = range.end();
+    iterator it = ut.begin(), end = ut.end();
 
     (*this)('[');
 
-    utree::visit(*it, *this); ++it;
+    (*this)(*it); ++it;
 
     for (; it != end; ++it) {
       out << ", ";
-      utree::visit(*it, *this);
+      (*this)(*it);
     }
     
     (*this)(']');
@@ -124,10 +128,36 @@ struct json_printer {
 
   template<typename Iterator>
   void operator() (iterator_range<Iterator> const& range) const {
-    if (is_object(range))
-      print_object(range);
-    else
-      print_array(range);
+    BOOST_ASSERT(false);
+  }
+
+  void operator() (utree const& ut) const {
+    using boost::fusion::at_c;
+
+    switch (ut.which()) {
+      case utree_type::reference_type:
+        return (*this)(ut.deref());
+
+      case utree_type::range_type:
+      case utree_type::list_type:
+        if (at_c<1>(annotations[ut.tag()]) == json_object::value) {
+          print_object(ut);
+          return;
+        }
+        else if (at_c<1>(annotations[ut.tag()]) == json_array::value) {
+          print_array(ut);
+          return;
+        }
+        else if (at_c<1>(annotations[ut.tag()]) == json_member_pair::value) {
+          print_member_pair(ut);
+          return;
+        }
+
+      default:
+        break;
+    }
+
+    utree::visit(ut, *this);
   }
 
   void operator() (any_ptr const& p) const {

@@ -41,6 +41,8 @@ struct push_subtype_annotation {
 
   template<class Range>
   void operator() (utree& ast, long type, Range const& rng) const {
+    std::cout << "annotate: " << ast << type << std::endl;
+
     typedef typename annotations_type::value_type value_type;
     typedef typename annotations_type::size_type size_type;
 

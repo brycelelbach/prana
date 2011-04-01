@@ -23,6 +23,7 @@ project
   : requirements
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
     <include>./
+    <include>$(BOOST_ROOT)
   : build-dir bin.v2
   ;
 

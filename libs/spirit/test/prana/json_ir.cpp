@@ -32,7 +32,8 @@ int main (void) { try {
  
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast())         (in))
+      ((pt)         (in))
+      /*
       (((ir[0]).get())    ("[1, 2]"))
       (((ir[0][0]).get()) ("1"))
       (((ir[0][1]).get()) ("2"))
@@ -41,10 +42,11 @@ int main (void) { try {
       (((ir[2]).get())    ("\"invalid\""))
       (((ir[3][1]).get()) ("\"invalid\""))
       (((ir[0][2]).get()) ("\"invalid\""))
+      */
     )
   }
   
-  std::cout << "basic array test: " << std::endl; 
+  std::cout << "basic object test: " << std::endl; 
 
   { 
     std::string in = "{\"a\":{\"b\":1, \"c\":2}, \"d\":{\"e\":3}}";
@@ -57,7 +59,8 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast())             (in))
+      ((pt)             (in))
+      /*
       (((ir["a"]).get())      ("{\"b\":1, \"c\":2}"))
       (((ir["a"]["b"]).get()) ("1"))
       (((ir["a"]["c"]).get()) ("2"))
@@ -66,6 +69,7 @@ int main (void) { try {
       (((ir["f"]).get())      ("\"invalid\""))
       (((ir["g"]["h"]).get()) ("\"invalid\""))
       (((ir["a"]["d"]).get()) ("\"invalid\""))
+      */
     )
   }
 
