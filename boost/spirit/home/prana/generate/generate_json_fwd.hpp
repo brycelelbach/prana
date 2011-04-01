@@ -11,17 +11,20 @@
 #include <iosfwd>
 #include <string>
 
-#include <boost/spirit/include/support_utree.hpp>
+#include <boost/spirit/home/prana/parse/parse_tree.hpp>
+#include <boost/spirit/home/prana/parse/grammar/json.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 
 template<class Char>
-bool generate_json (utree const& in, std::basic_ostream<Char>& out);
+bool generate_json (parse_tree<tag::json> const& in,
+                    std::basic_ostream<Char>& out);
 
 template<class Char>
-bool generate_json (utree const& in, std::basic_string<Char>& out);
+bool generate_json (parse_tree<tag::json> const& in,
+                    std::basic_string<Char>& out);
 
 } // prana
 } // spirit

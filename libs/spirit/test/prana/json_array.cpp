@@ -29,7 +29,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("[[], []]")))
+      ((pt) ("[[], []]")))
   }
 
   std::cout << std::endl << "basic array test: " << std::endl; 
@@ -43,7 +43,7 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "array skipping test: " << std::endl; 
@@ -57,7 +57,7 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("[\"a\", \"b\", \"c\", \"d\"]")))
+      ((pt) ("[\"a\", \"b\", \"c\", \"d\"]")))
   }
   
   std::cout << std::endl << "multi type array test: " << std::endl; 
@@ -71,7 +71,7 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "nested array test: " << std::endl; 
@@ -85,7 +85,7 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "line position test: " << std::endl; 
@@ -99,7 +99,7 @@ int main (void) { try {
     
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("[[true, false], true]")))
+      ((pt) ("[[true, false], true]")))
 
     BSP_BOOLEAN_TESTS(
       ((extract_source_location(pt.ast()[0], pt).line()) (1))

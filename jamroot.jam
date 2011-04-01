@@ -24,6 +24,8 @@ project
   : requirements
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
     <include>./
+    <include>$(BOOST_ROOT)
+    <cxxflags>-DBOOST_SPIRIT_ACTIONS_ALLOW_ATTR_COMPAT
   : build-dir bin
   ;
 

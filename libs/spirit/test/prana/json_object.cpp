@@ -28,7 +28,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("[{}, {}]")))
+      ((pt) ("[{}, {}]")))
   }
   
   std::cout << std::endl << "basic object test: " << std::endl; 
@@ -42,7 +42,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "object skipping test: " << std::endl; 
@@ -56,7 +56,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("{\"/\":273, \"+\":36, \"-\":-17, \"*\":45}")))
+      ((pt) ("{\"/\":273, \"+\":36, \"-\":-17, \"*\":45}")))
   }
   
   std::cout << std::endl << "multi type object test: " << std::endl; 
@@ -71,7 +71,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "nested object test: " << std::endl; 
@@ -88,7 +88,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "line position test: " << std::endl; 
@@ -102,13 +102,13 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) ("{\"car\":1, \"cdr\":{\"two\":2, \"three\":3}}")))
+      ((pt) ("{\"car\":1, \"cdr\":{\"two\":2, \"three\":3}}")))
 
     BSP_BOOLEAN_TESTS(
       ((extract_source_location(pt.ast()[0], pt).line()) (1))
       ((extract_source_location(pt.ast()[0], pt).line()) (2)))
   }
-  
+
   } catch (std::exception& e) {
     std::cout << "caught: " << e.what() << "\n";
     return -1;

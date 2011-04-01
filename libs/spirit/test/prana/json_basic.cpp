@@ -28,7 +28,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
 
   std::cout << std::endl << "boolean test: " << std::endl; 
@@ -42,7 +42,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
 
   std::cout << std::endl << "integer test: " << std::endl; 
@@ -56,7 +56,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
   
   std::cout << std::endl << "floating test: " << std::endl; 
@@ -70,7 +70,7 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
 
   std::cout << std::endl << "string test: " << std::endl; 
@@ -84,9 +84,9 @@ int main (void) { try {
 
     BSP_STRINGIFY_TESTS(
       generate_json,
-      ((pt.ast()) (in)))
+      ((pt) (in)))
   }
-  
+
   } catch (std::exception& e) {
     std::cout << "caught: " << e.what() << "\n";
     return -1;

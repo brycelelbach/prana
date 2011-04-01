@@ -11,7 +11,7 @@ variant test : <optimization>off <inlining>on <debug-symbols>off ;
 
 project
   : requirements
-    <variant>test
+#    <variant>test
     <warnings>on
     <toolset>clang:<cxxflags>-Wno-multichar
   ;
