@@ -122,6 +122,14 @@ class parse_tree {
     set(in);
   }  
 
+  parse_tree (char const* in, source_type const& s =
+                                magic::default_source<Tag>::value):
+    _ast(), _annotations(), _source(s)
+  {
+    // TODO: not optimal
+    set(std::string(in));
+  }  
+
   parse_tree (parse_tree const& other):
     _ast(), _annotations(), _source()
   {
@@ -155,6 +163,14 @@ class parse_tree {
     set(in);
   }
   
+  parse_tree& operator= (char const* in) {
+    _ast.clear();
+    _annotations.clear();
+    _source = magic::default_source<Tag>::value;
+    // TODO: not optimal
+    set(std::string(in));
+  }
+  
   void assign (parse_tree const& other) {
     if (!equal(other))
       copy(other);
@@ -166,7 +182,7 @@ class parse_tree {
     copy(other);
     return *this;
   } 
-  
+
   template<class In>
   void assign (In in, source_type const& s =
                         magic::default_source<Tag>::value)
@@ -175,6 +191,15 @@ class parse_tree {
     _annotations.clear();
     _source = s; 
     set(in);
+  }
+  
+  void assign (char const* in, source_type const& s =
+                                 magic::default_source<Tag>::value)
+  {
+    _ast.clear();
+    _annotations.clear();
+    _source = s; 
+    set(std::string(in));
   }
 
   utree& ast (void) {

@@ -25,33 +25,76 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
-struct is_variadic_predicate {
+struct is_variadic_visitor {
   typedef bool result_type;
 
   template<class T>
   result_type operator() (T const&) const {
-    std::cout << "is_variadic - T" << std::endl;
     return false;
   }
 
   result_type operator() (utree::const_range const& ut) const {
-    std::cout << "is_variadic - range" << std::endl;
-    return utree::visit(ut.back(), is_variadic_predicate());
+    return utree::visit(ut.back(), is_variadic_visitor());
   }
 
   result_type operator() (utf8_symbol_range_type const& ut) const {
-    std::cout << "is_variadic - symbol" << std::endl;
     return ut == std::string("...");
   }
 }; 
 
 template<class T>
 inline bool is_variadic (T const& val) {
-  return is_variadic_predicate()(val);
+  return is_variadic_visitor()(val);
 } 
 
 inline bool is_variadic (utree const& val) {
-  return utree::visit(val, is_variadic_predicate());
+  return utree::visit(val, is_variadic_visitor());
+}
+
+struct initialize_to_list_visitor {
+  typedef std::map<utree, utree> bindings_type;
+
+ private:
+  mutable boost::shared_ptr<bindings_type> _bindings;
+
+ public:
+  typedef bool result_type;
+
+  initialize_to_list_visitor (boost::shared_ptr<bindings_type>& bindings_):
+    _bindings(bindings_) { }
+
+  initialize_to_list_visitor (initialize_to_list_visitor const& other):
+    _bindings(other._bindings) { } 
+
+  template<class T>
+  result_type operator() (T const&) const {
+    // TODO: replace with exception (this should never really be reached,
+    // though)
+    BOOST_ASSERT(false);
+  }
+
+  result_type operator() (utree::const_range const& ut) const {
+    BOOST_FOREACH(utree const& element, ut) {
+      utree::visit(element, *this);
+    }
+  }
+
+  result_type operator() (utf8_symbol_range_type const& ut) const {
+    utree name(ut);
+
+    if (name != utree(utf8_symbol_type("...")))
+      (*_bindings)[name] = utree::list_type();
+  }
+}; 
+
+template<class T, class Bindings>
+inline bool initialize_to_list (T const& val, Bindings& bindings) {
+  return initialize_to_list_visitor(bindings)(val);
+} 
+
+template<class Bindings>
+inline bool initialize_to_list (utree const& val, Bindings& bindings) {
+  return utree::visit(val, initialize_to_list_visitor(bindings));
 }
 
 struct matcher {
@@ -91,19 +134,20 @@ struct matcher {
   template<class T0, class T1>
   result_type operator() (T0 const&, T1 const&) const {
     // TODO: replace with exception (this should never really be reached,
-    // though
+    // though)
     BOOST_ASSERT(false);
   }
 
   template<class T>
   typename disable_if<is_same<function_base, T>, result_type>::type 
   operator() (utf8_symbol_range_type const& lhs, T const& rhs) const {
-    std::cout << "symbol-T" << std::endl; 
+    //std::cout << "symbol-T" << std::endl; 
     utree ut(lhs);
 
     if (_literals.count(ut))
       return false;
     else {
+      //std::cout << "binding (rhs) " << utree(rhs) << " to (lhs) " << ut << std::endl; 
       if (!_bindings->count(ut))
         (*_bindings)[ut] = utree::list_type();
       (*_bindings)[ut].push_back(rhs);
@@ -114,80 +158,81 @@ struct matcher {
   template<class T>
   typename disable_if<is_same<function_base, T>, result_type>::type 
   operator() (utree::const_range const& lhs, T const& rhs) const {
-    std::cout << "range-T" << std::endl; 
-    switch (traits::size(lhs)) {
-      case 0: {
-        // TODO: replace with exception
-        BOOST_ASSERT(false); 
-        return false;
-      }
-
-      case 1: {
-        return utree::visit(lhs.front(), utree(rhs), *this);
-      }
-      
-      case 2: {
-        if (is_variadic(lhs))
-          return utree::visit(lhs.front(), utree(rhs), *this);
-      }
- 
-      // if the lhs has more than two elements, it can't possibly match.
-      default:
-        return false;
-    }
+    //std::cout << "range-T" << std::endl; 
+    return utree::visit(utree(lhs), utree(rhs), *this);
+//    switch (traits::size(lhs)) {
+//      case 0: {
+//        // TODO: replace with exception
+//        BOOST_ASSERT(false); 
+//        return false;
+//      }
+//
+//      case 1: {
+//        return utree::visit(lhs.front(), utree(rhs), *this);
+//      }
+//      
+//      case 2: {
+//        if (is_variadic(lhs))
+//          return utree::visit(lhs.front(), utree(rhs), *this);
+//      }
+// 
+//      // if the lhs has more than two elements, it can't possibly match.
+//      default:
+//        return false;
+//    }
   }
   
   result_type operator() (utf8_symbol_range_type const& lhs,
                           utf8_symbol_range_type const& rhs) const
   {
-    std::cout << "symbol-symbol" << std::endl; 
+    //std::cout << "symbol-symbol" << std::endl; 
     utree ut(lhs);
     bindings_type::iterator it = _bindings->find(ut),
                             end = _bindings->end();
 
-    if (it == end)
-      return false;
-    else if (_literals.count(ut))
+    if (_literals.count(ut))
       return !std::lexicographical_compare(lhs.begin(), lhs.end(),
                                            rhs.begin(), rhs.end());
     else {
-      it->second.push_back(rhs);
+      //std::cout << "binding (rhs) " << utree(rhs) << " to (lhs) " << ut << std::endl; 
+      if (!_bindings->count(ut))
+        (*_bindings)[ut] = utree::list_type();
+      (*_bindings)[ut].push_back(rhs);
       return true;
     }
   }
   
-  result_type operator() (utf8_symbol_range_type const& lhs,
-                          utree::const_range const& rhs) const 
-  {
-    std::cout << "symbol-range" << std::endl; 
-    if (traits::size(rhs) == 1)
-      return utree::visit(utree(lhs), rhs.front(), *this);
-    else 
-      // this can't possibly match
-      return false;
-  }
+  //result_type operator() (utf8_symbol_range_type const& lhs,
+  //                        utree::const_range const& rhs) const 
+  //{
+  //  std::cout << "symbol-range" << std::endl; 
+  //  if (traits::size(rhs) == 1)
+  //    return utree::visit(utree(lhs), rhs.front(), *this);
+  //  else 
+  //    // this can't possibly match
+  //    return false;
+  //}
   
   result_type operator() (utree::const_range const& lhs,
                           utree::const_range const& rhs) const
   {
-    std::cout << "range-range" << std::endl; 
-    std::cout << "is_variadic: " << is_variadic(lhs) << std::endl;
+    //std::cout << "range-range" << std::endl; 
+    //std::cout << "is_variadic: " << is_variadic(lhs) << std::endl;
 
     utree::const_range::const_iterator it = lhs.begin(),
                                             end = lhs.end();
 
     if (is_variadic(lhs)) {
-      std::cout <<   "lhs size: " << traits::size(lhs)
-                << "\nrhs size: " << traits::size(rhs) << std::endl;
+      //std::cout <<   "lhs size: " << traits::size(lhs)
+      //        << "\nrhs size: " << traits::size(rhs) << std::endl;
 
       if (traits::size(rhs) < (traits::size(lhs) - 2))
         return false;
      
       // initialize the variable argument to a list, so that it's not invalid
-      // if it's empty 
+      // if it's empty
       utree::const_range::const_iterator vararg = boost::prior(end, 2);
-      utree ut(*vararg);
-      (*_bindings)[ut] = utree::list_type();
+      initialize_to_list(utree(*vararg), _bindings);
     }
 
     else if (traits::size(lhs) != traits::size(rhs))
@@ -197,8 +242,8 @@ struct matcher {
       if (it == end)
         return false;
 
-      std::cout <<   "lhs: " << *it
-                << "\nrhs: " << ut << std::endl;
+      //std::cout <<   "lhs: " << *it
+      //          << "\nrhs: " << ut << std::endl;
 
       if (!utree::visit(*it, ut, *this))
         return false;

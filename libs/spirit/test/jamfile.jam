@@ -57,7 +57,8 @@ project
       [ run prana/phxpr_cxx_mul.cpp           : : : : ]
       [ run prana/phxpr_cxx_not.cpp           : : : : ]
       [ run prana/phxpr_cxx_or.cpp            : : : : ]
-      [ run prana/phxpr_cxx_pattern.cpp       : : : : ]
+      [ run prana/phxpr_cxx_pattern_basic.cpp : : : : ]
+      [ run prana/phxpr_cxx_pattern_list.cpp  : : : : ]
       [ run prana/phxpr_cxx_rest.cpp          : : : : ]
     ;
 
