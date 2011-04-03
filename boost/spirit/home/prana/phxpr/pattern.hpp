@@ -103,16 +103,18 @@ struct matcher {
 
  private:
   literals_type const& _literals;
+  utree const& _body;
   mutable boost::shared_ptr<bindings_type> _bindings;
 
  public:
   typedef bool result_type;
 
-  matcher (std::set<utree> const& literals_):
-    _literals(literals_), _bindings(new bindings_type()) { }
+  matcher (std::set<utree> const& literals_, utree const& body_):
+    _literals(literals_), _body(body_), _bindings(new bindings_type()) { }
 
   matcher (matcher const& other):
-    _literals(other._literals), _bindings(other._bindings) { } 
+    _literals(other._literals), _body(other._body),
+    _bindings(other._bindings) { } 
 
   literals_type const& literals (void) const {
     return _literals;
@@ -123,9 +125,101 @@ struct matcher {
     return *_bindings;
   }
 
-  boost::shared_ptr<utree> apply (utree const& body) {
-    // TODO: implement
-    return boost::shared_ptr<utree>();
+ private:
+  // Note: ptr is assumed to be a utree list 
+  void apply (utree const& body, utree& ut) const {
+    switch (body.which()) {
+      case utree_type::reference_type: {
+        apply(body.deref(), ut);
+        return;
+      }
+      
+      case utree_type::invalid_type: {
+        // TODO: make this an exception
+        BOOST_ASSERT(false);
+        return;
+      }
+
+      case utree_type::list_type:
+      case utree_type::range_type: {
+        // put an empty list in the parent utree
+        ut.push_back(utree::list_type());
+        // fill the new list
+        BOOST_FOREACH(utree const& element, body) {
+          apply(element, ut.back());
+        }
+        return;
+      }
+
+      case utree_type::symbol_type: {
+        bindings_type::const_iterator it = _bindings->find(body),
+                                      end = _bindings->end();
+        
+        // if we found a match, we replace the symbol with it, and then expand
+        // the replacement.
+        if (it != end) {
+          apply(it->second, ut);
+          return;
+        }
+
+        // if we didn't find a match, add the symbol as-is
+        ut.push_back(body);
+        return; 
+      }
+
+      default: {
+        ut.push_back(body);
+        return;
+      }    
+    }
+  }
+  
+  boost::shared_ptr<utree> apply (utree const& body) const {
+    switch (body.which()) {
+      case utree_type::reference_type: {
+        return apply(body.deref());
+      }
+      
+      case utree_type::invalid_type: {
+        // TODO: make this an exception
+        BOOST_ASSERT(false);
+        return boost::shared_ptr<utree>();
+      }
+
+      case utree_type::list_type:
+      case utree_type::range_type: {
+        // the replacement is a list, so we need to apply the bindings to the
+        // replacement elements.
+        boost::shared_ptr<utree> r(new utree());
+        *r = utree::list_type();
+        BOOST_FOREACH(utree const& element, body) {
+          apply(element, *r);
+        }
+        return r;
+      }
+
+      case utree_type::symbol_type: {
+        bindings_type::const_iterator it = _bindings->find(body),
+                                      end = _bindings->end();
+        
+        // if we found a match, we replace the symbol with it, and then expand
+        // the replacement.
+        if (it != end)
+          return apply(it->second);
+
+        // if we didn't find a match, return the symbol as-is
+        return boost::shared_ptr<utree>(new utree(body));
+      }
+
+      default: {
+        return boost::shared_ptr<utree>(new utree(body));
+      }    
+    }
+  }
+
+ public:
+  boost::shared_ptr<utree> expand (void) const {
+    return apply(_body);
   }
 
   // the lhs is always the pattern element and the rhs is always corresponding
@@ -287,6 +381,7 @@ struct pattern {
     return _body;
   }
 
+  #if 0
   result_type operator() (utree const& use) const {
     matcher m(_literals);
     
@@ -295,9 +390,11 @@ struct pattern {
     else
       return result_type();
   }
+  #endif
 
+  // TODO: can't we just NRVO safely here?
   boost::shared_ptr<matcher> match (utree const& use) const {
-    boost::shared_ptr<matcher> m(new matcher(_literals));
+    boost::shared_ptr<matcher> m(new matcher(_literals, _body));
 
     if (utree::visit(_elements, use, *m))
       return m;

@@ -36,13 +36,14 @@ struct macro {
     _definitions.push_back(pattern(_literals, elements, body));
   }
 
-  boost::shared_ptr<utree> operator[] (utree const& use) const {
+  // TODO: can't we just NRVO safely here?
+  boost::shared_ptr<matcher> match (utree const& use) const {
     BOOST_FOREACH(pattern const& p, _definitions) {
-      boost::shared_ptr<utree> m = p(use);
+      boost::shared_ptr<matcher> m = p.match(use);
       if (m)
         return m;
     }
-    return boost::shared_ptr<utree>();
+    return boost::shared_ptr<matcher>();
   }
 
   std::string keyword (void) const {
