@@ -71,19 +71,24 @@ struct initialize_to_list_visitor {
     // TODO: replace with exception (this should never really be reached,
     // though)
     BOOST_ASSERT(false);
+    return false;
   }
 
   result_type operator() (utree::const_range const& ut) const {
     BOOST_FOREACH(utree const& element, ut) {
       utree::visit(element, *this);
     }
+    return true;
   }
 
   result_type operator() (utf8_symbol_range_type const& ut) const {
     utree name(ut);
+    //std::cout << name << std::endl;
 
     if (name != utree(utf8_symbol_type("...")))
       (*_bindings)[name] = utree::list_type();
+
+    return true;
   }
 }; 
 
@@ -216,6 +221,30 @@ struct matcher {
       }    
     }
   }
+  
+  void bind (utree& binding, utree const& rhs) const {
+    switch (binding.which()) {
+      case utree_type::reference_type: {
+        bind(binding.deref(), rhs);
+        return;
+      }
+      
+      case utree_type::invalid_type:
+      case utree_type::list_type:
+      case utree_type::range_type: {
+        binding.push_back(rhs);
+        return;
+      }
+
+      default: {
+        utree ut = binding;
+        binding = utree::list_type();
+        ut.push_back(binding);
+        ut.push_back(rhs);
+        return;
+      }    
+    }
+  }
 
  public:
   boost::shared_ptr<utree> expand (void) const {
@@ -243,8 +272,9 @@ struct matcher {
     else {
       //std::cout << "binding (rhs) " << utree(rhs) << " to (lhs) " << ut << std::endl; 
       if (!_bindings->count(ut))
-        (*_bindings)[ut] = utree::list_type();
-      (*_bindings)[ut].push_back(rhs);
+        (*_bindings)[ut] = rhs;
+      else
+        bind((*_bindings)[ut], rhs);
       return true;
     }
   }
@@ -290,8 +320,9 @@ struct matcher {
     else {
       //std::cout << "binding (rhs) " << utree(rhs) << " to (lhs) " << ut << std::endl; 
       if (!_bindings->count(ut))
-        (*_bindings)[ut] = utree::list_type();
-      (*_bindings)[ut].push_back(rhs);
+        (*_bindings)[ut] = rhs;
+      else
+        bind((*_bindings)[ut], rhs);
       return true;
     }
   }
