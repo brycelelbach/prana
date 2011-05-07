@@ -14,6 +14,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace boost {
 namespace spirit {
@@ -38,28 +39,39 @@ struct environment {
     outer(parent), depth(parent ? parent->depth + 1 : 0),
     definitions(boost::unordered_detail::default_bucket_count, hash, pred) { }
   
-  iterator operator[] (key_type const& name) {
+  fusion::vector2<iterator, bool> operator[] (key_type const& name) {
     iterator it = definitions.find(name),
              end = definitions.end();
 
     // If we didn't find the definition and we have an outer scope,
     // check the outer scope for the definition.
-    if (it == end && outer)
-      return (*outer)[name];
-    // If we found the definition or have no outer scope, return the
-    // iterator.
+    if (it == end) {
+      if (outer)
+        return (*outer)[name];
+
+      // If we found the definition or have no outer scope, return the
+      // iterator and false.
+      return fusion::vector2<iterator, bool>(it, false);
+    }
+
     else
-      return it;
+      return fusion::vector2<iterator, bool>(it, true);
   }
   
-  const_iterator operator[] (key_type const& name) const {
+  fusion::vector2<const_iterator, bool>
+  operator[] (key_type const& name) const {
     const_iterator it = definitions.find(name),
              end = definitions.end();
 
-    if (it == end && outer)
-      return (*outer)[name];
+    if (it == end) {
+      if (outer)
+        return (*outer)[name];
+
+      return fusion::vector2<const_iterator, bool>(it, false);
+    }
+
     else
-      return it;
+      return fusion::vector2<const_iterator, bool>(it, true);
   }
 
   template<class T>

@@ -15,7 +15,7 @@ int main (void) { try {
   using boost::spirit::prana::phxpr::macro;
   using boost::spirit::prana::phxpr::pattern;
 
-  macro m("foo");
+  macro m;
 
   } catch (std::exception& e) {
     std::cout << "caught: " << e.what() << "\n";

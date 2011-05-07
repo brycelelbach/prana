@@ -23,14 +23,12 @@ struct macro {
   typedef std::set<utree> literals_type;
 
  private:
-  std::string _keyword;
   literals_type _literals;
   dynamic_array<pattern> _definitions;
 
  public:
-  macro (std::string const& keyword_,
-         literals_type const& literals_ = literals_type()):
-    _keyword(keyword_), _literals(literals_), _definitions() { }
+  macro (literals_type const& literals_ = literals_type()):
+    _literals(literals_), _definitions() { }
 
   void add (utree const& elements, utree const& body) {
     _definitions.push_back(pattern(_literals, elements, body));
@@ -44,10 +42,6 @@ struct macro {
         return m;
     }
     return boost::shared_ptr<matcher>();
-  }
-
-  std::string keyword (void) const {
-    return _keyword;
   }
 };
 
