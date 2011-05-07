@@ -46,9 +46,10 @@ struct json_printer {
   }
 
   void print_member_pair (utree const& ut) const {
-    print_key(ut[0]);
+    utree::const_iterator it = ut.begin();
+    print_key(*it); ++it;
     out << ':';
-    (*this)(ut[1]);
+    (*this)(*it);
   }
 
   void print_key (utree const& ut) const {
