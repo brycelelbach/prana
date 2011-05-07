@@ -37,7 +37,7 @@ struct environment {
   environment (environment* parent = 0, Hash const& hash = Hash(),
                Pred const& pred = Pred()):
     outer(parent), depth(parent ? parent->depth + 1 : 0),
-    definitions(boost::unordered_detail::default_bucket_count, hash, pred) { }
+    definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
   
   fusion::vector2<iterator, bool> operator[] (key_type const& name) {
     iterator it = definitions.find(name),
@@ -77,7 +77,7 @@ struct environment {
   template<class T>
   void define (key_type const& name, T const& val) {
     // TODO: replace with exception
-    BOOST_ASSERT(definitions.find(name) != definitions.end());
+    BOOST_ASSERT(definitions.find(name) == definitions.end());
     definitions[name] = val;
   }
 

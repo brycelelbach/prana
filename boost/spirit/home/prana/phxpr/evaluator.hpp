@@ -12,11 +12,12 @@
 #include <boost/function.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
-#include <boost/spirit/prana/phxpr/core/actor.hpp>
-#include <boost/spirit/prana/phxpr/core/function.hpp>
-#include <boost/spirit/prana/phxpr/core/quote.hpp>
-#include <boost/spirit/prana/phxpr/macro.hpp>
-#include <boost/spirit/prana/phxpr/environment.hpp>
+#include <boost/spirit/home/prana/phxpr/core/actor.hpp>
+#include <boost/spirit/home/prana/phxpr/core/function.hpp>
+#include <boost/spirit/home/prana/phxpr/core/quote.hpp>
+#include <boost/spirit/home/prana/phxpr/core/procedure.hpp>
+#include <boost/spirit/home/prana/phxpr/macro.hpp>
+#include <boost/spirit/home/prana/phxpr/environment.hpp>
 
 namespace boost {
 namespace spirit {
@@ -29,13 +30,13 @@ std::string get_symbol(utree const& s) {
     BOOST_ASSERT(false);
   }
  
-  utf8_symbol_range symbol = s.get<utf8_symbol_range>();
+  utf8_symbol_range_type symbol = s.get<utf8_symbol_range_type>();
   return std::string(symbol.begin(), symbol.end());
 }
 
 typedef boost::function<phxpr::function(actor_list const&)> compiled_function;
 
-struct compiler {
+struct evaluator {
   environment<compiled_function> functions;
   environment<macro> macros;
 
@@ -61,7 +62,7 @@ struct compiler {
 
       if (at_c<1>(macro)) {
         boost::shared_ptr<matcher> match
-          = at_c<0>(macro)->match(utree::list_type());
+          = at_c<0>(macro)->second.match(utree::list_type());
 
         if (match) {
           boost::shared_ptr<utree> expansion = match->expand();
@@ -78,31 +79,31 @@ struct compiler {
 
     if (at_c<1>(func)) {
       actor_list flist;
-      return (*at_c<0>(func))(flist);
+      return (at_c<0>(func)->second)(flist);
     } // }}}
     
     // TODO: replace with exception (identifier not found error)
     BOOST_ASSERT(false);
-    return function();
+    return result_type();
   }
 
   template<class Iterator>
-  void operator() (iterator_range<Iterator> const& range) const {
+  result_type operator() (iterator_range<Iterator> const& range) const {
     using boost::fusion::at_c;
-      
-    typedef iterator_range<Iterator>::const_iterator i = range.begin();
 
-    std::string sym = get_symbol(*i);
-    ++i;
+    typename iterator_range<Iterator>::const_iterator it = range.begin();
+
+    std::string sym = get_symbol(*it);
+    ++it;
 
     { // {{{ macro expansion
       fusion::vector2<environment<macro>::const_iterator, bool> macro
         = macros[sym];
 
       if (at_c<1>(macro)) {
-        utree use(utree::const_range(i, range.end()), spirit::shallow);
+        utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
 
-        boost::shared_ptr<matcher> match = at_c<0>(macro)->match(use);
+        boost::shared_ptr<matcher> match = at_c<0>(macro)->second.match(use);
 
         if (match) {
           boost::shared_ptr<utree> expansion = match->expand();
@@ -118,7 +119,7 @@ struct compiler {
       = functions[sym];
 
     if (at_c<1>(func)) {
-      utree use(utree::const_range(i, range.end()), spirit::shallow);
+      utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
 
       actor_list flist;
 
@@ -126,24 +127,29 @@ struct compiler {
         flist.push_back(utree::visit(e, *this));
       }
 
-      return (*at_c<0>(func))(flist);
+      return (at_c<0>(func)->second)(flist);
     } // }}}
     
     // TODO: replace with exception (identifier not found error)
     BOOST_ASSERT(false);
-    return function();
+    return result_type();
   }
 
-  void operator() (any_ptr const& p) const {
+  result_type operator() (any_ptr const& p) const {
     // TODO: make this an exception
     BOOST_ASSERT(false);
     return result_type();
   }
 
-  void operator() (function_base const& pf) const {
+  result_type operator() (function_base const& pf) const {
     // TODO: make this an exception
     BOOST_ASSERT(false);
     return result_type();
+  }
+
+  // forwarder
+  result_type operator() (utree const& ut) const {
+    return utree::visit(ut, *this);
   }
 }; 
 

@@ -46,6 +46,7 @@ project
       [ run prana/phxpr_cxx_back.cpp          : : : : ]
       [ run prana/phxpr_cxx_div.cpp           : : : : ]
       [ run prana/phxpr_cxx_eq.cpp            : : : : ]
+      [ run prana/phxpr_cxx_evaluator.cpp     : : : : ]
       [ run prana/phxpr_cxx_expand.cpp        : : : : ]
       [ run prana/phxpr_cxx_front.cpp         : : : : ]
       [ run prana/phxpr_cxx_if.cpp            : : : : ]

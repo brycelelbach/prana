@@ -17,6 +17,7 @@
 #include <boost/spirit/home/prana/phxpr/core/function.hpp>
 #include <boost/spirit/home/prana/phxpr/core/lambda.hpp>
 #include <boost/spirit/home/prana/phxpr/core/nary_function.hpp>
+#include <boost/spirit/home/prana/phxpr/core/procedure.hpp>
 #include <boost/spirit/home/prana/phxpr/core/quote.hpp>
 #include <boost/spirit/home/prana/phxpr/core/unary_function.hpp>
 #include <boost/spirit/home/prana/phxpr/core/variable_arguments.hpp>
