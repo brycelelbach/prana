@@ -5,42 +5,42 @@
 ;   Distributed under the Boost Software License, Version 1.0. (See accompanying
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-(load "boost/test.phxpr") 
+(load "boost.test") 
 
-(test-suite 'prana-unit-test-add
+(boost:test:suite (quote phxpr:intrinsics:lambda) 
   ; factorial
-  ((define fact
+  ((variable fact
     (lambda (n)
       (if (<= n 0) 1
         (* n (fact (- n 1))))))
 
-   (test-eq ((lambda (x)  (fact x)) 0)  1)
-   (test-eq ((lambda (x)  (fact x)) 1)  1)
-   (test-eq ((lambda (x)  (fact x)) 2)  2)
-   (test-eq ((lambda (x)  (fact x)) 3)  6)
-   (test-eq ((lambda (x)  (fact x)) 4)  24)
-   (test-eq ((lambda (x)  (fact x)) 5)  120)
-   (test-eq ((lambda (x)  (fact x)) 6)  720)
-   (test-eq ((lambda (x)  (fact x)) 7)  5040)
-   (test-eq ((lambda (x)  (fact x)) 8)  40320)
-   (test-eq ((lambda (x)  (fact x)) 9)  362880)
-   (test-eq ((lambda (x)  (fact x)) 10) 3628800)
+   (boost:test:= ((lambda (x)  (fact x)) 0)  1)
+   (boost:test:= ((lambda (x)  (fact x)) 1)  1)
+   (boost:test:= ((lambda (x)  (fact x)) 2)  2)
+   (boost:test:= ((lambda (x)  (fact x)) 3)  6)
+   (boost:test:= ((lambda (x)  (fact x)) 4)  24)
+   (boost:test:= ((lambda (x)  (fact x)) 5)  120)
+   (boost:test:= ((lambda (x)  (fact x)) 6)  720)
+   (boost:test:= ((lambda (x)  (fact x)) 7)  5040)
+   (boost:test:= ((lambda (x)  (fact x)) 8)  40320)
+   (boost:test:= ((lambda (x)  (fact x)) 9)  362880)
+   (boost:test:= ((lambda (x)  (fact x)) 10) 3628800)
 
   ; fibonacci sequence
-   (define fib
+   (variable fib
     (lambda (n)
       (if (< n 2) n
         (+ (fib (- n 1)) (fib (- n 2)))))) 
    
-   (test-eq ((lambda (x)  (fib x))  0)  0)
-   (test-eq ((lambda (x)  (fib x))  1)  1)
-   (test-eq ((lambda (x)  (fib x))  2)  1)
-   (test-eq ((lambda (x)  (fib x))  3)  2)
-   (test-eq ((lambda (x)  (fib x))  4)  3)
-   (test-eq ((lambda (x)  (fib x))  5)  5)
-   (test-eq ((lambda (x)  (fib x))  6)  8)
-   (test-eq ((lambda (x)  (fib x))  7)  13)
-   (test-eq ((lambda (x)  (fib x))  8)  21)
-   (test-eq ((lambda (x)  (fib x))  9)  34)
-   (test-eq ((lambda (x)  (fib x))  10) 55)))
+   (boost:test:= ((lambda (x)  (fib x))  0)  0)
+   (boost:test:= ((lambda (x)  (fib x))  1)  1)
+   (boost:test:= ((lambda (x)  (fib x))  2)  1)
+   (boost:test:= ((lambda (x)  (fib x))  3)  2)
+   (boost:test:= ((lambda (x)  (fib x))  4)  3)
+   (boost:test:= ((lambda (x)  (fib x))  5)  5)
+   (boost:test:= ((lambda (x)  (fib x))  6)  8)
+   (boost:test:= ((lambda (x)  (fib x))  7)  13)
+   (boost:test:= ((lambda (x)  (fib x))  8)  21)
+   (boost:test:= ((lambda (x)  (fib x))  9)  34)
+   (boost:test:= ((lambda (x)  (fib x))  10) 55)))
 

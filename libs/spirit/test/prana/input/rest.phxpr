@@ -5,20 +5,20 @@
 ;   Distributed under the Boost Software License, Version 1.0. (See accompanying
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-(load "boost/test.phxpr") 
+(load "boost.test") 
 
-(test-suite 'prana-unit-test-rest
+(boost:test:suite (quote phxpr:intrinsics:rest)
   ; basic
-  ((define l1 '(2 3))
+  ((variable l1 (quote (2 3)))
 
-   (test-eq (rest (list 1 2 3)) l1)
-   (test-eq ((lambda (x) (rest (list 1 2 x))) 3) l1)
-   (test-eq ((lambda (x y) (rest (list 1 x y))) 2 3) l1) 
+   (boost:test:= (rest (list 1 2 3)) l1)
+   (boost:test:= ((lambda (x) (rest (list 1 2 x))) 3) l1)
+   (boost:test:= ((lambda (x y) (rest (list 1 x y))) 2 3) l1) 
 
   ; nested
-   (define l2 '(3))
-   (define l3 '((2) (3)))
+   (variable l2 (quote (3)))
+   (variable l3 (quote ((2) (3))))
 
-   (test-eq (rest (list (list 1) (list 2) (list 3))) l3)
-   (test-eq ((lambda (x y) (rest (list (list 1) (list x) y))) 2 l2) l3)))
+   (boost:test:= (rest (list (list 1) (list 2) (list 3))) l3)
+   (boost:test:= ((lambda (x y) (rest (list (list 1) (list x) y))) 2 l2) l3)))
 

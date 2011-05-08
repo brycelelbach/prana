@@ -41,8 +41,8 @@ bool is_define (utree const& item) {
   if (item.which() != utree_type::list_type ||
       item.begin()->which() != utree_type::symbol_type)
     return false;
-  return (get_symbol(*item.begin()) == "define-variable")
-      || (get_symbol(*item.begin()) == "define-macro");
+  return (get_symbol(*item.begin()) == "variable")
+      || (get_symbol(*item.begin()) == "macro");
 }
 
 typedef boost::function<phxpr::function(actor_list const&)> compiled_function;
@@ -88,8 +88,8 @@ struct evaluator {
     std::string sym(str.begin(), str.end());
 
     // TODO: make this an exception
-    BOOST_ASSERT(sym != "define-variable");
-    BOOST_ASSERT(sym != "define-macro");
+    BOOST_ASSERT(sym != "variable");
+    BOOST_ASSERT(sym != "macro");
     BOOST_ASSERT(sym != "quote");
     BOOST_ASSERT(sym != "lambda");
 
@@ -143,7 +143,7 @@ struct evaluator {
     // TODO: replace with exception
     BOOST_ASSERT(it != end);
 
-    if (sym == "define-variable") {
+    if (sym == "variable") {
       utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
 
       //std::cout << body << std::endl;
@@ -151,7 +151,7 @@ struct evaluator {
       return define_variable(body);
     }
 
-    if (sym == "define-macro") {
+    if (sym == "macro") {
       utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
       return define_macro(body);
     }

@@ -5,22 +5,22 @@
 ;   Distributed under the Boost Software License, Version 1.0. (See accompanying
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-(load "boost/test.phxpr") 
+(load "boost.test") 
 
-(test-suite 'prana-unit-test-div
+(boost:test:suite (quote phxpr:intrinsics:div)
   ; binary
-  ((test-eq                   (/ 8 4)                       2)
-   (test-eq ((lambda (x)      (/ 8 x))              4)      2)
-   (test-eq ((lambda (x y)    (/ x y))              8 4)    2)
-   (test-eq ((lambda (x y)    (/ 8 (/ x y)))        4 2)    4)
+  ((boost:test:=                   (/ 8 4)                       2)
+   (boost:test:= ((lambda (x)      (/ 8 x))              4)      2)
+   (boost:test:= ((lambda (x y)    (/ x y))              8 4)    2)
+   (boost:test:= ((lambda (x y)    (/ 8 (/ x y)))        4 2)    4)
 
   ; nary
-   (test-eq                   (/ 8 4 2)                     1)
-   (test-eq ((lambda (x)      (/ 8 4 x))            2)      1)
-   (test-eq ((lambda (x y)    (/ 8 x y))            4 2)    1)
-   (test-eq ((lambda (x y z)  (/ 32 16 (/ x y z)))  8 4 2)  2)
+   (boost:test:=                   (/ 8 4 2)                     1)
+   (boost:test:= ((lambda (x)      (/ 8 4 x))            2)      1)
+   (boost:test:= ((lambda (x y)    (/ 8 x y))            4 2)    1)
+   (boost:test:= ((lambda (x y z)  (/ 32 16 (/ x y z)))  8 4 2)  2)
 
   ; negative
-   (test-eq                   (/ -4 2)                      -2)
-   (test-eq ((lambda (x)      (/ x 2))              -4)     -2)))
+   (boost:test:=                   (/ -4 2)                      -2)
+   (boost:test:= ((lambda (x)      (/ x 2))              -4)     -2)))
 

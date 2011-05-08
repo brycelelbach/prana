@@ -5,18 +5,18 @@
 ;   Distributed under the Boost Software License, Version 1.0. (See accompanying
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-(load "boost/test.phxpr") 
+(load "boost.test") 
 
-(test-suite 'prana-unit-test-at
+(boost:test:suite (quote phxpr:intrinsics:at)
   ; basic
-  ((define l '(1 2 3))
+  ((variable l (quote (1 2 3)))
 
-   (test-eq (at (list 1 2 3) 1) 2)
-   (test-eq ((lambda (x) (at (list 1 2 3) x)) 2) 3)
-   (test-eq ((lambda (x) (at x 1)) l) 2)
-   (test-eq ((lambda (x y) (at x y)) l 2) 3)
+   (boost:test:= (at (list 1 2 3) 1) 2)
+   (boost:test:= ((lambda (x) (at (list 1 2 3) x)) 2) 3)
+   (boost:test:= ((lambda (x) (at x 1)) l) 2)
+   (boost:test:= ((lambda (x y) (at x y)) l 2) 3)
 
   ; 0 index
-   (test-eq ((lambda (x) (at (list 1 2 3) x)) 0) 1)
-   (test-eq ((lambda (x y) (at x y)) l 0) 1)))
+   (boost:test:= ((lambda (x) (at (list 1 2 3) x)) 0) 1)
+   (boost:test:= ((lambda (x y) (at x y)) l 0) 1)))
 

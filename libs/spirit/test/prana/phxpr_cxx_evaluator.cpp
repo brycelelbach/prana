@@ -33,7 +33,7 @@ int main (void) { try {
   {
     /// phxpr        
     parse_tree<sexpr> times2_definition(
-      "(define-variable times-2\n"
+      "(variable times-2\n"
       "   (lambda (_1)\n"
       "     (* 2 _1)))");
   
@@ -59,7 +59,7 @@ int main (void) { try {
   {
     /// phxpr        
     parse_tree<sexpr> fact_definition(
-      "(define-variable fact\n"
+      "(variable fact\n"
       "   (lambda (_1)\n"
       "     (if (<= _1 0) 1\n"
       "       (* _1 (fact (- _1 1))))))");

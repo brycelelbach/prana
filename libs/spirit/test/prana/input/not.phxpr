@@ -5,18 +5,18 @@
 ;   Distributed under the Boost Software License, Version 1.0. (See accompanying
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-(load "boost/test.phxpr") 
+(load "boost.test") 
 
-(test-suite 'prana-unit-test-not
+(boost:test:suite (quote phxpr:intrinsics:not)
   ; basic
-  ((test-eq                 (! #t)         #f)
-   (test-eq                 (! #f)         #t)
-   (test-eq ((lambda (x)    (! x))    #t)  #f) 
-   (test-eq ((lambda (x)    (! x))    #f)  #t) 
+  ((boost:test:=                 (! #t)         #f)
+   (boost:test:=                 (! #f)         #t)
+   (boost:test:= ((lambda (x)    (! x))    #t)  #f) 
+   (boost:test:= ((lambda (x)    (! x))    #f)  #t) 
 
   ; nested
-   (test-eq               (! (! #t))       #t)
-   (test-eq               (! (! #f))       #f)
-   (test-eq ((lambda (x)  (! (! x)))  #t)  #t) 
-   (test-eq ((lambda (x)  (! (! x)))  #f)  #f))) 
+   (boost:test:=               (! (! #t))       #t)
+   (boost:test:=               (! (! #f))       #f)
+   (boost:test:= ((lambda (x)  (! (! x)))  #t)  #t) 
+   (boost:test:= ((lambda (x)  (! (! x)))  #f)  #f))) 
 
