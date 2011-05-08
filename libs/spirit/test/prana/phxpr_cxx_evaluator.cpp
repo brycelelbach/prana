@@ -70,7 +70,6 @@ int main (void) { try {
     e.variables->define("<=", lte);
     e.variables->define("*", mul);
     e.variables->define("-", min);
-    e.variables->define("this", _this);
   
     e(fact_definition.ast());
  
