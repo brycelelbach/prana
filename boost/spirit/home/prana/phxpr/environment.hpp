@@ -27,18 +27,18 @@ namespace phxpr {
 template<class Value, class Key = std::string,
          class Hash = boost::hash<Key>, class Pred = std::equal_to<Key> >
 struct environment {
-  typedef Value value_type;
+  typedef Value mapped_type;
   typedef Key key_type;
 
-//  typedef boost::unordered_map<key_type, value_type, Hash, Pred> map_type;
-  typedef std::map<key_type, value_type> map_type;
+//  typedef boost::unordered_map<key_type, mapped_type, Hash, Pred> map_type;
+  typedef std::map<key_type, mapped_type> map_type;
 
   typedef typename map_type::iterator iterator;
   typedef typename map_type::const_iterator const_iterator;
 
   typedef typename map_type::size_type size_type;
   
-  typedef typename map_type::value_type key_value_type;
+  typedef typename map_type::value_type value_type;
 
   environment (environment* parent = 0, Hash const& hash = Hash(),
                Pred const& pred = Pred()):
@@ -87,12 +87,7 @@ struct environment {
     //std::cout << "level[" << depth << "]: defining " << name << std::endl; 
     // TODO: replace with exception
     BOOST_ASSERT(definitions.find(name) == definitions.end());
-    definitions.insert(key_value_type(name, val));
-  }
-
-  void undefine (key_type const& name) {
-    //std::cout << "undefining " << name << std::endl;
-    definitions.erase(name);
+    definitions.insert(value_type(name, val));
   }
 
   bool defined (key_type const& name) const {

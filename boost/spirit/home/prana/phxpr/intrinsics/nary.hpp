@@ -41,7 +41,6 @@ BSP_NARY_INTRINSIC(mul,   result = result * element, 2)
 BSP_NARY_INTRINSIC(div,   result = result / element, 2)
 
 #undef BSP_NARY_INTRINSIC
-#undef BSP_SHORT_CIRCUITED_NARY_INTRINSIC
 
 } // phxpr
 } // prana

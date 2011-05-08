@@ -29,10 +29,6 @@ struct quote_function: actor<quote_function> {
   utree eval (scope const&) const {
     return utree(boost::ref(val));
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<quote_function>(quote_function(val)));
-  }
 };
 
 struct quote_type {

@@ -41,11 +41,6 @@ struct begin_function: actor<begin_function> {
     }
     return (*end)(env);
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<begin_function>(
-      begin_function(elements)));
-  }
 };
 
 struct begin_composite: composite<begin_composite> {

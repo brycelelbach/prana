@@ -28,7 +28,6 @@ int main (void) { try {
   using boost::spirit::prana::phxpr::mul;
   using boost::spirit::prana::phxpr::min;
   using boost::spirit::prana::phxpr::_1;
-  using boost::spirit::prana::phxpr::_this;
 
   {
     /// phxpr        
@@ -39,7 +38,7 @@ int main (void) { try {
   
     evaluator e;
   
-    e.variables->define("*", mul);
+    e.variables.define("*", mul);
   
     e(times2_definition.ast());
  
@@ -66,10 +65,10 @@ int main (void) { try {
   
     evaluator e;
   
-    e.variables->define("if", if_);
-    e.variables->define("<=", lte);
-    e.variables->define("*", mul);
-    e.variables->define("-", min);
+    e.variables.define("if", if_);
+    e.variables.define("<=", lte);
+    e.variables.define("*", mul);
+    e.variables.define("-", min);
   
     e(fact_definition.ast());
  

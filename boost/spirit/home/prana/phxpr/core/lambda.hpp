@@ -13,7 +13,6 @@
 #include <boost/spirit/home/prana/config.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 
 #include <boost/spirit/home/prana/phxpr/core/composite.hpp>
@@ -46,10 +45,9 @@ struct lambda_function: actor<lambda_function> {
       outer = outer->outer();
       
     if (elements && !elements->empty()) {
-      boost::scoped_array<utree> fargs(new utree[elements->size() + 1]);
+      boost::scoped_array<utree> fargs(new utree[elements->size()]);
 
-      std::size_t i = 1;
-      fargs[0] = clone();
+      std::size_t i = 0;
 
       BOOST_FOREACH(function const& element, *elements) {
         fargs[i++] = element(env);
@@ -57,18 +55,12 @@ struct lambda_function: actor<lambda_function> {
 
       utree* fi = fargs.get();
 
-      return body->eval(scope(fi, fi + elements->size() + 1, outer));
+      return body->eval(scope(fi, fi + elements->size(), outer));
     }
     
     else {
-      boost::scoped_ptr<utree> this_(new utree(clone()));
-      return body->eval(scope(this_.get(), 0, outer));
+      return body->eval(scope(0, 0, outer));
     }
-  }
-
-  utree clone (void) const {
-    return utree(stored_function<lambda_function>(
-      lambda_function(elements, body, level)));
   }
 };
 

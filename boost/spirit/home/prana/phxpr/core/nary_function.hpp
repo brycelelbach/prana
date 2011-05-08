@@ -55,11 +55,6 @@ struct nary_function: actor<nary_function<Derived> > {
 
     return result;
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<nary_function>(
-      nary_function(elements)));
-  }
 };
 
 template<class Function>

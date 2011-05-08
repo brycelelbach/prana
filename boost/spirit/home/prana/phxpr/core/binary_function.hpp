@@ -45,11 +45,6 @@ struct binary_function: actor<binary_function<Derived> > {
     return derived().eval((*elements)[0](env),
                           (*elements)[1](env));
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<binary_function>(
-      binary_function(elements)));
-  }
 };
 
 template<class Function>

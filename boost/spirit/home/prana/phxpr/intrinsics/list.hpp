@@ -39,10 +39,6 @@ struct list_function: actor<list_function> {
     }
     return result;
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<list_function>(list_function(elements)));
-  }
 };
 
 struct list_composite: composite<list_composite> {

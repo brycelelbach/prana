@@ -44,11 +44,6 @@ struct unary_function: actor<unary_function<Derived> > {
   utree eval (scope const& env) const {
     return derived().eval((*elements)[0](env));
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<unary_function>(
-      unary_function(elements)));
-  }
 };
 
 template<class Function>

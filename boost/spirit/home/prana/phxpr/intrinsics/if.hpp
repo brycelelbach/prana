@@ -38,10 +38,6 @@ struct if_function: actor<if_function> {
     else
       return (*elements)[2](env);
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<if_function>(if_function(elements)));
-  }
 };
 
 struct if_composite: composite<if_composite> {

@@ -21,7 +21,6 @@
 #include <boost/spirit/home/prana/phxpr/core/quote.hpp>
 #include <boost/spirit/home/prana/phxpr/core/unary_function.hpp>
 #include <boost/spirit/home/prana/phxpr/core/variable_arguments.hpp>
-#include <boost/spirit/home/prana/phxpr/core/this_function.hpp>
 
 #endif // BSP_PHXPR_CORE_HPP
 

@@ -71,25 +71,22 @@ struct actor {
   }
 
   utree operator() (void) const {
-    boost::array<utree, 1> elements;
-    elements[0] = derived().clone();
+    boost::array<utree, 0> elements;
     return derived().eval(get_range(elements));
   }
 
   template<class A0>
   utree operator() (A0 const& _0) const {
-    boost::array<utree, 2> elements;
-    elements[0] = derived().clone();
-    elements[1] = as_utree(_0);
+    boost::array<utree, 1> elements;
+    elements[0] = as_utree(_0);
     return derived().eval(get_range(elements));
   }
 
   template<class A0, class A1>
   utree operator() (A0 const& _0, A1 const& _1) const {
-    boost::array<utree, 3> elements;
-    elements[0] = derived().clone();
-    elements[1] = as_utree(_0);
-    elements[2] = as_utree(_1);
+    boost::array<utree, 2> elements;
+    elements[0] = as_utree(_0);
+    elements[1] = as_utree(_1);
     return derived().eval(get_range(elements));
   }
 

@@ -50,11 +50,6 @@ struct vararg_function: actor<vararg_function<scoped> > {
 
     return result;
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<vararg_function>(
-      vararg_function(n, level)));
-  }
 };
 
 template<> 
@@ -77,11 +72,6 @@ struct vararg_function<false>: actor<vararg_function<false> > {
 
     return result;
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<vararg_function>(
-      vararg_function(n)));
-  }
 };
 
 template<bool scoped = true>
@@ -99,12 +89,12 @@ vararg<true> const varg = { };
 // unscoped varg
 vararg<false> const unscoped_varg = { };
 
-function const _1_ = unscoped_varg(1);
-function const _2_ = unscoped_varg(2);
+function const _1_ = unscoped_varg(0);
+function const _2_ = unscoped_varg(1);
 
 #define BSP_MAKE_PLACEHOLDER(n)                         \
   function const BOOST_PP_CAT(BOOST_PP_CAT(_, n), _) =  \
-    unscoped_varg(n);                                   \
+    unscoped_varg(BOOST_PP_DEC(n));                     \
   /***/
 
 #include <boost/spirit/home/prana/phxpr/vertical/placeholders.hpp>

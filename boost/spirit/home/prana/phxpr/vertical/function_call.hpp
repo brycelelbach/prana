@@ -20,8 +20,8 @@
   #include <boost/preprocessor/repetition/repeat.hpp>
 
   #if !defined(BSP_PUSH_ELEMENT)
-    #define BSP_PUSH_ELEMENT(n)                                 \
-      elements[n] = as_utree(BOOST_PP_CAT(_, BOOST_PP_DEC(n)))  \
+    #define BSP_PUSH_ELEMENT(n)                   \
+      elements[n] = as_utree(BOOST_PP_CAT(_, n))  \
     /***/
   #endif
 
@@ -54,11 +54,10 @@
 
   template<BOOST_PP_ENUM_PARAMS(BSP_N, class A)>
   utree operator() (BOOST_PP_ENUM_BINARY_PARAMS(BSP_N, A, const& _)) const {
-    boost::array<utree, BOOST_PP_INC(BSP_N)> elements;
-    elements[0] = derived().clone();   
+    boost::array<utree, BSP_N> elements;
  
     #define BOOST_PP_ITERATION_PARAMS_2 \
-      (3, (1, BSP_N, BSP_THIS_HEADER))  \
+      (3, (0, BOOST_PP_DEC(BSP_N), BSP_THIS_HEADER))  \
       /***/
 
     #include BOOST_PP_ITERATE()

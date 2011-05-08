@@ -50,7 +50,7 @@ project
       [ run prana/phxpr_cxx_expand.cpp        : : : : ]
       [ run prana/phxpr_cxx_front.cpp         : : : : ]
       [ run prana/phxpr_cxx_if.cpp            : : : : ]
-      [ run prana/phxpr_cxx_lambda.cpp        : : : : ]
+      #[ run prana/phxpr_cxx_lambda.cpp        : : : : ]
       [ run prana/phxpr_cxx_list.cpp          : : : : ]
       [ run prana/phxpr_cxx_lt.cpp            : : : : ]
       [ run prana/phxpr_cxx_lte.cpp           : : : : ]

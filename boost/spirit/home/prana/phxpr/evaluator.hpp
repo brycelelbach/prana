@@ -47,30 +47,23 @@ bool is_define (utree const& item) {
 
 typedef boost::function<phxpr::function(actor_list const&)> compiled_function;
 
-struct evaluator {
-  mutable boost::shared_ptr<environment<compiled_function> > variables;
-  mutable boost::shared_ptr<environment<macro> > macros;
+struct evaluator_visitor {
+  mutable environment<compiled_function>* variables;
+  mutable environment<macro>* macros;
 
   typedef phxpr::function result_type;
 
-  evaluator (void):
-    variables(new environment<compiled_function>),
-    macros(new environment<macro>) { }
+  evaluator_visitor (void): variables(0), macros(0) { }
 
-  evaluator (environment<compiled_function>* variables_parent,
-             environment<macro>* macros_parent):
-    variables(new environment<compiled_function>(variables_parent)),
-    macros(new environment<macro>(macros_parent)) { }
+  evaluator_visitor (environment<compiled_function>* variables_,
+                     environment<macro>* macros_):
+    variables(variables_),
+    macros(macros_) { }
 
-  evaluator (evaluator const& other):
+  evaluator_visitor (evaluator_visitor const& other):
     variables(other.variables),
     macros(other.macros) { } 
   
-  evaluator& operator= (evaluator const& rhs) {
-    variables = rhs.variables;
-    macros = rhs.macros;
-  } 
-
   result_type operator() (utree::invalid_type) const {
     // TODO: make this an exception
     BOOST_ASSERT(false);
@@ -83,6 +76,7 @@ struct evaluator {
   }
 
   result_type operator() (utf8_symbol_range_type const& str) const {
+    // {{{ nullary variable/macro implementation
     using boost::fusion::at_c;
 
     std::string sym(str.begin(), str.end());
@@ -117,18 +111,17 @@ struct evaluator {
     if (at_c<1>(func)) {
       actor_list flist;
       
-      //std::cout << "calling " << sym << std::endl; 
-
       return (at_c<0>(func)->second)(flist);
     } // }}}
     
     // TODO: replace with exception (identifier not found error)
     BOOST_ASSERT(false);
     return result_type();
-  }
+  } // }}}
 
   template<class Iterator>
   result_type operator() (iterator_range<Iterator> const& range) const {
+    // {{{ nary variable/macro implementation
     using boost::fusion::at_c;
 
     typename iterator_range<Iterator>::const_iterator it = range.begin(),
@@ -145,9 +138,6 @@ struct evaluator {
 
     if (sym == "variable") {
       utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
-
-      //std::cout << body << std::endl;
-
       return define_variable(body);
     }
 
@@ -191,33 +181,21 @@ struct evaluator {
     if (at_c<1>(func)) {
       utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
 
-   //   boost::shared_ptr<actor_list> flist(new actor_list(use.size()));
       actor_list flist;
 
       BOOST_FOREACH(utree const& e, use) {
-//        flist->push_back(utree::visit(e, *this));
         flist.push_back(utree::visit(e, *this));
       }
 
-      //std::cout << "calling " << sym << std::endl; 
-      //std::cout << "with " << use << std::endl; 
 
       return (at_c<0>(func)->second)(flist);
     } // }}}
 
-//    std::cout << at_c<0>(func)->first << std::endl;
-
-//    for (environment<compiled_function>::const_iterator vit = variables.definitions.begin(),
-//                                                        vend = variables.definitions.end();
-//         vit != vend; ++vit)
-//    {
-//      std::cout << vit->first << std::endl;
-//    }
  
     // TODO: replace with exception (identifier not found error)
     BOOST_ASSERT(false);
     return result_type();
-  }
+  } // }}}
 
   result_type operator() (any_ptr const& p) const {
     // TODO: make this an exception
@@ -239,8 +217,6 @@ struct evaluator {
   result_type define_variable (utree const& ut) const {
     utree::const_iterator it = ut.begin(), end = ut.end();
    
-    //std::cout << "defining variable " << ut << std::endl;
- 
     // TODO: replace with exception
     BOOST_ASSERT(it != end);
 
@@ -253,16 +229,14 @@ struct evaluator {
     // TODO: replace with exception (multiple definitions)
     BOOST_ASSERT(!variables->locally_defined(name));
 
-    boost::shared_ptr<function> func(new function);
+    boost::shared_ptr<phxpr::function> func(new phxpr::function);
     variables->define(name, procedure(func, variables->level()));
-
+    
     function r = (*this)(*it);
-
-    //std::cout << "level[" << variables.level() << "]: defining variable " << name << std::endl;
-
+    
     func->f = r.f;
     func->fixed = r.fixed;
-
+    
     return result_type();  
   }
   
@@ -291,60 +265,87 @@ struct evaluator {
     return result_type();  
   }
   
-  result_type make_lambda (utree const& ut) const {
-    // TODO: replace with exception
-//    BOOST_ASSERT(ut.size() == 2);
+  result_type make_lambda (utree const& ut) const;
+}; 
 
-    // TODO: replace with exception (no body)
-//    BOOST_ASSERT(ut.back().size() != 0);
+struct evaluator {
+  environment<compiled_function> variables;
+  environment<macro> macros;
 
-    bool fixed_arity = (get_symbol(ut.front().back()) != "...");
+  typedef phxpr::function result_type;
 
-    evaluator local(&(*variables), &(*macros));
+  evaluator (void) { }
 
-    utree::const_iterator it = ut.front().begin();
-    
-    for (utree::size_type i = 0; i < ut.front().size(); ++i, ++it) {
-      if (!fixed_arity && ((ut.front().size() - 1) == i)) {
-        local.variables->define(get_symbol(*it),
-          procedure(boost::shared_ptr<function>
-            (new function(phxpr::varg(i + 1, local.variables->level()).f, false)),
-             local.variables->level()));
-        break;
-      }
+  evaluator (environment<compiled_function>* variables_parent,
+             environment<macro>* macros_parent):
+    variables(variables_parent), macros(macros_parent) { }
 
-      local.variables->define(get_symbol(*it),
-        procedure(boost::shared_ptr<function>
-          (new function(phxpr::arg(i + 1, local.variables->level()).f)),
-           local.variables->level()));
+  ~evaluator (void) {
+    if (variables.level() == 0) {
+      // Clean up recursive calls. Without help, shared_ptr<> won't release
+      // these properly.
+      BOOST_FOREACH(environment<compiled_function>::value_type const& e,
+                    variables.definitions)
+      {
+        if (e.second.target<procedure>()) {
+          e.second.target<procedure>()->body->f.clear();
+        }
+      } 
     }
+  }
 
-    boost::shared_ptr<actor_list> flist(new actor_list(ut.size() - 1));
-
-    it = ut.begin(); ++it;
-
-    for (; it != ut.end(); ++it) {
-      if (!is_define(*it))
-        flist->push_back(local(*it));
-      else
-        local(*it);
-    }
-
-//    BOOST_FOREACH(utree const& item, ut.back()) {
-//      std::cout << "item " << item << std::endl;
-//
-//      if (!is_define(item))
-//        flist->push_back(local(item));
-//      else
-//        local(item);
-//    }
-
-    if (flist->size() > 1)
-      return begin(flist);
-    else
-      return flist->front();   
+  // forwarders
+  result_type operator() (utree const& ut) {
+    evaluator_visitor eval(&variables, &macros);
+    return utree::visit(ut, eval);
+  }
+ 
+  template<class T> 
+  result_type operator() (T const& val) {
+    evaluator_visitor eval(&variables, &macros);
+    return eval(val);
   }
 }; 
+  
+evaluator_visitor::result_type
+evaluator_visitor::make_lambda (utree const& ut) const {
+  bool fixed_arity = (get_symbol(ut.front().back()) != "...");
+
+  evaluator local(variables, macros);
+
+  utree::const_iterator it = ut.front().begin();
+  
+  for (utree::size_type i = 0; i < ut.front().size(); ++i, ++it) {
+    if (!fixed_arity && ((ut.front().size() - 1) == i)) {
+      local.variables.define(get_symbol(*it),
+        procedure(boost::shared_ptr<function>
+          (new function(phxpr::varg(i, local.variables.level()).f, false)),
+           local.variables.level()));
+      break;
+    }
+
+    local.variables.define(get_symbol(*it),
+      procedure(boost::shared_ptr<function>
+        (new function(phxpr::arg(i, local.variables.level()).f)),
+         local.variables.level()));
+  }
+
+  boost::shared_ptr<actor_list> flist(new actor_list(ut.size() - 1));
+
+  it = ut.begin(); ++it;
+
+  for (; it != ut.end(); ++it) {
+    if (!is_define(*it))
+      flist->push_back(local(*it));
+    else
+      local(*it);
+  }
+
+  if (flist->size() > 1)
+    return begin(flist);
+  else
+    return flist->front();   
+}
 
 } // phxpr
 } // prana

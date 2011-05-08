@@ -45,11 +45,6 @@ struct argument_function: actor<argument_function<scoped> > {
     else
       return arg.eval(*eptr);
   }
-  
-  utree clone (void) const {
-    return utree(stored_function<argument_function>(
-      argument_function(n, level)));
-  }
 };
 
 template<> 
@@ -66,11 +61,6 @@ struct argument_function<false>: actor<argument_function<false> > {
       return utree(boost::ref(arg));
     else 
       return arg.eval(env);
-  }
-  
-  utree clone (void) const {
-    return utree(stored_function<argument_function>(
-      argument_function(n)));
   }
 };
 
@@ -89,11 +79,11 @@ argument<true> const arg = { };
 // unscoped arg
 argument<false> const unscoped_arg = { };
 
-function const _1 = unscoped_arg(1);
-function const _2 = unscoped_arg(2);
+function const _1 = unscoped_arg(0);
+function const _2 = unscoped_arg(1);
 
-#define BSP_MAKE_PLACEHOLDER(n)                       \
-  function const BOOST_PP_CAT(_, n) = unscoped_arg(n) \
+#define BSP_MAKE_PLACEHOLDER(n)                                     \
+  function const BOOST_PP_CAT(_, n) = unscoped_arg(BOOST_PP_DEC(n)) \
   /***/
 
 #include <boost/spirit/home/prana/phxpr/vertical/placeholders.hpp>
