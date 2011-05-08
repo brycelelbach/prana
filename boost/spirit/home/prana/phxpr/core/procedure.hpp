@@ -22,14 +22,18 @@ namespace prana {
 namespace phxpr {
     
 struct procedure: composite<procedure> {
-  // we must hold f by reference because functions can be recursive
-  boost::reference_wrapper<function const> body;
+  boost::shared_ptr<function> body;
   scope::size_type level;
 
-  procedure (function const& body_, scope::size_type level_ = 0):
+  procedure (boost::shared_ptr<function> const& body_,
+             scope::size_type level_ = 0):
     body(body_), level(level_) { }
+  
+  procedure (function const& body_, scope::size_type level_ = 0):
+    body(new function(body_.f, body_.fixed)), level(level_) { }
 
   function compose (boost::shared_ptr<actor_list> const& actors) const {
+    BOOST_ASSERT(body);
     return function(lambda_function(actors, body, level));
   }
 };

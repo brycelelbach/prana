@@ -10,11 +10,14 @@
 #if !defined(BSP_DE441280_828F_4B7F_B79F_5EA7766C9625)
 #define BSP_DE441280_828F_4B7F_B79F_5EA7766C9625
 
+#include <map>
 #include <string>
 
 #include <boost/assert.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/spirit/home/support/utree.hpp>
 
 namespace boost {
 namespace spirit {
@@ -27,18 +30,23 @@ struct environment {
   typedef Value value_type;
   typedef Key key_type;
 
-  typedef boost::unordered_map<key_type, value_type, Hash, Pred> map_type;
+//  typedef boost::unordered_map<key_type, value_type, Hash, Pred> map_type;
+  typedef std::map<key_type, value_type> map_type;
 
   typedef typename map_type::iterator iterator;
   typedef typename map_type::const_iterator const_iterator;
 
   typedef typename map_type::size_type size_type;
+  
+  typedef typename map_type::value_type key_value_type;
 
   environment (environment* parent = 0, Hash const& hash = Hash(),
                Pred const& pred = Pred()):
-    outer(parent), depth(parent ? parent->depth + 1 : 0),
-    definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
-  
+    outer(parent), depth(parent ? parent->depth + 1 : 0) {} //,
+    //definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
+ 
+  ~environment() { /*std::cout << "~environment" << std::endl;*/ }
+ 
   fusion::vector2<iterator, bool> operator[] (key_type const& name) {
     iterator it = definitions.find(name),
              end = definitions.end();
@@ -61,7 +69,7 @@ struct environment {
   fusion::vector2<const_iterator, bool>
   operator[] (key_type const& name) const {
     const_iterator it = definitions.find(name),
-             end = definitions.end();
+                   end = definitions.end();
 
     if (it == end) {
       if (outer)
@@ -76,29 +84,35 @@ struct environment {
 
   template<class T>
   void define (key_type const& name, T const& val) {
+    //std::cout << "level[" << depth << "]: defining " << name << std::endl; 
     // TODO: replace with exception
     BOOST_ASSERT(definitions.find(name) == definitions.end());
-    definitions[name] = val;
+    definitions.insert(key_value_type(name, val));
   }
 
   void undefine (key_type const& name) {
+    //std::cout << "undefining " << name << std::endl;
     definitions.erase(name);
   }
 
-  bool defined (key_type const& name) {
-    return (*this)(name) != definitions.end();
+  bool defined (key_type const& name) const {
+    return fusion::at_c<1>((*this)[name]); 
+  }
+  
+  bool locally_defined (key_type const& name) const {
+    return definitions.count(name); 
   }
 
   environment* parent (void) const {
     return outer;
   }
 
-  unsigned level (void) const {
+  scope::size_type level (void) const {
     return depth;
   }
 
   environment* outer;
-  unsigned depth;
+  scope::size_type depth;
   map_type definitions;
 };
 

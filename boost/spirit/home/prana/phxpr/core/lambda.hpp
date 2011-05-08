@@ -24,17 +24,18 @@ namespace prana {
 namespace phxpr {
     
 struct lambda_function: actor<lambda_function> {
-  function body;
+  boost::shared_ptr<function> body;
   boost::shared_ptr<actor_list> elements;
   scope::size_type level;
 
   typedef utree result_type;
 
   lambda_function (boost::shared_ptr<actor_list> const& elements_,
-                   function const& body_, scope::size_type level_ = 0):
+                   boost::shared_ptr<function> const& body_,
+                   scope::size_type level_ = 0):
     body(body_), elements(elements_), level(level_)
   {
-    BOOST_ASSERT(!body.empty());
+    BOOST_ASSERT(body);
     BOOST_ASSERT(elements);
   }
   
@@ -56,12 +57,12 @@ struct lambda_function: actor<lambda_function> {
 
       utree* fi = fargs.get();
 
-      return body.eval(scope(fi, fi + elements->size() + 1, outer));
+      return body->eval(scope(fi, fi + elements->size() + 1, outer));
     }
     
     else {
       boost::scoped_ptr<utree> this_(new utree(clone()));
-      return body.eval(scope(this_.get(), 0, outer));
+      return body->eval(scope(this_.get(), 0, outer));
     }
   }
 
@@ -82,7 +83,8 @@ struct formals {
     elements(elements_), level(level_) { }
 
   function operator() (function const& body) const {
-    return function(lambda_function(elements, body, level));
+    return function(lambda_function(elements,
+      boost::shared_ptr<function>(new function(body)), level));
   }
 };
 

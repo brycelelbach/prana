@@ -27,6 +27,8 @@ struct function: actor<function> {
 
   function (utree const& f, bool fixed = true): f(f), fixed(fixed) { }
 
+  function (function const& other): f(other.f), fixed(other.fixed) { }
+
   template<class F>
   function (F const& f, bool fixed = true):
     f(stored_function<F>(f)), fixed(fixed) { }
