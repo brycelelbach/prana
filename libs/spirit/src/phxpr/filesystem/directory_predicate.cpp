@@ -7,24 +7,25 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/spirit/home/prana/phxpr/filesystem/remove.hpp>
+#include <boost/spirit/home/prana/phxpr/filesystem/directory_predicate.hpp>
 
 namespace boost {
 namespace spirit {
 namespace prana {
 namespace phxpr {
-
+  
 using boost::filesystem::path;
-using boost::filesystem::remove;
+using boost::filesystem::status;
+using boost::filesystem::is_directory;
 
-utree remove_function::eval (utree const& subject) const {
+utree directory_predicate_function::eval (utree const& subject) const {
   // TODO: exception handling.
   utf8_string_range_type range = subject.get<utf8_string_range_type>();
   path p(range.begin(), range.end());
-  return utree(::boost::filesystem::remove(p));
+  return utree(is_directory(status(p)));
 }
 
-remove_composite const remove_ = remove_composite();
+directory_predicate_composite const is_dir = directory_predicate_composite();
 
 } // phxpr
 } // prana

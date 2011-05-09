@@ -7,7 +7,7 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/spirit/home/prana/phxpr/filesystem/remove.hpp>
+#include <boost/spirit/home/prana/phxpr/filesystem/file_predicate.hpp>
 
 namespace boost {
 namespace spirit {
@@ -15,16 +15,17 @@ namespace prana {
 namespace phxpr {
 
 using boost::filesystem::path;
-using boost::filesystem::remove;
+using boost::filesystem::status;
+using boost::filesystem::is_regular_file;
 
-utree remove_function::eval (utree const& subject) const {
+utree file_predicate_function::eval (utree const& subject) const {
   // TODO: exception handling.
   utf8_string_range_type range = subject.get<utf8_string_range_type>();
   path p(range.begin(), range.end());
-  return utree(::boost::filesystem::remove(p));
+  return utree(is_regular_file(status(p)));
 }
 
-remove_composite const remove_ = remove_composite();
+file_predicate_composite const is_file = file_predicate_composite();
 
 } // phxpr
 } // prana

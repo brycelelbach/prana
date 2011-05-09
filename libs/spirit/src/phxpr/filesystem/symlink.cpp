@@ -7,7 +7,7 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/spirit/home/prana/phxpr/filesystem/remove.hpp>
+#include <boost/spirit/home/prana/phxpr/filesystem/symlink.hpp>
 
 namespace boost {
 namespace spirit {
@@ -15,16 +15,22 @@ namespace prana {
 namespace phxpr {
 
 using boost::filesystem::path;
-using boost::filesystem::remove;
+using boost::filesystem::create_symlink;
 
-utree remove_function::eval (utree const& subject) const {
+utree symlink_function::eval (utree const& source, utree const& dest) const {
   // TODO: exception handling.
-  utf8_string_range_type range = subject.get<utf8_string_range_type>();
-  path p(range.begin(), range.end());
-  return utree(::boost::filesystem::remove(p));
+  utf8_string_range_type source_range = source.get<utf8_string_range_type>();
+  path source_path(source_range.begin(), source_range.end());
+
+  utf8_string_range_type dest_range = dest.get<utf8_string_range_type>();
+  path dest_path(dest_range.begin(), dest_range.end());
+
+  create_symlink(source_path, dest_path);
+
+  return utree();
 }
 
-remove_composite const remove_ = remove_composite();
+symlink_composite const symlink_ = symlink_composite();
 
 } // phxpr
 } // prana

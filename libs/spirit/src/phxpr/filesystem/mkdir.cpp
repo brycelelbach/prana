@@ -7,7 +7,7 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/spirit/home/prana/phxpr/filesystem/remove.hpp>
+#include <boost/spirit/home/prana/phxpr/filesystem/mkdir.hpp>
 
 namespace boost {
 namespace spirit {
@@ -15,16 +15,16 @@ namespace prana {
 namespace phxpr {
 
 using boost::filesystem::path;
-using boost::filesystem::remove;
+using boost::filesystem::create_directory;
 
-utree remove_function::eval (utree const& subject) const {
+utree mkdir_function::eval (utree const& subject) const {
   // TODO: exception handling.
   utf8_string_range_type range = subject.get<utf8_string_range_type>();
   path p(range.begin(), range.end());
-  return utree(::boost::filesystem::remove(p));
+  return utree(create_directory(p));
 }
 
-remove_composite const remove_ = remove_composite();
+mkdir_composite const mkdir_ = mkdir_composite();
 
 } // phxpr
 } // prana
