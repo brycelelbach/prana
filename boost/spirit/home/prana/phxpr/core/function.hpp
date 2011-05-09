@@ -23,7 +23,7 @@ struct function: actor<function> {
   utree f;
   bool fixed;
 
-  function (void): f() { std::cout << "ctor: " << this << std::endl; }
+  function (void): f() { }
 
   function (utree const& f, bool fixed = true): f(f), fixed(fixed) { }
 
@@ -32,8 +32,6 @@ struct function: actor<function> {
   template<class F>
   function (F const& f, bool fixed = true):
     f(stored_function<F>(f)), fixed(fixed) { }
-
-  ~function (void) { std::cout << "dtor: " << this << std::endl; }
 
   bool empty (void) const {
     return f.which() != utree_type::function_type;

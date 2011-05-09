@@ -10,7 +10,6 @@
 #if !defined(BSP_DE441280_828F_4B7F_B79F_5EA7766C9625)
 #define BSP_DE441280_828F_4B7F_B79F_5EA7766C9625
 
-#include <map>
 #include <string>
 
 #include <boost/assert.hpp>
@@ -30,8 +29,7 @@ struct environment {
   typedef Value mapped_type;
   typedef Key key_type;
 
-//  typedef boost::unordered_map<key_type, mapped_type, Hash, Pred> map_type;
-  typedef std::map<key_type, mapped_type> map_type;
+  typedef boost::unordered_map<key_type, mapped_type, Hash, Pred> map_type;
 
   typedef typename map_type::iterator iterator;
   typedef typename map_type::const_iterator const_iterator;
@@ -42,10 +40,8 @@ struct environment {
 
   environment (environment* parent = 0, Hash const& hash = Hash(),
                Pred const& pred = Pred()):
-    outer(parent), depth(parent ? parent->depth + 1 : 0) {} //,
-    //definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
- 
-  ~environment() { /*std::cout << "~environment" << std::endl;*/ }
+    outer(parent), depth(parent ? parent->depth + 1 : 0),
+    definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
  
   fusion::vector2<iterator, bool> operator[] (key_type const& name) {
     iterator it = definitions.find(name),
@@ -84,7 +80,6 @@ struct environment {
 
   template<class T>
   void define (key_type const& name, T const& val) {
-    //std::cout << "level[" << depth << "]: defining " << name << std::endl; 
     // TODO: replace with exception
     BOOST_ASSERT(definitions.find(name) == definitions.end());
     definitions.insert(value_type(name, val));
@@ -117,5 +112,4 @@ struct environment {
 } // boost
 
 #endif // BSP_DE441280_828F_4B7F_B79F_5EA7766C9625
-
 

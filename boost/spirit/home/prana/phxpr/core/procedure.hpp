@@ -27,11 +27,10 @@ struct procedure: composite<procedure> {
 
   explicit procedure (boost::shared_ptr<function> const& body_,
                       scope::size_type level_ = 0):
-    body(body_), level(level_) { std::cout << "shared_ptr ctor" << std::endl; }
+    body(body_), level(level_) { }
   
   explicit procedure (function const& body_, scope::size_type level_ = 0):
-    body(new function(body_.f, body_.fixed)), level(level_) 
-    { std::cout << "function ctor" << std::endl; }
+    body(new function(body_.f, body_.fixed)), level(level_) { }
 
   function compose (boost::shared_ptr<actor_list> const& actors) const {
     BOOST_ASSERT(body);

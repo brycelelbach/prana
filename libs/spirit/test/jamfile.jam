@@ -11,12 +11,13 @@ variant test : <optimization>off <inlining>on <debug-symbols>off ;
 
 project
   : requirements
+    <library>/prana//phxpr 
     <warnings>on
     <toolset>clang:<cxxflags>-Wno-multichar
   ;
 
 {
-  alias schematic :
+  alias schematic_test :
       [ run prana/schematic_become.cpp        : : : : ]
       [ run prana/schematic_capacity.cpp      : : : : ]
       [ run prana/schematic_car.cpp           : : : : ]
@@ -27,19 +28,19 @@ project
       [ run prana/schematic_sizeof.cpp        : : : : ]
     ;
 
-  alias adt :
+  alias adt_test :
       [ run prana/adt_ternary_search_tree.cpp : : : : ]
       [ run prana/adt_dynamic_array.cpp       : : : : ]
       [ run prana/adt_source_location.cpp     : : : : ]
       [ run prana/adt_position_iterator.cpp   : : : : ]
     ;
   
-  alias sexpr :
+  alias sexpr_test :
       [ run prana/sexpr_basic.cpp             : : : : ]
       [ run prana/sexpr_list.cpp              : : : : ]
     ;
 
-  alias phxpr : 
+  alias phxpr_test : 
       [ run prana/phxpr_cxx_add.cpp           : : : : ]
       [ run prana/phxpr_cxx_and.cpp           : : : : ]
       [ run prana/phxpr_cxx_at.cpp            : : : : ]
@@ -49,8 +50,8 @@ project
       [ run prana/phxpr_cxx_evaluator.cpp     : : : : ]
       [ run prana/phxpr_cxx_expand.cpp        : : : : ]
       [ run prana/phxpr_cxx_front.cpp         : : : : ]
+      [ run prana/phxpr_cxx_io.cpp            : : : : ]
       [ run prana/phxpr_cxx_if.cpp            : : : : ]
-      #[ run prana/phxpr_cxx_lambda.cpp        : : : : ]
       [ run prana/phxpr_cxx_list.cpp          : : : : ]
       [ run prana/phxpr_cxx_lt.cpp            : : : : ]
       [ run prana/phxpr_cxx_lte.cpp           : : : : ]
@@ -64,14 +65,14 @@ project
       [ run prana/phxpr_cxx_rest.cpp          : : : : ]
     ;
 
-  alias json :
+  alias json_test :
       [ run prana/json_basic.cpp              : : : : ]
       [ run prana/json_array.cpp              : : : : ]
       [ run prana/json_object.cpp             : : : : ]
       [ run prana/json_ir.cpp                 : : : : ]
     ;
   
-  alias xml :
+  alias xml_test :
       [ run prana/xml_basic.cpp               : : : : ]
       [ run prana/xml_attributes.cpp          : : : : ]
       [ run prana/xml_children.cpp            : : : : ]

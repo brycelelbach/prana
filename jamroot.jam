@@ -16,6 +16,7 @@ variant valgrind : <testing.launcher>valgrind ;
 
 use-project /boost : $(BOOST_ROOT) ;
 
+use-project /prana          : libs/spirit/build ;
 use-project /prana_test     : libs/spirit/test ;
 use-project /prana_example  : libs/spirit/example ;
 

@@ -33,6 +33,7 @@ struct if_function: actor<if_function> {
   }
 
   utree eval (scope const& env) const {
+    // TODO: typecheck (*elements)[0](env)
     if ((*elements)[0](env).get<bool>())
       return (*elements)[1](env);
     else
