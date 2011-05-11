@@ -28,6 +28,7 @@ project
   : build-dir bin.v2
   ;
 
+build-project libs/spirit/build ;
 build-project libs/spirit/test ;
 build-project libs/spirit/example ;
 

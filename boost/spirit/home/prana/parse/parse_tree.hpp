@@ -49,7 +49,7 @@ class parse_tree {
 
     // ignore the UTF bom created by windows (no-op if Tag doesn't support UTF)
     ignore_utf_bom<magic::utf_version<Tag>::value>::call(
-      in, magic::stringify_source(_source)
+      in, magic::stringify_source<Tag>(_source)
     );
 
     parser_type p(_source, _annotations);
@@ -116,7 +116,8 @@ class parse_tree {
     _ast(), _annotations(), _source(magic::default_source<Tag>::value) { }
 
   template<class In>
-  parse_tree (In in, source_type const& s = magic::default_source<Tag>::value):
+  parse_tree (In& in, source_type const& s =
+                        magic::default_source<Tag>::value):
     _ast(), _annotations(), _source(s)
   {
     set(in);
@@ -156,7 +157,7 @@ class parse_tree {
   } 
   
   template<class In>
-  parse_tree& operator= (In in) {
+  parse_tree& operator= (In& in) {
     _ast.clear();
     _annotations.clear();
     _source = magic::default_source<Tag>::value;
@@ -184,8 +185,8 @@ class parse_tree {
   } 
 
   template<class In>
-  void assign (In in, source_type const& s =
-                        magic::default_source<Tag>::value)
+  void assign (In& in, source_type const& s =
+                               magic::default_source<Tag>::value)
   {
     _ast.clear();
     _annotations.clear();

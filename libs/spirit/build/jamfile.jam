@@ -9,8 +9,6 @@
 
 project
   : requirements
-    <library>/boost/iostreams//boost_iostreams
-    <library>/boost/filesystem//boost_filesystem
     <warnings>on
     <toolset>clang:<cxxflags>-Wno-multichar
   ;
@@ -26,6 +24,14 @@ lib phxpr
     ../src/phxpr/filesystem/symlink_predicate.cpp
     ../src/phxpr/filesystem/file_predicate.cpp
     ../src/phxpr/ports/io_context.cpp
+    ../src/phxpr/ports/write.cpp
+  : <library>/boost/iostreams//boost_iostreams
+  : <library>/boost/filesystem//boost_filesystem
   ;
 
+exe sexpr_reader
+  : ../src/drivers/sexpr_reader.cpp
+  : <library>/boost/program_options//boost_program_options
+    <library>phxpr
+  ;
 

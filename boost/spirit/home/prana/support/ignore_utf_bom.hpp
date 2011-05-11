@@ -11,7 +11,7 @@
 #define BSP_SUPPORT_IGNORE_UTF8_BOM_HPP
 
 #include <ios>
-#include <iostream>
+#include <istream>
 
 #include <boost/spirit/home/prana/exception.hpp>
 
@@ -36,7 +36,7 @@ template<>
 struct ignore_utf_bom<8> {
   typedef void type;
 
-  static type call (std::iostream& in, std::string const& source) {
+  static type call (std::istream& in, std::string const& source) {
     char c = in.peek();
 
     if (c == '\xef') {
