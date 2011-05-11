@@ -59,7 +59,12 @@ class parse_tree {
     iterator_type first(sfirst);
     iterator_type last(slast);
 
-    return magic::invoke<Tag>(first, last, p, _ast);
+    bool r = magic::invoke<Tag>(first, last, p, _ast);
+
+    // put the last character back.
+    in.putback(*first);
+
+    return r;
   } 
  
   template<class Range> 

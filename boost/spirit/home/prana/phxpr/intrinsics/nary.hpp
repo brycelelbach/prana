@@ -38,7 +38,7 @@ namespace phxpr {
 BSP_NARY_INTRINSIC(add,   result = result + element, 2)
 BSP_NARY_INTRINSIC(min,   result = result - element, 2)
 BSP_NARY_INTRINSIC(mul,   result = result * element, 2)
-BSP_NARY_INTRINSIC(div,   result = result / element, 2)
+BSP_NARY_INTRINSIC(div_,  result = result / element, 2)
 
 #undef BSP_NARY_INTRINSIC
 

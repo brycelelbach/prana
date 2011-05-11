@@ -26,7 +26,7 @@ write_function::eval (utree const& obj, utree const& port) const {
   } catch (...) {
     // TODO: replace with exception handling
     BOOST_ASSERT(false);
-    return utree();
+    return utree(false);
   }
 }
 

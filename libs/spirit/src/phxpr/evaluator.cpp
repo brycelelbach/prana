@@ -67,7 +67,7 @@ struct evaluator_visitor {
   }
 
   result_type operator() (utf8_symbol_range_type const& str) const {
-    // {{{ nullary variable/macro implementation
+    // {{{ variable reference implementation
     using boost::fusion::at_c;
 
     std::string sym(str.begin(), str.end());
@@ -78,24 +78,7 @@ struct evaluator_visitor {
     BOOST_ASSERT(sym != "quote");
     BOOST_ASSERT(sym != "lambda");
 
-    { // {{{ macro expansion
-      fusion::vector2<environment<macro>::const_iterator, bool> macro
-        = (*macros)[sym];
-
-      if (at_c<1>(macro)) {
-        boost::shared_ptr<matcher> match
-          = at_c<0>(macro)->second.match(utree::list_type());
-
-        if (match) {
-          boost::shared_ptr<utree> expansion = match->expand();
-          // TODO: make this an exception
-          BOOST_ASSERT(expansion);
-          return utree::visit(*expansion, *this);
-        }
-      }
-    } // }}}
-
-    // {{{ function invocation
+    // {{{ variable expansion
     fusion::vector2<environment<compiled_function>::const_iterator, bool> func
       = (*variables)[sym];
 
@@ -124,8 +107,14 @@ struct evaluator_visitor {
     std::string sym = get_symbol(*it);
     ++it;
     
-    // TODO: replace with exception
-    BOOST_ASSERT(it != end);
+    // nullary call
+    if (it == end) {
+      // TODO: replace with exceptions
+      BOOST_ASSERT(sym != "variable");
+      BOOST_ASSERT(sym != "macro");
+      BOOST_ASSERT(sym != "quote");
+      BOOST_ASSERT(sym != "lambda");
+    }
 
     if (sym == "variable") {
       utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
@@ -178,10 +167,8 @@ struct evaluator_visitor {
         flist.push_back(utree::visit(e, *this));
       }
 
-
       return (at_c<0>(func)->second)(flist);
     } // }}}
-
  
     // TODO: replace with exception (identifier not found error)
     BOOST_ASSERT(false);

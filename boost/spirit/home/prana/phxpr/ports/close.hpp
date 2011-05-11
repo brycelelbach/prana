@@ -57,11 +57,11 @@ struct close_function: actor<close_function> {
       context->ports[fd]->close();
       context->ports[fd].reset();
 
-      return utree();
+      return utree(true);
     } catch (...) {
       // TODO: replace with exception handling
       BOOST_ASSERT(false);
-      return utree();
+      return utree(false);
     }
   }
 };

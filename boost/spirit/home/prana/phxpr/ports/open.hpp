@@ -54,7 +54,7 @@ struct open_function: actor<open_function> {
     } catch (...) {
       // TODO: replace with exception handling
       BOOST_ASSERT(false);
-      return utree();
+      return utree(false);
     }
   }
 };

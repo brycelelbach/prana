@@ -35,7 +35,7 @@ namespace phxpr {
   name##_composite const name = name##_composite();                   \
   /***/
 
-BSP_BINARY_INTRINSIC(at,    spirit::index(left, right))
+BSP_BINARY_INTRINSIC(at,    spirit::index(right, left))
 BSP_BINARY_INTRINSIC(eq,    left == right)
 BSP_BINARY_INTRINSIC(lt,    left < right)
 BSP_BINARY_INTRINSIC(lte,   left <= right)

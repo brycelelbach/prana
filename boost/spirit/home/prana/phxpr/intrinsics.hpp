@@ -16,6 +16,9 @@
 #include <boost/spirit/home/prana/phxpr/intrinsics/nary.hpp>
 #include <boost/spirit/home/prana/phxpr/intrinsics/unary.hpp>
 #include <boost/spirit/home/prana/phxpr/intrinsics/binary.hpp>
+#include <boost/spirit/home/prana/phxpr/intrinsics/push_back.hpp>
+#include <boost/spirit/home/prana/phxpr/intrinsics/push_front.hpp>
+#include <boost/spirit/home/prana/phxpr/intrinsics/newline.hpp>
 
 #endif // BSP_PHXPR_INTRINSICS_HPP
 

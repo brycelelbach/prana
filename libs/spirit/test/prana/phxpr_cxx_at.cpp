@@ -28,14 +28,14 @@ int main (void) { try {
   ut.push_back(3);  
 
   // basic
-  BOOST_TEST_EQ(at(list(1, 2, 3), 1)    (),         2);
-  BOOST_TEST_EQ(at(list(1, 2, 3), _1)   (2),        3);
-  BOOST_TEST_EQ(at(_1, 1)               (ut),       2);
-  BOOST_TEST_EQ(at(_1, _2)              (ut, 2),    3);
+  BOOST_TEST_EQ(at(1, list(1, 2, 3))    (),         2);
+  BOOST_TEST_EQ(at(_1, list(1, 2, 3))   (2),        3);
+  BOOST_TEST_EQ(at(1, _1)               (ut),       2);
+  BOOST_TEST_EQ(at(_1, _2)              (2, ut),    3);
 
   // 0 index  
-  BOOST_TEST_EQ(at(list(1, 2, 3), _1)   (0),        1);
-  BOOST_TEST_EQ(at(_1, _2)              (ut, 0),    1);
+  BOOST_TEST_EQ(at(_1, list(1, 2, 3))   (0),        1);
+  BOOST_TEST_EQ(at(_1, _2)              (0, ut),    1);
  
   } catch (std::exception& e) {
     std::cout << "caught: " << e.what() << "\n";

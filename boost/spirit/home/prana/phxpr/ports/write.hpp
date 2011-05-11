@@ -88,7 +88,7 @@ struct write_function: binary_function<write_function> {
     } catch (...) {
       // TODO: replace with exception handling
       BOOST_ASSERT(false);
-      return utree();
+      return utree(false);
     }
   }
 };

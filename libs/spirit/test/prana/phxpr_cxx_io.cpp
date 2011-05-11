@@ -13,13 +13,13 @@ using boost::spirit::prana::phxpr::io_context;
 using boost::spirit::prana::phxpr::open_composite;
 
 int main (void) { 
-  boost::shared_ptr<io_context> context(new io_context);
+//  boost::shared_ptr<io_context> context(new io_context);
 
-  open_composite const open_(context);
+//  open_composite const open_(context);
 
-  utree ut = open_("foo.txt", std::ios_base::out)(); 
+//  utree ut = open_("foo.txt", std::ios_base::out)(); 
 
-  (*context->ports[ut.get<unsigned>()]) << "hello world!\n";
+//  (*context->ports[ut.get<unsigned>()]) << "hello world!\n";
 
   return 0;
 }

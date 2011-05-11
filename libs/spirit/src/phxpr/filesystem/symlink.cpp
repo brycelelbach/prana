@@ -25,9 +25,12 @@ utree symlink_function::eval (utree const& source, utree const& dest) const {
   utf8_string_range_type dest_range = dest.get<utf8_string_range_type>();
   path dest_path(dest_range.begin(), dest_range.end());
 
-  create_symlink(source_path, dest_path);
-
-  return utree();
+  try {
+    create_symlink(source_path, dest_path);
+    return utree(true);
+  }
+ 
+  catch (...) { return utree(false); }
 }
 
 symlink_composite const symlink_ = symlink_composite();

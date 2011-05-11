@@ -12,11 +12,11 @@
   ((variable l (quote (1 2 3)))
 
    (boost:test:= (at (list 1 2 3) 1) 2)
-   (boost:test:= ((lambda (x) (at (list 1 2 3) x)) 2) 3)
-   (boost:test:= ((lambda (x) (at x 1)) l) 2)
-   (boost:test:= ((lambda (x y) (at x y)) l 2) 3)
+   (boost:test:= ((lambda (x) (at x (list 1 2 3))) 2) 3)
+   (boost:test:= ((lambda (x) (at 1 x)) l) 2)
+   (boost:test:= ((lambda (x y) (at x y)) 2 l) 3)
 
   ; 0 index
-   (boost:test:= ((lambda (x) (at (list 1 2 3) x)) 0) 1)
-   (boost:test:= ((lambda (x y) (at x y)) l 0) 1)))
+   (boost:test:= ((lambda (x) (at x (list 1 2 3))) 0) 1)
+   (boost:test:= ((lambda (x y) (at x y)) 0 l) 1)))
 

@@ -35,3 +35,9 @@ exe sexpr_reader
     <library>phxpr
   ;
 
+exe phxi
+  : ../src/drivers/phxi.cpp
+  : <library>/boost/program_options//boost_program_options
+    <library>phxpr
+  ;
+
