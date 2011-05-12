@@ -64,7 +64,7 @@ struct evaluator_visitor {
 
   template<class T>
   result_type operator() (T const& val) const {
-    return quote(utree(val));
+    return result_type(utree(val));
   }
 
   result_type operator() (utf8_symbol_range_type const& str) const {
@@ -80,13 +80,17 @@ struct evaluator_visitor {
     BOOST_ASSERT(sym != "lambda");
 
     // {{{ variable expansion
-    fusion::vector2<environment<compiled_function>::const_iterator, bool> func
-      = (*variables)[sym];
+    fusion::vector3<
+      environment<compiled_function>::const_iterator, bool, scope::size_type
+    > func = (*variables)[sym];
 
     if (at_c<1>(func)) {
-      actor_list flist;
-      
-      return (at_c<0>(func)->second)(flist);
+      if (at_c<0>(func)->second.target<procedure>())
+        return utree(at_c<0>(func)->second.target<procedure>()->body->f); 
+
+      // TODO: eliminate this case, by storing all compiled functions in
+      // procedure instances.
+      return (at_c<0>(func)->second)(actor_list());
     } // }}}
     
     // TODO: replace with exception (identifier not found error)
@@ -146,10 +150,8 @@ struct evaluator_visitor {
       return define_macro(body);
     }
 
-    if (sym == "quote") {
-      utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
-      return make_quote(body);
-    }
+    if (sym == "quote")
+      return quote(*it);
 
     if (sym == "lambda") {
       utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
@@ -157,8 +159,9 @@ struct evaluator_visitor {
     }
 
     { // {{{ macro expansion
-      fusion::vector2<environment<macro>::const_iterator, bool> macro
-        = (*macros)[sym];
+      fusion::vector3<
+        environment<macro>::const_iterator, bool, scope::size_type
+      > macro = (*macros)[sym];
 
       if (at_c<1>(macro)) {
         utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
@@ -175,8 +178,9 @@ struct evaluator_visitor {
     } // }}}
 
     // {{{ function invocation
-    fusion::vector2<environment<compiled_function>::const_iterator, bool> func
-      = (*variables)[sym];
+    fusion::vector3<
+      environment<compiled_function>::const_iterator, bool, scope::size_type
+    > func = (*variables)[sym];
 
     if (at_c<1>(func)) {
       utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
@@ -258,11 +262,6 @@ struct evaluator_visitor {
     return result_type(); 
   }
   
-  result_type make_quote (utree const& ut) const {
-    // IMPLEMENT
-    return result_type();  
-  }
-  
   result_type make_lambda (utree const& ut) const;
 }; 
 
@@ -320,6 +319,7 @@ evaluator_visitor::make_lambda (utree const& ut) const {
       local(*it);
   }
 
+  // REVIEW: pass fixed_arity to the function instance that's returned?
   if (flist->size() > 1)
     return begin(flist);
   else

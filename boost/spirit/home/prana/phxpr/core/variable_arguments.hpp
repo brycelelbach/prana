@@ -36,7 +36,7 @@ struct vararg_function: actor<vararg_function<scoped> > {
 
     while (level != eptr->level())
       eptr = eptr->outer();
-    
+
     utree result;
 
     for (std::size_t i = n; i < eptr->size(); ++i) {

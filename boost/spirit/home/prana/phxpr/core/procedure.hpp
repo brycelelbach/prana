@@ -27,7 +27,7 @@ struct procedure: composite<procedure> {
 
   explicit procedure (boost::shared_ptr<function> const& body_,
                       scope::size_type level_ = 0):
-    body(body_), level(level_) { }
+    body(body_), level(level_) { BOOST_ASSERT(body); }
   
   explicit procedure (function const& body_, scope::size_type level_ = 0):
     body(new function(body_.f, body_.fixed)), level(level_) { }

@@ -43,7 +43,8 @@ struct environment {
     outer(parent), depth(parent ? parent->depth + 1 : 0),
     definitions(boost::unordered::detail::default_bucket_count, hash, pred) { }
  
-  fusion::vector2<iterator, bool> operator[] (key_type const& name) {
+  fusion::vector3<iterator, bool, scope::size_type>
+  operator[] (key_type const& name) {
     iterator it = definitions.find(name),
              end = definitions.end();
 
@@ -55,14 +56,16 @@ struct environment {
 
       // If we found the definition or have no outer scope, return the
       // iterator and false.
-      return fusion::vector2<iterator, bool>(it, false);
+      return fusion::vector3<iterator, bool, scope::size_type>
+        (it, false, depth);
     }
 
     else
-      return fusion::vector2<iterator, bool>(it, true);
+      return fusion::vector3<iterator, bool, scope::size_type>
+        (it, true, depth);
   }
   
-  fusion::vector2<const_iterator, bool>
+  fusion::vector3<const_iterator, bool, scope::size_type>
   operator[] (key_type const& name) const {
     const_iterator it = definitions.find(name),
                    end = definitions.end();
@@ -71,11 +74,13 @@ struct environment {
       if (outer)
         return (*outer)[name];
 
-      return fusion::vector2<const_iterator, bool>(it, false);
+      return fusion::vector3<const_iterator, bool, scope::size_type>
+        (it, false, depth);
     }
 
     else
-      return fusion::vector2<const_iterator, bool>(it, true);
+      return fusion::vector3<const_iterator, bool, scope::size_type>
+        (it, true, depth);
   }
 
   template<class T>

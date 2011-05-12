@@ -10,6 +10,8 @@
 #if !defined(BSP_PHXPR_CORE_FUNCTION_HPP)
 #define BSP_PHXPR_CORE_FUNCTION_HPP
 
+#include <boost/ref.hpp>
+
 #include <boost/spirit/home/prana/config.hpp>
 
 #include <boost/spirit/home/prana/phxpr/core/actor.hpp>
@@ -34,7 +36,7 @@ struct function: actor<function> {
     f(stored_function<F>(f)), fixed(fixed) { }
 
   bool empty (void) const {
-    return f.which() != utree_type::function_type;
+    return f.which() == utree_type::invalid_type;
   }
 
   bool fixed_arity (void) const {
@@ -42,7 +44,10 @@ struct function: actor<function> {
   }
 
   utree eval (scope const& env) const {
-    return f.eval(env);
+    if (f.which() == utree_type::function_type)
+      return f.eval(env);
+    else
+      return utree(boost::ref(f));
   }
 };
 

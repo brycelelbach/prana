@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
   std::string file("");
  
   visible.add_options()
-    ("help,h", "print out program usage (this message)")
+    ("help,h", "print this message")
   ;
 
   hidden.add_options()

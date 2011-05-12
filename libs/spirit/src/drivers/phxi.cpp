@@ -28,6 +28,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+using boost::spirit::nil;
 using boost::spirit::utree;
 using boost::spirit::utree_type;
 
@@ -39,6 +40,7 @@ using boost::spirit::prana::generate_sexpr;
 using boost::spirit::prana::phxpr::evaluator;
 using boost::spirit::prana::phxpr::function;
 using boost::spirit::prana::phxpr::procedure;
+using boost::spirit::prana::phxpr::quote;
 
 using boost::spirit::prana::phxpr::begin;
 using boost::spirit::prana::phxpr::at;
@@ -67,18 +69,18 @@ int main (int argc, char** argv) {
 
   options_description visible("Usage: phxi [options]"), hidden;
    
-  std::string file("");
+  std::string input(""), args("");
  
   visible.add_options()
-    ("help,h", "print out program usage (this message)")
+    ("help,h", "print this message")
     ("version,v", "display the version and copyright information")
-    ("print-reads", "print each datum read from the input file before "
-                    "evaluating it")
+    ("args,a", value<std::string>(&args),
+     "s-expression passed to interpreted code via platform:cmdline") 
   ;
 
   hidden.add_options()
-    ("input,i", value<std::string>(&file), 
-     "file to read and execute phxpr code from") 
+    ("input", value<std::string>(&input), 
+     "input to read and execute phxpr code from") 
   ;
 
   positional_options_description p;
@@ -102,9 +104,7 @@ int main (int argc, char** argv) {
     std::cout <<
       "phxi, the phxpr interpreter (Prana v" BSP_VERSION_STR ")\n"
       "\n"
-      "Copyright (c) 2010-2011 Bryce Lelbach\n"
-      "Copyright (c) 2001-2011 Joel de Guzman\n"
-      "Copyright (c) 2001-2011 Hartmut Kaiser\n"
+      "Copyright (c) 2010-2011 Bryce Lelbach, Joel de Guzman and Hartmut Kaiser\n"
       "\n" 
       "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
       "file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
@@ -116,8 +116,8 @@ int main (int argc, char** argv) {
     return 1; 
   }
 
-  try {
-    std::ifstream ifs(file.c_str(), std::ifstream::in);  
+//  try {
+    std::ifstream ifs(input.c_str(), std::ifstream::in);  
     evaluator e;
  
     // basic environment 
@@ -133,7 +133,6 @@ int main (int argc, char** argv) {
     e.variables.define("-", min);
     e.variables.define("*", mul);
     e.variables.define("/", div_);
-    e.variables.define("display", display);
     e.variables.define("front", front);
     e.variables.define("back", back);
     e.variables.define("rest", rest);
@@ -141,41 +140,54 @@ int main (int argc, char** argv) {
     e.variables.define("empty?", not_);
     e.variables.define("push-front", push_front);
     e.variables.define("push-back", push_back);
-    e.variables.define("newline", newline);
-      
-    // crude, temporary solution
+
+    // temporary stand-ins for I/O, will be replaced by the ports subsystem
+    e.variables.define("ports:display", display);
+    e.variables.define("ports:newline", newline);
+    
+    // temporary stand-ins for the system interface, will be replaced by the
+    // platform subsystem
+    if (vm.count("args")) {
+      // TODO: error handling
+      parse_tree<sexpr> pt(args); 
+      e.variables.define("platform:cmdline", procedure(quote(pt.ast())));
+    }
+
+    else
+      e.variables.define("platform:cmdline", procedure(quote(utree(nil))));
+ 
     dynamic_array<boost::shared_ptr<parse_tree<sexpr> > > asts(16);
     utree r;
 
-    // read-eval loop
+    // interpreter loop
     while (ifs.good()) {
       asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
 
       // read
       asts.back().reset(new parse_tree<sexpr>(ifs));
 
-      if (vm.count("print-reads")) {
-        std::cout << "datum[" << asts.size() << "]: (type="
-                  << asts.back()->ast().which() << ") ";
-        generate_sexpr(asts.back()->ast(), std::cout);
-        std::cout << std::endl; 
+      // eval
+      function f = e(asts.back()->ast());
+
+      if (!ifs.good()) {
+        if (!f.empty())
+          r = f();
+        break;
       }
 
-      // eval
-      if (!ifs.good())
-        r = e(asts.back()->ast())();
-      else 
-        e(asts.back()->ast())();
+      // invoke for side effects
+      else if (!f.empty()) 
+        f();
     }
 
-    // print the result (if there is one) 
-    if (r.which() != utree_type::invalid_type) {
-      std::cout << "return value: ";
-      generate_sexpr(r, std::cout);
-      std::cout << std::endl;
-    }
-  }
+    // print the result  
+    std::cout << "return value: ";
+    generate_sexpr(r, std::cout);
+    std::cout << std::endl;
 
+//  }
+
+/*
   catch (std::exception& e) {
     std::cerr << "error: caught exception \"" << e.what() << "\"\n";
     return 1;
@@ -185,6 +197,7 @@ int main (int argc, char** argv) {
     std::cerr << "error: caught unknown exception\n";
     return 1;
   }
+*/
 
   return 0; 
 }

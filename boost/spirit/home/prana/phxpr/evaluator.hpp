@@ -20,6 +20,8 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
+// TODO: Wrap all compiled functions in procedures, so that passing around
+// intrinsics will work.
 typedef boost::function<phxpr::function(actor_list const&)> compiled_function;
 
 struct evaluator {

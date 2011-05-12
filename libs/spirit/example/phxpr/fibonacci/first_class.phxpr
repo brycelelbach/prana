@@ -1,0 +1,27 @@
+;   Copyright (c) 2010-2011 Bryce Lelbach
+;   Copyright (c) 2001-2011 Joel de Guzman
+;   Copyright (c) 2001-2011 Hartmut Kaiser
+;
+;   Distributed under the Boost Software License, Version 1.0. (See accompanying
+;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+(variable fibonacci
+  (lambda (n)
+    (if (< n 2) n
+      (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))) 
+
+(variable print-procedure
+  (lambda (name f n)
+    ((lambda (name n result)
+      (ports:display "(")
+      (ports:display name)
+      (ports:display " ")
+      (ports:display n)
+      (ports:display ") ==> ")
+      (ports:display result)
+      (ports:newline)
+      result) name n (f n)))) 
+
+(print-procedure "fibonacci" fibonacci platform:cmdline)
+
+
