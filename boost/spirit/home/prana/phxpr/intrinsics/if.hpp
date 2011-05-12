@@ -43,7 +43,7 @@ struct if_function: actor<if_function> {
 
 struct if_composite: composite<if_composite> {
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(if_function(elements));
+    return function(if_function(elements), 3, true);
   }
 };
 

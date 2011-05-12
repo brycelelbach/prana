@@ -43,7 +43,7 @@ struct list_function: actor<list_function> {
 
 struct list_composite: composite<list_composite> {
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(list_function(elements));
+    return function(list_function(elements), 0, false);
   }
 };
 

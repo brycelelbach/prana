@@ -45,7 +45,8 @@ struct begin_function: actor<begin_function> {
 
 struct begin_composite: composite<begin_composite> {
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(begin_function(elements));
+    // REVIEW: should minimum arity be 1?
+    return function(begin_function(elements), 0, false);
   }
 };
 

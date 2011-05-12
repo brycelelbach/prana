@@ -21,6 +21,8 @@ namespace boost {
 namespace spirit {
 namespace prana {
 namespace phxpr {
+
+// TODO: use function for arity/level stuff.
     
 struct lambda_function: actor<lambda_function> {
   boost::shared_ptr<function> body;

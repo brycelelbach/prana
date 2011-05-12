@@ -19,8 +19,9 @@ namespace phxpr {
 
 #define BSP_NARY_INTRINSIC(name, expression, size)                    \
   struct name##_function: nary_function<name##_function> {            \
-    name##_function (boost::shared_ptr<actor_list> const& elements):  \
-      base_type(elements, size) { }                                   \
+    name##_function (boost::shared_ptr<actor_list> const& elements,   \
+                     scope::size_type s = size):                      \
+      base_type(elements, s) { }                                      \
                                                                       \
     typedef bool result_type;                                         \
                                                                       \

@@ -26,10 +26,12 @@ namespace phxpr {
 
 template<bool scoped = true>
 struct argument_function: actor<argument_function<scoped> > {
-  scope::size_type n;
-  scope::size_type level;
+  typedef scope::size_type size_type;
 
-  argument_function (scope::size_type n_, scope::size_type level_ = 0):
+  size_type n;
+  size_type level;
+
+  argument_function (size_type n_, size_type level_ = 0):
     n(n_), level(level_) { }
 
   utree eval (scope const& env) const {
@@ -49,9 +51,11 @@ struct argument_function: actor<argument_function<scoped> > {
 
 template<> 
 struct argument_function<false>: actor<argument_function<false> > {
-  scope::size_type n;
+  typedef scope::size_type size_type;
 
-  argument_function (scope::size_type n_, scope::size_type level_ = 0):
+  size_type n;
+
+  argument_function (size_type n_, size_type level_ = 0):
     n(n_) { }
 
   utree eval (scope const& env) const {
@@ -66,10 +70,12 @@ struct argument_function<false>: actor<argument_function<false> > {
 
 template<bool scoped = true>
 struct argument {
+  typedef scope::size_type size_type;
+
   typedef function result_type;
 
-  function operator() (scope::size_type n, scope::size_type level = 0) const {
-    return function(argument_function<scoped>(n, level));
+  function operator() (size_type n, size_type level = 0) const {
+    return function(argument_function<scoped>(n, level), n + 1, true, level);
   }
 };
 

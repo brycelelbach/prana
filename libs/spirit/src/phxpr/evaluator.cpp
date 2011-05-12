@@ -177,7 +177,7 @@ struct evaluator_visitor {
       }
     } // }}}
 
-    // {{{ function invocation
+    // {{{ function creation
     fusion::vector3<
       environment<compiled_function>::const_iterator, bool, scope::size_type
     > func = (*variables)[sym];

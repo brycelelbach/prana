@@ -14,19 +14,19 @@ namespace boost {
 namespace spirit {
 namespace prana {
 
-utree_type::info recursive_which (utree const& ut) {
+inline utree_type::info recursive_which (utree const& ut) {
   if (ut.which() == utree_type::reference_type)
     return recursive_which(ut.deref());
 
   return ut.which();
 }
 
-bool is_utree_string (utree const& ut) {
+inline bool is_utree_string (utree const& ut) {
   utree_type::info t = recursive_which(ut);
   return t == utree_type::string_type || t == utree_type::string_range_type;
 }
 
-bool is_utree_container (utree const& ut) {
+inline bool is_utree_container (utree const& ut) {
   utree_type::info t = recursive_which(ut);
   return t == utree_type::list_type || t == utree_type::range_type;
 }

@@ -30,11 +30,12 @@ struct procedure: composite<procedure> {
     body(body_), level(level_) { BOOST_ASSERT(body); }
   
   explicit procedure (function const& body_, scope::size_type level_ = 0):
-    body(new function(body_.f, body_.fixed)), level(level_) { }
+    body(new function(body_)), level(level_) { }
 
   function compose (boost::shared_ptr<actor_list> const& actors) const {
     BOOST_ASSERT(body);
-    return function(lambda_function(actors, body, level));
+    return function(lambda_function
+      (actors, body, level), body->arity, body->fixed);
   }
 };
 

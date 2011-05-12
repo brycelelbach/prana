@@ -11,16 +11,16 @@
       (* x (factorial (- x 1))))))
 
 (variable print-procedure
-  (lambda (name f n)
-    ((lambda (name n result)
+  (lambda (f n)
+    ((lambda (n result)
       (ports:display "(")
-      (ports:display name)
+      (ports:display "factorial")
       (ports:display " ")
       (ports:display n)
       (ports:display ") ==> ")
       (ports:display result)
       (ports:newline)
-      result) name n (f n)))) 
+      result) n (f n)))) 
 
-(print-procedure "factorial" factorial platform:cmdline)
+(print-procedure factorial platform:cmdline)
 

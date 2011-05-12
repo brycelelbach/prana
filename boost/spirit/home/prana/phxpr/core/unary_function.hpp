@@ -49,7 +49,7 @@ struct unary_function: actor<unary_function<Derived> > {
 template<class Function>
 struct unary_composite: composite<unary_composite<Function> > {
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(Function(elements));
+    return function(Function(elements), 1, true);
   }
 };
 

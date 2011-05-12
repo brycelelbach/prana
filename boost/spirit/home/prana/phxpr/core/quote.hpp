@@ -35,11 +35,11 @@ struct quote_type {
   typedef function result_type;
 
   function operator() (utree const& val) const {
-    return function(quote_function(val));
+    return function(quote_function(val), 0, true);
   }
   
   function operator() (function const& f) const {
-    return function(quote_function(f.f));
+    return function(quote_function(f.f), 0, true);
   }
 };
 

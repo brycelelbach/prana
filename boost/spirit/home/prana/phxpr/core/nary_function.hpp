@@ -24,6 +24,8 @@ namespace phxpr {
 
 template<class Derived>
 struct nary_function: actor<nary_function<Derived> > {
+  typedef scope::size_type size_type;
+
   boost::shared_ptr<actor_list> elements;
 
   typedef nary_function<Derived> base_type;
@@ -33,7 +35,7 @@ struct nary_function: actor<nary_function<Derived> > {
   }
 
   nary_function (boost::shared_ptr<actor_list> const& elements,
-                 scope::size_type minimum_arity = 0): elements(elements)
+                 size_type minimum_arity = 0): elements(elements)
   {
     BOOST_ASSERT(elements);
     BOOST_ASSERT(elements->size() >= minimum_arity);
@@ -59,8 +61,14 @@ struct nary_function: actor<nary_function<Derived> > {
 
 template<class Function>
 struct nary_composite: composite<nary_composite<Function> > {
+  typedef scope::size_type size_type;
+
+  size_type const minimum;
+
+  nary_composite (size_type minimum_ = 0): minimum(minimum_) { }
+
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(Function(elements));
+    return function(Function(elements, minimum), minimum, false);
   }
 };
 

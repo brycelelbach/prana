@@ -26,10 +26,12 @@ namespace phxpr {
 
 template<bool scoped = true>
 struct vararg_function: actor<vararg_function<scoped> > {
-  std::size_t n;
-  std::size_t level;
+  typedef scope::size_type size_type;
 
-  vararg_function (std::size_t n, std::size_t level = 0): n(n), level(level) { }
+  size_type n;
+  size_type level;
+
+  vararg_function (size_type n_, size_type level_ = 0): n(n_), level(level_) { }
 
   utree eval (scope const& env) const {
     scope const* eptr = &env;
@@ -39,7 +41,7 @@ struct vararg_function: actor<vararg_function<scoped> > {
 
     utree result;
 
-    for (std::size_t i = n; i < eptr->size(); ++i) {
+    for (size_type i = n; i < eptr->size(); ++i) {
       utree const& arg = (*eptr)[i];
 
       if (arg.which() != utree_type::function_type)
@@ -54,14 +56,16 @@ struct vararg_function: actor<vararg_function<scoped> > {
 
 template<> 
 struct vararg_function<false>: actor<vararg_function<false> > {
-  std::size_t n;
+  typedef scope::size_type size_type;
 
-  vararg_function (std::size_t n, std::size_t level = 0): n(n) { }
+  size_type n;
+
+  vararg_function (size_type n_, size_type level_ = 0): n(n_) { }
 
   utree eval (scope const& env) const {
     utree result;
     
-    for (std::size_t i = n; i < env.size(); ++i) {
+    for (size_type i = n; i < env.size(); ++i) {
       utree const& arg = env[i];
 
       if (arg.which() != utree_type::function_type)
@@ -76,10 +80,12 @@ struct vararg_function<false>: actor<vararg_function<false> > {
 
 template<bool scoped = true>
 struct vararg {
+  typedef scope::size_type size_type;
+
   typedef function result_type;
 
-  function operator() (std::size_t n, std::size_t level = 0) const {
-    return function(vararg_function<scoped>(n, level), false);
+  function operator() (size_type n, size_type level = 0) const {
+    return function(vararg_function<scoped>(n, level), n + 1, false, level);
   }
 };
 

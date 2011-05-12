@@ -50,7 +50,7 @@ struct binary_function: actor<binary_function<Derived> > {
 template<class Function>
 struct binary_composite: composite<binary_composite<Function> > {
   function compose (boost::shared_ptr<actor_list> const& elements) const {
-    return function(Function(elements));
+    return function(Function(elements), 2, true);
   }
 };
 
