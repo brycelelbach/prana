@@ -41,9 +41,6 @@ BSP_UNARY_INTRINSIC(back,    subject.back())
 BSP_UNARY_INTRINSIC(rest,    spirit::rest(subject))
 BSP_UNARY_INTRINSIC(not_,    !subject)
 
-// temporary intrinsic, superseded by ports
-BSP_UNARY_INTRINSIC(display, (std::cout << subject, utree(spirit::nil)))
-
 #undef BSP_UNARY_INTRINSIC
 
 } // phxpr

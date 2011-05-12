@@ -18,6 +18,7 @@
 #include <boost/spirit/home/prana/phxpr/intrinsics/binary.hpp>
 #include <boost/spirit/home/prana/phxpr/intrinsics/push_back.hpp>
 #include <boost/spirit/home/prana/phxpr/intrinsics/push_front.hpp>
+#include <boost/spirit/home/prana/phxpr/intrinsics/display.hpp>
 #include <boost/spirit/home/prana/phxpr/intrinsics/newline.hpp>
 
 #endif // BSP_PHXPR_INTRINSICS_HPP
