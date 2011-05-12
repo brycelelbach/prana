@@ -86,7 +86,7 @@ struct evaluator_visitor {
 
     if (at_c<1>(func)) {
       if (at_c<0>(func)->second.target<procedure>())
-        return utree(at_c<0>(func)->second.target<procedure>()->body->f); 
+        return at_c<0>(func)->second.target<procedure>()->body->f; 
 
       // TODO: eliminate this case, by storing all compiled functions in
       // procedure instances.
@@ -114,7 +114,7 @@ struct evaluator_visitor {
     if (is_utree_container(*it)) {
       boost::shared_ptr<function> anon(new function);
       *anon = utree::visit(*it, *this);
-
+      
       ++it;
 
       utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);

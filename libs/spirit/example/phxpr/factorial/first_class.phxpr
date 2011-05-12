@@ -6,9 +6,9 @@
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 (variable factorial
-  (lambda (n)
-    (if (<= n 0) 1
-      (* n (factorial (- n 1))))))
+  (lambda (x)
+    (if (<= x 0) 1
+      (* x (factorial (- x 1))))))
 
 (variable print-procedure
   (lambda (name f n)

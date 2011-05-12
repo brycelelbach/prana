@@ -41,7 +41,7 @@ struct lambda_function: actor<lambda_function> {
   utree eval (scope const& env) const {
     scope const* outer = &env; // Get the parent scope.
 
-    while (outer && (level != outer->level()))
+    while (level != outer->level())
       outer = outer->outer();
       
     if (elements && !elements->empty()) {

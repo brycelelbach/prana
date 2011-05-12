@@ -34,6 +34,8 @@ struct display_function: unary_function<display_function> {
     else
       generate_sexpr(subject, std::cout);
 
+    std::cout << std::flush;
+
     return utree(spirit::nil);
   }
 };
