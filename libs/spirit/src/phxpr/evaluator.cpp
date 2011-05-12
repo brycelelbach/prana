@@ -8,6 +8,7 @@
 #include <boost/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
+#include <boost/spirit/home/prana/support/utree_predicates.hpp>
 #include <boost/spirit/home/prana/phxpr/core/arguments.hpp>
 #include <boost/spirit/home/prana/phxpr/core/variable_arguments.hpp>
 #include <boost/spirit/home/prana/phxpr/core/quote.hpp>
@@ -103,6 +104,25 @@ struct evaluator_visitor {
 
     // TODO: replace with exception
     BOOST_ASSERT(it != end);
+
+    // TODO: consider moving this to a separate method
+    // {{{ anonymous lambda or indirect procedure call 
+    if (is_utree_container(*it)) {
+      boost::shared_ptr<function> anon(new function);
+      *anon = utree::visit(*it, *this);
+
+      ++it;
+
+      utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+
+      boost::shared_ptr<actor_list> flist(new actor_list);
+
+      BOOST_FOREACH(utree const& e, use) {
+        flist->push_back(utree::visit(e, *this));
+      }
+
+      return lambda_function(flist, anon, variables->level()); 
+    } // }}}
 
     std::string sym = get_symbol(*it);
     ++it;
@@ -289,7 +309,7 @@ evaluator_visitor::make_lambda (utree const& ut) const {
          local.variables.level()));
   }
 
-  boost::shared_ptr<actor_list> flist(new actor_list(ut.size() - 1));
+  boost::shared_ptr<actor_list> flist(new actor_list);
 
   it = ut.begin(); ++it;
 
