@@ -8,8 +8,7 @@ Prerequisites
   * `Boost C++ Libraries <http://www.boost.org>`_ (1.47.0+)
   * `Boost Build <http://www.boost.org/boost-build2>`_ (v2+)
 
-*Note: Support for Windows (7, HPC Compute Cluster or Server) + MSVC 10 is
- forthcoming.*
+*Note: Support for Windows (7, HPC Compute Cluster or Server) + MSVC 10 is forthcoming.*
 
 Building
 ========
