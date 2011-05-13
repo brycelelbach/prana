@@ -1,12 +1,15 @@
 Prerequisites
 =============
 
-  * Kernel: Linux
-  * C++ compiler: `GCC <http://gcc.gnu.org>` (4.4.* or 4.5.*) or `Clang <http://clang.llvm.org>` (2.9+) 
-  * C++ standard library: `GNU libstdc++ <http://gcc.gnu.org/libstdc++/>` (4.4.* or 4.5.*)
-  * C standard library: `EGLIBC <http://www.eglibc.org/home>` (2.7.*+) or `glibc <http://www.gnu.org/s/libc>` (2.7.*+)
-  * `Boost C++ Libraries <http://www.boost.org>` (1.47.0+)
-  * `Boost Build <http://www.boost.org/boost-build2>` (v2+)
+  * Kernel: `Linux <git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git>`_ (2.6.3*+)
+  * C++ compiler: `GCC <http://gcc.gnu.org>`_ (4.4.* or 4.5.*) or `Clang <http://clang.llvm.org>`_ (2.9+) 
+  * C++ standard library: `GNU libstdc++ <http://gcc.gnu.org/libstdc++/>`_ (4.4.* or 4.5.*)
+  * C standard library: `EGLIBC <http://www.eglibc.org/home>`_ (2.7.*+) or `glibc <http://www.gnu.org/s/libc>`_ (2.7.*+)
+  * `Boost C++ Libraries <http://www.boost.org>`_ (1.47.0+)
+  * `Boost Build <http://www.boost.org/boost-build2>`_ (v2+)
+
+.. note:: Support for Windows (7, HPC Compute Cluster or Server) + MSVC 10 is
+   forthcoming.
 
 Building
 ========
