@@ -16,14 +16,14 @@ namespace boost {
 namespace spirit {
 
 std::ostream& operator<< (std::ostream& out, scope const& env) {
-  out << "level[" << env.level() << "]";
+  out << "level[" << env.level() << "]" << std::endl;
 
-  BOOST_FOREACH(utree const& e, env) {
-    out << "  " << e;
+  for (scope::size_type i = 0; i < env.size(); ++i) {
+    out << "  element[" << i << "]: " << env[i] << std::endl;
   }
 
   if (env.outer())
-    out << env.outer();
+    out << *env.outer();
 
   return out;
 }

@@ -9,6 +9,8 @@
 #include <boost/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
+#include <boost/spirit/home/prana/support/utree_function_cast.hpp>
+#include <boost/spirit/home/prana/support/utree_scope_io.hpp>
 #include <boost/spirit/home/prana/support/utree_predicates.hpp>
 #include <boost/spirit/home/prana/phxpr/core/arguments.hpp>
 #include <boost/spirit/home/prana/phxpr/core/variable_arguments.hpp>
@@ -207,11 +209,29 @@ struct trampoline_function: actor<trampoline_function> {
   }
   
   utree eval (scope const& env) const {
+//    std::cout << "====================================================" << std::endl
+//              << env << std::endl
+//              << "====================================================" << std::endl;
+
     scope const* outer = &env; // Get the parent scope.
 
-    while (ph->level != outer->level())
+    while ((ph->level - 1) != outer->level())
       outer = outer->outer();
-      
+
+//    std::cout << "outer level: " << outer->level() << std::endl;
+
+    BOOST_ASSERT(recursive_which(ph->body->f) == utree_type::function_type);
+
+    // FIXME: avoid dynamic_cast
+    stored_function<argument_function<true> > const* scoped_arg
+      = utree_function_cast<stored_function<argument_function<true> > >
+        (ph->body->f);
+
+    // REVIEW: handle unscoped arg, scoped varg and unscoped varg?
+    BOOST_ASSERT(scoped_arg);
+
+    utree real_f = scoped_arg->f.get(env);
+
     if (elements && !elements->empty()) {
       boost::scoped_array<utree> fargs(new utree[elements->size()]);
 
@@ -223,14 +243,11 @@ struct trampoline_function: actor<trampoline_function> {
 
       utree* fi = fargs.get();
 
-      utree real_f = ph->body->eval(env);
-      return real_f.eval(scope(fi, fi + elements->size()));
+      return real_f.eval(scope(fi, fi + elements->size(), outer));
     }
     
-    else {
-      utree real_f = ph->body->eval(env);
-      return real_f.eval(scope(0, 0));
-    }
+    else 
+      return real_f.eval(scope(0, 0, outer));
   }
 };
   

@@ -42,10 +42,28 @@ struct argument_function: actor<argument_function<scoped> > {
 
     utree const& arg = (*eptr)[n];
 
-    if (arg.which() != utree_type::function_type)
+    if (arg.which() != utree_type::function_type) {
+//      std::cout << "evaluating non-function" << std::endl
+//                << "scoped arg (n=" << n << " level=" << level << ") "
+//                << arg.which() << std::endl;
       return utree(boost::ref(arg));
-    else
+    }
+    else {
+//      std::cout << "evaluating function" << std::endl
+//                << "scoped arg (n=" << n << " level=" << level << ") "
+//                << arg.which() << std::endl;
       return arg.eval(*eptr);
+    }
+  }
+  
+  utree get (scope const& env) const {
+    scope const* eptr = &env;
+
+    while (level != eptr->level())
+      eptr = eptr->outer();
+
+    utree const& arg = (*eptr)[n];
+    return utree(boost::ref(arg));
   }
 };
 
@@ -65,6 +83,11 @@ struct argument_function<false>: actor<argument_function<false> > {
       return utree(boost::ref(arg));
     else 
       return arg.eval(env);
+  }
+  
+  utree get (scope const& env) const {
+    utree const& arg = env[n];
+    return utree(boost::ref(arg));
   }
 };
 
