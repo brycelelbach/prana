@@ -35,8 +35,17 @@ struct procedure: composite<procedure> {
   function compose (boost::shared_ptr<actor_list> const& actors) const {
     BOOST_ASSERT(body);
     return function(lambda_function
-      (actors, body, level), body->arity, body->fixed);
+      (actors, body, level), body->arity, body->fixed, level);
   }
+};
+
+struct placeholder: procedure {
+  explicit placeholder (boost::shared_ptr<function> const& body_,
+                        scope::size_type level_ = 0):
+    procedure(body_, level_) { }
+  
+  explicit placeholder (function const& body_, scope::size_type level_ = 0):
+    procedure(body_, level_) { }
 };
 
 } // phxpr
