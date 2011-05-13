@@ -1,19 +1,27 @@
-Prana is a C++ header-only library implementing a generic abstract syntax tree
-data structure called utree. It is designed to be portable and deployable on
-embedded systems. Prana is primarily intended to work with `the Boost.Spirit
-parser/generator framework <http://www.boost-spirit.com/home>`_.
+Prerequisites
+=============
+
+  * Kernel: Linux
+  * C++ compiler: `GCC <http://gcc.gnu.org>` (4.4.* or 4.5.*) or `Clang <http://clang.llvm.org>` (2.9+) 
+  * C++ standard library: `GNU libstdc++ <http://gcc.gnu.org/libstdc++/>` (4.4.* or 4.5.*)
+  * C standard library: `EGLIBC <http://www.eglibc.org/home>` (2.7.*+) or `glibc <http://www.gnu.org/s/libc>` (2.7.*+)
+  * `Boost C++ Libraries <http://www.boost.org>` (1.47.0+)
+  * `Boost Build <http://www.boost.org/boost-build2>` (v2+)
+
+Building
+========
+
+  0) Set the environmental variable BOOST_ROOT to point to your Boost source
+     tree:::
+
+      $ export BOOST_ROOT=/home/wash/boost
+
+  1) Invoke bjam:::
+
+      $ bjam -j40
 
 License
 =======
 
-Prana uses the `Boost Software License <http://www.boost.org/BOOST_LICENSE_1_0.rst>`_.
-A copy should be available in the credit directory of this repository.
- 
-Contact
-=======
-
-:Mailing List: `spirit.general <spirit-general@lists.sourceforge.net>`_
-:Repository: `utree at GitHub <http://github/brycelelbach/utree>`_
-:IRC: ##ariel at `irc.freenode.net <http://freenode.net>`_ 
-:POC: `Bryce Lelbach (aka wash) <admin@thefireflyproject.us>`_
+Prana uses the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
 
