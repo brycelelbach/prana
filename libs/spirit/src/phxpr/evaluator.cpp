@@ -10,7 +10,6 @@
 #include <boost/fusion/include/at_c.hpp>
 
 #include <boost/spirit/home/prana/support/utree_function_cast.hpp>
-#include <boost/spirit/home/prana/support/utree_scope_io.hpp>
 #include <boost/spirit/home/prana/support/utree_predicates.hpp>
 #include <boost/spirit/home/prana/phxpr/core/arguments.hpp>
 #include <boost/spirit/home/prana/phxpr/core/variable_arguments.hpp>
@@ -194,32 +193,33 @@ evaluator::~evaluator (void) {
   }
 }
 
+// TODO: Pass in more generic parameters instead of a placeholder instance
 struct trampoline_function: actor<trampoline_function> {
-  boost::shared_ptr<placeholder> ph;
   boost::shared_ptr<actor_list> elements;
+  boost::shared_ptr<placeholder> ph;
 
   typedef utree result_type;
 
-  trampoline_function (placeholder const& ph_,
-                       boost::shared_ptr<actor_list> const& elements_):
-    ph(new placeholder(ph_.body, ph_.level)), elements(elements_)
+  trampoline_function (boost::shared_ptr<actor_list> const& elements_,
+                       placeholder const& ph_):
+    elements(elements_), ph(new placeholder(ph_.body, ph_.level))
   {
-    BOOST_ASSERT(ph);
     BOOST_ASSERT(elements);
+    BOOST_ASSERT(ph);
   }
   
   utree eval (scope const& env) const {
-//    std::cout << "====================================================" << std::endl
-//              << env << std::endl
-//              << "====================================================" << std::endl;
+    // TODO: replace with exception
+    BOOST_ASSERT(ph);
 
     scope const* outer = &env; // Get the parent scope.
 
-    while ((ph->level - 1) != outer->level())
+    scope::size_type const level = (ph->level) ? (ph->level - 1) : 0;
+
+    while (level != outer->level())
       outer = outer->outer();
 
-//    std::cout << "outer level: " << outer->level() << std::endl;
-
+    // TODO: replace with exception
     BOOST_ASSERT(recursive_which(ph->body->f) == utree_type::function_type);
 
     // FIXME: avoid dynamic_cast
@@ -346,10 +346,9 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
     }
 
     // handle placeholder-as-procedure
-    if (at_c<0>(func)->second.target<placeholder>()) {
+    if (at_c<0>(func)->second.target<placeholder>())
       return trampoline_function
-        (*at_c<0>(func)->second.target<placeholder>(), flist);
-    }
+        (flist, *at_c<0>(func)->second.target<placeholder>());
 
     return (at_c<0>(func)->second)(flist);
   } // }}}
