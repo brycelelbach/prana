@@ -8,6 +8,7 @@
 #if !defined(BSP_6ADC238A_29FE_4E20_ABE6_EC49705D14C3)
 #define BSP_6ADC238A_29FE_4E20_ABE6_EC49705D14C3
 
+#include <boost/spirit/home/prana/support/utree_predicates.hpp>
 #include <boost/spirit/home/prana/phxpr/core/unary_function.hpp>
 #include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
 
@@ -24,12 +25,15 @@ struct display_function: unary_function<display_function> {
   typedef utree result_type;
 
   utree eval (utree const& subject) const {
-    if (subject.which() == utree_type::string_type ||
-        subject.which() == utree_type::string_range_type)
+    if (recursive_which(subject) == utree_type::string_type ||
+        recursive_which(subject) == utree_type::string_range_type)
     {
       utf8_string_range_type str = subject.get<utf8_string_range_type>();
       std::cout << std::string(str.begin(), str.end());
     }
+
+    else if (recursive_which(subject) == utree_type::function_type)
+      std::cout << "#function"; 
  
     else
       generate_sexpr(subject, std::cout);
