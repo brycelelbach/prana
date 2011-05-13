@@ -23,6 +23,8 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
+// TODO: make use of visit_ref
+
 std::string get_symbol(utree const& s) {
   if (s.which() != utree_type::symbol_type) {
     // TODO: make this an exception
@@ -42,6 +44,8 @@ bool is_define (utree const& item) {
 }
 
 struct evaluator_visitor {
+  // FIXME: use of visit_ref will mitigate the need for these members to be 
+  // mutable. 
   mutable environment<compiled_function>* variables;
   mutable environment<macro>* macros;
 
@@ -57,6 +61,10 @@ struct evaluator_visitor {
   evaluator_visitor (evaluator_visitor const& other):
     variables(other.variables),
     macros(other.macros) { } 
+
+  // forwarder
+  result_type operator() (utree const& ut) const
+  { return utree::visit(ut, *this); }
   
   result_type operator() (utree::invalid_type) const {
     // TODO: make this an exception
@@ -65,10 +73,10 @@ struct evaluator_visitor {
   }
 
   template<class T>
-  result_type operator() (T const& val) const {
-    return result_type(utree(val)); 
-  }
+  result_type operator() (T const& val) const
+  { return result_type(utree(val)); }
 
+  // TODO: move out-of-line
   result_type operator() (utf8_symbol_range_type const& str) const {
     // {{{ variable reference implementation
     using boost::fusion::at_c;
@@ -110,24 +118,23 @@ struct evaluator_visitor {
   template<class Iterator>
   result_type operator() (iterator_range<Iterator> const& range) const;
 
-  result_type operator() (any_ptr const& p) const {
+  result_type operator() (any_ptr const&) const {
     // TODO: make this an exception
     BOOST_ASSERT(false);
+    // REVIEW: right return type?
     return result_type();
   }
 
-  result_type operator() (function_base const& pf) const {
+  result_type operator() (function_base const&) const {
     // TODO: make this an exception
     BOOST_ASSERT(false);
+    // REVIEW: right return type?
     return result_type();
   }
 
-  // forwarder
-  result_type operator() (utree const& ut) const {
-    return utree::visit(ut, *this);
-  }
-
+  // TODO: move out-of-line
   result_type define_variable (utree const& ut) const {
+    // {{{ variable definitions
     utree::const_iterator it = ut.begin(), end = ut.end();
    
     // TODO: replace with exception
@@ -153,9 +160,11 @@ struct evaluator_visitor {
     func->level = r.level;
  
     return result_type();  
-  }
+  } // }}}
   
+  // TODO: move out-of-line
   result_type define_macro (utree const& ut) const {
+    // {{{ IMPLEMENT macro definitions
     utree::const_iterator it = ut.begin(), end = ut.end();
     
     // TODO: replace with exception
@@ -170,15 +179,36 @@ struct evaluator_visitor {
     // TODO: replace with exception (multiple definitions)
     BOOST_ASSERT(!macros->locally_defined(name));
 
-    // IMPLEMENT
-
     return result_type(); 
-  }
+  } // }}}
   
   result_type make_lambda (utree const& ut) const;
+
+  template<class Iterator>
+  result_type make_anonymous_call (iterator_range<Iterator> const& range) const 
+  { // {{{ anonymous lambda or indirect procedure call 
+    typename iterator_range<Iterator>::const_iterator it = range.begin(),
+                                                      end = range.end();
+
+    boost::shared_ptr<function> anon(new function);
+    *anon = utree::visit(*it, *this);
+    
+    ++it;
+
+    utree use(iterator_range<Iterator>(it, end), spirit::shallow);
+
+    boost::shared_ptr<actor_list> flist(new actor_list);
+
+    BOOST_FOREACH(utree const& e, use) {
+      flist->push_back(utree::visit(e, *this));
+    }
+
+    return lambda_function(flist, anon, variables->level()); 
+  } // }}}
 }; 
 
 evaluator::~evaluator (void) {
+  // {{{ tear down code for refcnt'd recursive calls
   if (variables.level() == 0) {
     // Clean up recursive calls. Without help, shared_ptr<> won't release
     // these properly.
@@ -191,10 +221,12 @@ evaluator::~evaluator (void) {
         e.second.target<placeholder>()->body->f.clear();
     } 
   }
-}
+} // }}}
 
+// REVIEW: Move me somewhere more appropriate?
 // TODO: Pass in more generic parameters instead of a placeholder instance
 struct trampoline_function: actor<trampoline_function> {
+  // {{{ procedure call trampoline
   boost::shared_ptr<actor_list> elements;
   boost::shared_ptr<placeholder> ph;
 
@@ -249,8 +281,52 @@ struct trampoline_function: actor<trampoline_function> {
     else 
       return real_f.eval(scope(0, 0, outer));
   }
-};
+}; // }}}
+
+struct argument_visitor {
+  // {{{ visitor that places trampolines for anonymous function arguments
+  // FIXME: use of visit_ref will mitigate the need for this member to be 
+  // mutable. 
+  mutable evaluator_visitor* eval; 
+ 
+  typedef evaluator_visitor::result_type result_type;
+
+  argument_visitor (void): eval(0) { }
+
+  argument_visitor (evaluator_visitor* eval_):
+    eval(eval_) { }
+
+  argument_visitor (argument_visitor const& other):
+    eval(other.eval) { }
   
+  // forwarder
+  result_type operator() (utree const& ut) const
+  { return utree::visit(ut, *this); }
+  
+  result_type operator() (utree::invalid_type ivld) const
+  { return (*eval)(ivld); }
+  
+  template<class T>
+  result_type operator() (T const& val) const
+  { return (*eval)(val); }
+  
+  result_type operator() (utf8_symbol_range_type const& str) const
+  { return (*eval)(str); }
+  
+  template<class Iterator>
+  result_type operator() (iterator_range<Iterator> const& range) const {
+    // {{{ IMPLEMENT special handling for lambda expressions as arguments
+    return result_type();
+  } // }}}
+
+  result_type operator() (any_ptr const& p) const
+  { return (*eval)(p); }
+
+  result_type operator() (function_base const& pf) const
+  { return (*eval)(pf); }
+  // }}}
+};
+ 
 template<class Iterator>
 evaluator_visitor::result_type
 evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
@@ -263,24 +339,8 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
   // TODO: replace with exception
   BOOST_ASSERT(it != end);
 
-  // TODO: consider moving this to a separate method
-  // {{{ anonymous lambda or indirect procedure call 
-  if (is_utree_container(*it)) {
-    boost::shared_ptr<function> anon(new function);
-    *anon = utree::visit(*it, *this);
-    
-    ++it;
-
-    utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
-
-    boost::shared_ptr<actor_list> flist(new actor_list);
-
-    BOOST_FOREACH(utree const& e, use) {
-      flist->push_back(utree::visit(e, *this));
-    }
-
-    return lambda_function(flist, anon, variables->level()); 
-  } // }}}
+  if (is_utree_container(*it))
+    return make_anonymous_call(range);
 
   std::string sym = get_symbol(*it);
   ++it;
@@ -295,12 +355,12 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
   }
 
   if (sym == "variable") {
-    utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+    utree body(iterator_range<Iterator>(it, end), spirit::shallow);
     return define_variable(body);
   }
 
   if (sym == "macro") {
-    utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+    utree body(iterator_range<Iterator>(it, end), spirit::shallow);
     return define_macro(body);
   }
 
@@ -308,17 +368,18 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
     return quote(*it);
 
   if (sym == "lambda") {
-    utree body(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+    utree body(iterator_range<Iterator>(it, end), spirit::shallow);
     return make_lambda(body);
   }
 
+  // IMPLEMENT: move to a separate method
   { // {{{ macro expansion
     fusion::vector3<
       environment<macro>::const_iterator, bool, scope::size_type
     > macro = (*macros)[sym];
 
     if (at_c<1>(macro)) {
-      utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+      utree use(iterator_range<Iterator>(it, end), spirit::shallow);
 
       boost::shared_ptr<matcher> match = at_c<0>(macro)->second.match(use);
 
@@ -331,17 +392,22 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
     }
   } // }}}
 
+  // IMPLEMENT: move to a separate method
   // {{{ function creation
   fusion::vector3<
     environment<compiled_function>::const_iterator, bool, scope::size_type
   > func = (*variables)[sym];
 
   if (at_c<1>(func)) {
-    utree use(iterator_range<Iterator>(it, range.end()), spirit::shallow);
+    utree use(iterator_range<Iterator>(it, end), spirit::shallow);
 
     boost::shared_ptr<actor_list> flist(new actor_list);
     
     BOOST_FOREACH(utree const& e, use) {
+      // TODO: using visit_ref will replace the need for this const_cast
+      /* IMPLEMENT: uncomment when argument_visitor is implemented
+      argument_visitor arg_visitor(const_cast<evaluator*>(&evaluator_visitor)); 
+      flist->push_back(utree::visit(e, arg_visitor)); */
       flist->push_back(utree::visit(e, *this));
     }
 
@@ -403,8 +469,8 @@ evaluator_visitor::make_lambda (utree const& ut) const {
     return function
       (begin(flist).f, ut.front().size(), fixed_arity, local.variables.level());
   else
-    return function
-      (flist->front().f, ut.front().size(), fixed_arity, local.variables.level());
+    return function(flist->front().f,
+      ut.front().size(), fixed_arity, local.variables.level());
 }
 
 } // phxpr
