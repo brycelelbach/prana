@@ -5,7 +5,6 @@
 //  file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <typeinfo>
 #include <boost/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
@@ -23,6 +22,8 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
+// TODO: don't use temporary utree ranges!
+// TODO: return shared_ptr<>s to functions instead of functions
 // TODO: make use of visit_ref
 
 std::string get_symbol(utree const& s) {
@@ -76,7 +77,6 @@ struct evaluator_visitor {
   result_type operator() (T const& val) const
   { return result_type(utree(val)); }
 
-  // TODO: move out-of-line
   result_type operator() (utf8_symbol_range_type const& str) const {
     // {{{ variable reference implementation
     using boost::fusion::at_c;
@@ -132,7 +132,6 @@ struct evaluator_visitor {
     return result_type();
   }
 
-  // TODO: move out-of-line
   result_type define_variable (utree const& ut) const {
     // {{{ variable definitions
     utree::const_iterator it = ut.begin(), end = ut.end();
@@ -162,7 +161,6 @@ struct evaluator_visitor {
     return result_type();  
   } // }}}
   
-  // TODO: move out-of-line
   result_type define_macro (utree const& ut) const {
     // {{{ IMPLEMENT macro definitions
     utree::const_iterator it = ut.begin(), end = ut.end();
@@ -204,6 +202,39 @@ struct evaluator_visitor {
     }
 
     return lambda_function(flist, anon, variables->level()); 
+  } // }}}
+
+  template<class Iterator>
+  fusion::vector2<result_type, bool>
+  make_named_call (std::string const& sym,
+                   iterator_range<Iterator> const& range) const;
+
+  template<class Iterator>
+  fusion::vector2<result_type, bool>
+  expand_macro (std::string const& sym,
+                iterator_range<Iterator> const& range) const
+  { // {{{ macro expansion implementation
+    using boost::fusion::at_c;
+
+    fusion::vector3<
+      environment<macro>::const_iterator, bool, scope::size_type
+    > macro = (*macros)[sym];
+
+    if (at_c<1>(macro)) {
+      utree use(range, spirit::shallow);
+
+      boost::shared_ptr<matcher> match = at_c<0>(macro)->second.match(use);
+
+      if (match) {
+        boost::shared_ptr<utree> expansion = match->expand();
+        // TODO: make this an exception
+        BOOST_ASSERT(expansion);
+        return fusion::vector2<result_type, bool>
+          (utree::visit(*expansion, *this), true);
+      }
+    }
+
+    return fusion::vector2<result_type, bool>(result_type(), false);
   } // }}}
 }; 
 
@@ -328,6 +359,43 @@ struct argument_visitor {
 };
  
 template<class Iterator>
+fusion::vector2<evaluator_visitor::result_type, bool>
+evaluator_visitor::make_named_call (std::string const& sym,
+                                    iterator_range<Iterator> const& range) const
+{ // {{{ function creation
+  using boost::fusion::at_c;
+  
+  fusion::vector3<
+    environment<compiled_function>::const_iterator, bool, scope::size_type
+  > func = (*variables)[sym];
+
+  if (at_c<1>(func)) {
+    // TODO: 
+    utree use(range, spirit::shallow);
+
+    boost::shared_ptr<actor_list> flist(new actor_list);
+    
+    BOOST_FOREACH(utree const& e, use) {
+      // TODO: using visit_ref will replace the need for this const_cast
+      /* IMPLEMENT: uncomment when argument_visitor is implemented
+      argument_visitor arg_visitor(const_cast<evaluator*>(&evaluator_visitor)); 
+      flist->push_back(utree::visit(e, arg_visitor)); */
+      flist->push_back(utree::visit(e, *this));
+    }
+
+    // handle placeholder-as-procedure
+    if (at_c<0>(func)->second.target<placeholder>())
+      return fusion::vector2<result_type, bool>(trampoline_function
+        (flist, *at_c<0>(func)->second.target<placeholder>()), true);
+
+    return fusion::vector2<result_type, bool>
+      ((at_c<0>(func)->second)(flist), true);
+  }
+
+  return fusion::vector2<result_type, bool>(result_type(), false);
+} // }}}
+
+template<class Iterator>
 evaluator_visitor::result_type
 evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
   // {{{ nary variable/macro implementation
@@ -372,52 +440,18 @@ evaluator_visitor::operator() (iterator_range<Iterator> const& range) const {
     return make_lambda(body);
   }
 
-  // IMPLEMENT: move to a separate method
-  { // {{{ macro expansion
-    fusion::vector3<
-      environment<macro>::const_iterator, bool, scope::size_type
-    > macro = (*macros)[sym];
+  fusion::vector2<result_type, bool> r
+    = expand_macro(sym, iterator_range<Iterator>(it, end));
 
-    if (at_c<1>(macro)) {
-      utree use(iterator_range<Iterator>(it, end), spirit::shallow);
+  // expand_macro evalutes the expansion, so if a macro was found, we're done. 
+  if (at_c<1>(r))
+    return at_c<0>(r);
 
-      boost::shared_ptr<matcher> match = at_c<0>(macro)->second.match(use);
+  r = make_named_call(sym, iterator_range<Iterator>(it, end));
 
-      if (match) {
-        boost::shared_ptr<utree> expansion = match->expand();
-        // TODO: make this an exception
-        BOOST_ASSERT(expansion);
-        return utree::visit(*expansion, *this);
-      }
-    }
-  } // }}}
-
-  // IMPLEMENT: move to a separate method
-  // {{{ function creation
-  fusion::vector3<
-    environment<compiled_function>::const_iterator, bool, scope::size_type
-  > func = (*variables)[sym];
-
-  if (at_c<1>(func)) {
-    utree use(iterator_range<Iterator>(it, end), spirit::shallow);
-
-    boost::shared_ptr<actor_list> flist(new actor_list);
-    
-    BOOST_FOREACH(utree const& e, use) {
-      // TODO: using visit_ref will replace the need for this const_cast
-      /* IMPLEMENT: uncomment when argument_visitor is implemented
-      argument_visitor arg_visitor(const_cast<evaluator*>(&evaluator_visitor)); 
-      flist->push_back(utree::visit(e, arg_visitor)); */
-      flist->push_back(utree::visit(e, *this));
-    }
-
-    // handle placeholder-as-procedure
-    if (at_c<0>(func)->second.target<placeholder>())
-      return trampoline_function
-        (flist, *at_c<0>(func)->second.target<placeholder>());
-
-    return (at_c<0>(func)->second)(flist);
-  } // }}}
+  // if we found a named procedure, return it. 
+  if (at_c<1>(r))
+    return at_c<0>(r); 
 
   // TODO: replace with exception (identifier not found error)
   BOOST_ASSERT(false);
