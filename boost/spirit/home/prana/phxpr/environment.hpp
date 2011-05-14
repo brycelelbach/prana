@@ -23,6 +23,9 @@ namespace spirit {
 namespace prana {
 namespace phxpr {
 
+// REVIEW: We can possibly drop the third element of the fusion vector returned
+// by operator[] at some point, it's only needed for debugging and may be
+// extraneous. 
 template<class Value, class Key = std::string,
          class Hash = boost::hash<Key>, class Pred = std::equal_to<Key> >
 struct environment {
