@@ -12,9 +12,7 @@
 
 #include <phxpr/config.hpp>
 
-#include <boost/array.hpp>
-
-#include <boost/spirit/include/support_utree.hpp>
+#include <prana/include/utree.hpp>
 
 namespace phxpr {
 

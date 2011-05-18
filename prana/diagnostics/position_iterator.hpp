@@ -94,13 +94,13 @@ class position_iterator: public boost::iterator_adaptor<
 };
 
 template<class Iterator>
-inline source_location get_location (Iterator i) {
+inline source_location get_location (Iterator const& i) {
   source_location loc = {-1, -1};
   return loc;
 }
 
 template<class Iterator>
-inline source_location get_location (position_iterator<Iterator> i) {
+inline source_location get_location (position_iterator<Iterator> const& i) {
   return i.location();
 }
 

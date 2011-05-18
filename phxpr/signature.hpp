@@ -27,7 +27,7 @@ struct function_type {
   typedef boost::uint8_t integral;
 };
 
-struct arity_class {
+struct arity_type {
   enum info {
     fixed    = 0,
     variable = 1
@@ -46,8 +46,9 @@ struct evaluation_strategy {
 
 typedef std::size_t displacement;
 
-typedef boost::fusion::vector3<displacement, arity_class, evaluation_stategy>
-  signature;
+typedef boost::fusion::vector3<
+  displacement, arity_type::info, evaluation_strategy::info
+> signature;
 
 } // phxpr
 

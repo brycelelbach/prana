@@ -36,6 +36,7 @@ utree evaluate (utree const& ut) {
 utree evaluate (utree const& ut, evaluator& ev) {
   return utree::visit(ut, prana::visit_ref(ev));
 }
+// }}}
 
 } // phxpr
 

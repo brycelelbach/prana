@@ -16,195 +16,83 @@ int main (void) {
   using prana::parse_tree;
   using prana::tag::sexpr;
 
-  std::cout << "nil test: " << std::endl; 
-
   { 
-    std::string in = "nil";
-
+    const std::string in = "nil";
     parse_tree<sexpr> pt(in);
-
     SHEOL_TEST_STREQ(pt.ast(), "nil");
   }
 
-#if 0
-  std::cout << std::endl << "boolean test: " << std::endl; 
-
-  { //[boolean
-    std::string in = "#t";
-
+  { 
+    const std::string in = "#t";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "#t");
   }
 
-  std::cout << std::endl << "integer dec test: " << std::endl; 
-
-  { //[integer_dec
-    std::string in = "10";
-
+  { 
+    const std::string in = "10";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
-  }
-  
-  std::cout << std::endl << "integer hex test: " << std::endl; 
-
-  { //[integer_hex
-    std::string in = "#x10";
-
-    parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("16")))
-    //]  
-  }
-  
-  std::cout << std::endl << "integer oct test: " << std::endl; 
-
-  { //[integer_oct
-    std::string in = "#o10";
-
-    parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("8")))
-    //]  
-  }
-  
-  std::cout << std::endl << "floating test: " << std::endl; 
-
-  { //[floating
-    std::string in = "17.5";
-
-    parse_tree<sexpr> pt(in);
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "10");
   }
 
-  std::cout << std::endl << "string test: " << std::endl; 
-
-  { //[string
-    std::string in = "\"foo\"";
-
+  { 
+    const std::string in = "#x10";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
-  }
-  
-  std::cout << std::endl << "empty string test: " << std::endl; 
-
-  { //[empty_string
-    std::string in = "\"\"";
-
-    parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "16");
   }
 
-  std::cout << std::endl << "string double-quote character test: " << std::endl; 
-
-  { //[string_double_quote_character
-    std::string in = "(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")";
-
+  { 
+    const std::string in = "#o10";
     parse_tree<sexpr> pt(in);
-    
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")")))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "8");
   }
 
-  std::cout << std::endl << "binary test: " << std::endl; 
-
-  { //[binary
-    std::string in = "#\xDE\xAD\xBE\xEF#";
-
+  { 
+    const std::string in = "17.5";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "17.5");
   }
 
-  std::cout << std::endl << "empty binary test: " << std::endl; 
-
-  { //[empty_binary
-    std::string in = "##";
-
+  { 
+    const std::string in = "\"foo\"";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
-  }
-  
-  std::cout << std::endl << "binary hash character test: " << std::endl; 
-
-  { //[binary_hash_character
-    std::string in = "(### #\xBE## ##\xEF# #\xBE#\xEF#)";
-
-    parse_tree<sexpr> pt(in);
-    
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "\"foo\"");
   }
 
-  std::cout << std::endl << "symbol test: " << std::endl; 
-
-  { //[symbol
-    std::string in = "bar";
-
+  { 
+    const std::string in = "\"\"";
     parse_tree<sexpr> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) (in)))
-    //]  
+    SHEOL_TEST_STREQ(pt.ast(), "\"\"");
   }
-#endif
+
+  { 
+    const std::string in = "(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")";
+    parse_tree<sexpr> pt(in);
+    SHEOL_TEST_STREQ(pt.ast(), "(\"\"\" \"a\"\" \"\"b\" \"a\"b\")");
+  }
+
+  { 
+    const std::string in = "#\xDE\xAD\xBE\xEF#";
+    parse_tree<sexpr> pt(in);
+    SHEOL_TEST_STREQ(pt.ast(), "#\xDE\xAD\xBE\xEF#");
+  }
+
+  { 
+    const std::string in = "##";
+    parse_tree<sexpr> pt(in);
+    SHEOL_TEST_STREQ(pt.ast(), "##");
+  }
+
+  { 
+    const std::string in = "(### #\xBE## ##\xEF# #\xBE#\xEF#)";
+    parse_tree<sexpr> pt(in);
+    SHEOL_TEST_STREQ(pt.ast(), "(### #\xBE## ##\xEF# #\xBE#\xEF#)"); 
+  }
+
+  { 
+    const std::string in = "bar";
+    parse_tree<sexpr> pt(in);
+    SHEOL_TEST_STREQ(pt.ast(), "bar");
+  }
   
   return sheol::report_errors();
 }

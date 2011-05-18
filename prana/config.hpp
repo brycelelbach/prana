@@ -8,11 +8,14 @@
 #if !defined(PRANA_8C480E0F_D712_439D_8CF3_D542475E6F12)
 #define PRANA_8C480E0F_D712_439D_8CF3_D542475E6F12
 
-#include <boost/config.hpp>
-
 #include <sheol/config.hpp>
 
 #define BOOST_SPIRIT_DISABLE_UTREE_IO
+
+// Decltype-based result_of won't work with Spirit style CPs.
+#if defined(BOOST_RESULT_OF_USE_DECLTYPE)
+  #undef BOOST_RESULT_OF_USE_DECLTYPE
+#endif
 
 // For the time being, visit_ref can't use a nested result template because of
 // utree limitations.

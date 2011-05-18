@@ -84,7 +84,10 @@ struct sexpr_printer {
 
     (*this)('(');
 
-    utree::visit(*it, *this);
+    if (it != end) {
+      utree::visit(*it, *this);
+      ++it;
+    }
 
     for (; it != end; ++it) {
       out << ' ';

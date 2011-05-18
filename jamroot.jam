@@ -11,24 +11,27 @@ import os ;
 import testing ;
 
 local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
+local SHEOL_ROOT = [ os.environ SHEOL_ROOT ] ;
 
 variant valgrind : <testing.launcher>valgrind ;
 
 use-project /boost : $(BOOST_ROOT) ;
+use-project /sheol : $(SHEOL_ROOT) ;
 
-use-project /prana          : libs/spirit/build ;
-use-project /prana_test     : libs/spirit/test ;
-use-project /prana_example  : libs/spirit/example ;
+use-project /prana : build ;
+use-project /prana_tests : test/phxpr ;
+use-project /phxpr_tests : test/phxpr ;
 
 project 
   : requirements
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
-    <include>./
+    <warnings>on
+    <include>.
+    <include>$(SHEOL_ROOT)
     <include>$(BOOST_ROOT)
   : build-dir bin.v2
   ;
 
-build-project libs/spirit/build ;
-build-project libs/spirit/test ;
-build-project libs/spirit/example ;
+build-project test/prana ;
+build-project test/phxpr ;
 

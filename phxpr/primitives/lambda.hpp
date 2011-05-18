@@ -10,12 +10,9 @@
 #if !defined(PHXPR_F580B218_70FD_42EE_991F_52BA7814C51C)
 #define PHXPR_F580B218_70FD_42EE_991F_52BA7814C51C
 
-#include <phxpr/config.hpp>
-
-#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <phxpr/signature.hpp>
-#include <phxpr/primitives/function_body.hpp>
 #include <phxpr/primitives/procedure.hpp>
 
 namespace phxpr {
@@ -23,18 +20,24 @@ namespace phxpr {
 struct lambda: actor<lambda> {
   boost::shared_ptr<function_body> body;
   signature sig;
-  displacement num_locals;
+  displacement num_local_vars;
+  
+  lambda (function_body const& body_, signature const& sig_,
+          displacement num_local_vars_ = 0):
+    body(boost::make_shared<function_body>(body_)), sig(sig_),
+    num_local_vars(num_local_vars_)
+  { BOOST_ASSERT(body); }
 
   lambda (boost::shared_ptr<function_body> const& body_, signature const& sig_,
-          displacement num_locals_)
-    body(body_), sig(sig_), num_locals(num_locals_)
+          displacement num_local_vars_ = 0):
+    body(body_), sig(sig_), num_local_vars(num_local_vars_)
   { BOOST_ASSERT(body); }
   
   utree eval (scope const& env) const {
     BOOST_ASSERT(body);
 
     function_base* pf = new stored_function<procedure>
-      (body, sig, num_locals, env.checkout());
+      (procedure(body, env, sig, num_local_vars));
 
     return utree(pf); 
   }

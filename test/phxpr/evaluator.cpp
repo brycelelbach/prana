@@ -1,16 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2010-2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753)
-#define PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753
+#include <sheol/lightweight_test.hpp>
 
-#include <prana/config.hpp>
+#include <phxpr/evaluator.hpp>
 
-#include <phxpr/config/using.hpp>
+using phxpr::evaluator;
 
-#endif // PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753
+int main (void) {
+  evaluator e;
+
+  return sheol::report_errors();
+}
 

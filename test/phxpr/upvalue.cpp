@@ -1,6 +1,11 @@
-#include <iostream>
+////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/detail/lightweight_test.hpp>
+#include <sheol/lightweight_test.hpp>
 
 #include <phxpr/upvalue.hpp>
 
@@ -14,32 +19,30 @@ using phxpr::upvalue6;
 using phxpr::upvalue7;
 using phxpr::upvalue8;
 
-struct object {
+struct item {
   std::string name;
 
-  object (std::string const& name_ = "#<anonymous>"): name(name_)
+  item (std::string const& name_ = "#<anonymous>"): name(name_)
   { std::cout << "constructing " << name << std::endl; }
 
-  object (object const& other): name(other.name)
+  item (item const& other): name(other.name)
   { std::cout << "copy constructing " << name << std::endl; }
 
-  ~object (void)
+  ~item (void)
   { std::cout << "destroying " << name << std::endl; }
 };
 
 int main (void) {
-  upvalue0<object> up0;
-  upvalue1<object, object> up1;
-  upvalue2<object, object, object> up2;
-  upvalue3<object, object, object, object> up3;
-  upvalue4<object, object, object, object, object> up4;
-  upvalue5<object, object, object, object, object, object> up5;
-  upvalue6<object, object, object, object, object, object, object> up6;
-  upvalue7<object, object, object, object, object, object, object, object> up7;
-  upvalue8<object, object, object, object, object, object, object, object, object> up8;
+  upvalue0<item> up0;
+  upvalue1<item, item> up1;
+  upvalue2<item, item, item> up2;
+  upvalue3<item, item, item, item> up3;
+  upvalue4<item, item, item, item, item> up4;
+  upvalue5<item, item, item, item, item, item> up5;
+  upvalue6<item, item, item, item, item, item, item> up6;
+  upvalue7<item, item, item, item, item, item, item, item> up7;
+  upvalue8<item, item, item, item, item, item, item, item, item> up8;
 
-  BOOST_TEST(true);
-
-  return boost::report_errors();
+  return sheol::report_errors();
 }
 

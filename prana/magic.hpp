@@ -138,7 +138,7 @@ struct extract_source_location_from_node {
     using fusion::at_c;
     switch (ut.which()) {
       case utree_type::reference_type:
-        return call(ut.deref());
+        return call(ut.deref(), pt);
       case utree_type::range_type:
       case utree_type::list_type:
         return at_c<0>(pt.annotations()[ut.tag()]);

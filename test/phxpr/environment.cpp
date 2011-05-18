@@ -1,26 +1,31 @@
-#include <iostream>
+////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/detail/lightweight_test.hpp>
+#include <sheol/lightweight_test.hpp>
 
 #include <phxpr/environment.hpp>
 
 using phxpr::environment;
 
-struct object {
+struct item {
   std::string name;
 
-  object (std::string const& name_ = "#<anonymous>"): name(name_)
+  item (std::string const& name_ = "#<anonymous>"): name(name_)
   { std::cout << "constructing " << name << std::endl; }
 
-  object (object const& other): name(other.name)
+  item (item const& other): name(other.name)
   { std::cout << "copy constructing " << name << std::endl; }
 
-  ~object (void)
+  ~item (void)
   { std::cout << "destroying " << name << std::endl; }
 };
 
 int main (void) {
-  typedef environment<object> env_type;
+  typedef environment<item> env_type;
   typedef env_type::mapped_type mapped_type;
 
   char const* foo = "foo";
@@ -31,11 +36,11 @@ int main (void) {
   {
     env_type e;
 
-    a = e.define(foo_rng, object("foo"));
+    a = e.define(foo_rng, item("foo"));
   }
 
-  BOOST_TEST_EQ(a->name, "foo");
+  SHEOL_TEST_EQ(a->name, "foo");
 
-  return boost::report_errors();
+  return sheol::report_errors();
 }
 

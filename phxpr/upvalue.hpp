@@ -10,7 +10,7 @@
   #define PHXPR_7EDDE724_AD86_4E01_98C4_C450676309BA
   
   #include <phxpr/config.hpp>
-  
+
   #include <prana/support/safe_bool.hpp>
   
   #include <boost/swap.hpp>
@@ -31,7 +31,7 @@
   namespace phxpr {
  
   #define BOOST_PP_ITERATION_PARAMS_1                 \
-    (3, (1, PHXPR_ARITY_LIMIT, <phxpr/upvalue.hpp>))  \
+    (3, (1, PRANA_ARITY_LIMIT, <phxpr/upvalue.hpp>))  \
     /***/
 
   template <typename T>
