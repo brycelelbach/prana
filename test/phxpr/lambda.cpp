@@ -36,18 +36,23 @@ struct addition_function {
 int main (void) {
   evaluator e;
 
+  // specify the lambda signature 
   signature sig(2, arity_type::fixed, evaluation_strategy::call_by_value);  
 
+  // allocate the lambda body
   boost::shared_ptr<function_body> body
     = boost::make_shared<function_body>(addition_function());
 
+  // create a new lambda expression
   lambda l(body, sig);
 
-  // evaluate the lambda expression
+  // evaluate the lambda expression, returning a procedure
   utree proc = l.eval(scope());
 
+  // create our arguments
   boost::array<utree, 2> args = { { utree(2), utree(4) } };
 
+  // call the procedure
   utree result = proc.eval(scope(args.begin(), args.end()));
 
   std::cout << result << std::endl;

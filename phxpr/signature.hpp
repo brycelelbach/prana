@@ -18,10 +18,11 @@ namespace phxpr {
 
 struct function_type {
   enum info {
-    derived     = 0,
-    lambda      = 1,
-    placeholder = 2,
-    procedure   = 3
+    derived         = 0,
+    lambda          = 1,
+    placeholder     = 2,
+    local_variable  = 3,
+    procedure       = 4
   };
 
   typedef boost::uint8_t integral;

@@ -28,6 +28,14 @@ struct invalid_arity: virtual exception {
     expected(expected_), got(got_), type(type_) { }
 };
 
+struct invalid_local_variable: virtual exception {
+  displacement expected;
+  displacement got;
+
+  invalid_local_variable (displacement expected_, displacement got_):
+    expected(expected_), got(got_) { }
+};
+
 struct unsupported_arity_type: virtual exception {
   arity_type::info type;
 
