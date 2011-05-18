@@ -11,40 +11,37 @@
 
 #include <phxpr/evaluator.hpp>
 #include <phxpr/primitives/lambda.hpp>
-#include <phxpr/primitives/placeholder.hpp>
+#include <phxpr/primitives/binary.hpp>
 
 using boost::spirit::utree;
 using boost::spirit::scope;
 
 using phxpr::evaluator;
 using phxpr::lambda;
-using phxpr::placeholder;
 using phxpr::function_body;
 
 using phxpr::signature;
 using phxpr::displacement;
 using phxpr::arity_type;
 using phxpr::evaluation_strategy;
+using phxpr::binary;
 
-struct addition_function {
-  utree operator() (scope const& env) const {
-    BOOST_ASSERT(env.size() == 2);
-    return env[0] + env[1];
-  }
+struct addition_function: binary<addition_function> {
+  utree eval (utree const& lhs, utree const& rhs) const
+  { return lhs + rhs; }
 };
 
 int main (void) {
   evaluator e;
 
-  // specify the lambda signature 
-  signature sig(2, arity_type::fixed, evaluation_strategy::call_by_value);  
+  addition_function add;
 
   // allocate the lambda body
   boost::shared_ptr<function_body> body
-    = boost::make_shared<function_body>(addition_function());
+    = boost::make_shared<function_body>(add);
 
   // create a new lambda expression
-  lambda l(body, sig);
+  lambda l(body, add.sig);
 
   // evaluate the lambda expression, returning a procedure
   utree proc = l.eval(scope());
