@@ -25,5 +25,5 @@ Building
 License
 =======
 
-Prana uses the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
+Prana and Phxpr use the `Boost Software License <http://www.boost.org/LICENSE_1_0.txt>`_.
 
