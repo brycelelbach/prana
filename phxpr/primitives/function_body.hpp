@@ -12,7 +12,10 @@
 
 #include <phxpr/config.hpp>
 
+#include <boost/make_shared.hpp>
 #include <boost/ref.hpp>
+
+#include <sheol/adt/dynamic_array.hpp>
 
 #include <phxpr/primitives/actor.hpp>
 
@@ -21,25 +24,39 @@
 namespace phxpr {
 
 struct function_body: actor<function_body> {
-  utree code;
+  typedef sheol::adt::dynamic_array<utree> code_type;
+
+  boost::shared_ptr<code_type> code;
 
   function_body (void): code() { }
 
-  function_body (utree const& code_):
-    code(code_) { }
+  function_body (utree const& code_): code(boost::make_shared<code_type>())
+  { code->push_back(code_); }
+  
+  function_body (boost::shared_ptr<code_type> const& code_): code(code_) { }
 
-  function_body (function_body const& other):
-    code(other.code) { }
+  function_body (function_body const& other): code(other.code) { }
 
   template <typename F>
-  function_body (F const& code_):
-    code(stored_function<F>(code_)) { }
+  function_body (F const& code_): code(boost::make_shared<code_type>())
+  { code->push_back(utree(stored_function<F>(code_))); }
 
   utree eval (scope const& env) const {
-    if (prana::recursive_which(code) == utree_type::function_type)
-      return code.eval(env);
+    BOOST_ASSERT(code);
+    BOOST_ASSERT(code->size());
+
+    code_type::size_type i = 0;
+    const code_type::size_type end = code->size();
+
+    for (; i != (end - 1); ++i) {
+      if (prana::recursive_which((*code)[i]) == utree_type::function_type)
+        (*code)[i].eval(env);
+    }
+
+    if (prana::recursive_which((*code)[end - 1]) == utree_type::function_type)
+      return (*code)[end - 1].eval(env);
     else
-      return utree(boost::ref(code));
+      return utree(boost::ref((*code)[end - 1]));
   }
 };
 

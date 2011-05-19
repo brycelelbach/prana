@@ -11,15 +11,45 @@
 #include <prana/utree/predicates.hpp>
 #include <phxpr/evaluator.hpp>
 #include <phxpr/exception.hpp>
+#include <phxpr/primitives/lambda.hpp>
+#include <phxpr/primitives/placeholder.hpp>
 
 namespace phxpr {
 
 // {{{ internal evaluator algorithms
 evaluator::result_type
-evaluate_lambda_expression (evaluator& ev, utree const& formals,
-                            evaluator::range_type const& body)
+evaluate_lambda_body (utree const& body, evaluator& ev) {
+  // IMPLEMENT
+  return evaluator::result_type();
+}
+
+// IMPLEMENT: handle variable arguments
+void make_placeholder (utree const& formals, evaluator& ev) {
+  typedef utree::const_iterator iterator;
+
+  iterator it = formals.begin(), end = formals.end();
+
+  for (utree::size_type i = 0, end = formals.size(); i != end; ++i, ++it) {
+    if (prana::recursive_which(*it) != utree_type::symbol_type)
+      BOOST_THROW_EXCEPTION(expected_identifier(*it)); 
+
+    boost::shared_ptr<utree> p = ev.variables->define(*it, utree
+      (stored_function<placeholder>(placeholder(i, ev.frame)))); 
+
+    const signature sig(i, arity_type::fixed,
+                        evaluation_strategy::call_by_value, 
+                        function_type::placeholder);
+
+    ev.global_procedure_table->push_back(sig);
+    p->tag(ev.global_procedure_table->size());
+  }
+}
+
+evaluator::result_type
+evaluate_lambda_expression (utree const& formals,
+                            evaluator::range_type const& body, evaluator& ev)
 {
-  evaluator local_env(ev.variables, ev.global_procedure_table, ev.frame);
+  evaluator local_env(ev.variables, ev.global_procedure_table, ev.frame + 1);
 
   if (!prana::is_utree_container(formals))
     BOOST_THROW_EXCEPTION(expected_formals_list(formals));
@@ -32,15 +62,43 @@ evaluate_lambda_expression (evaluator& ev, utree const& formals,
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
                       function_type::lambda);
 
-  // IMPLEMENT
-  return evaluator::result_type();
+  make_placeholder(formals, local_env);
+
+  boost::shared_ptr<function_body> fbody = boost::make_shared<function_body>();
+
+  typedef evaluator::range_type::const_iterator iterator;
+
+  iterator it = body.begin(), end = body.end();
+
+  if (it != end)
+    BOOST_THROW_EXCEPTION(expected_body(utree(body))); 
+
+  for (; it != end; ++it) {
+    utree f = evaluate_lambda_body(*it, local_env);
+    fbody->code->push_back(f);
+  }
+
+  lambda l(fbody, sig);
+
+  local_env.global_procedure_table->push_back(sig);
+
+  utree ut = stored_function<lambda>(l);
+  ut.tag(local_env.global_procedure_table->size());
+
+  return ut; 
 }
 // }}}
 
 evaluator::result_type
 evaluator::operator() (evaluator::symbol_type const& str) {
-  // IMPLEMENT
-  return result_type();
+  using boost::fusion::at_c;
+
+  boost::shared_ptr<utree> p = variables->lookup(utree(str));
+
+  if (!p)
+    BOOST_THROW_EXCEPTION(identifier_not_found(utree(str)));
+
+  return *p;
 }
 
 evaluator::result_type
@@ -67,7 +125,7 @@ evaluator::operator() (evaluator::range_type const& range) {
     if (*it == "lambda") {
       iterator formals = it; ++formals;
       iterator body = formals; ++body; 
-      return evaluate_lambda_expression(*this, *formals, range_type(body, end)); 
+      return evaluate_lambda_expression(*formals, range_type(body, end), *this); 
     }
 
     else {

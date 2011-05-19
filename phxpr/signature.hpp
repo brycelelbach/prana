@@ -21,8 +21,7 @@ struct function_type {
     derived         = 0,
     lambda          = 1,
     placeholder     = 2,
-    local_variable  = 3,
-    procedure       = 4
+    procedure       = 3
   };
 
   typedef boost::uint8_t integral;

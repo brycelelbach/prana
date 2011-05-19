@@ -92,6 +92,22 @@ struct expected_formals_list: virtual exception {
   virtual ~expected_formals_list (void) throw() { }
 };
 
+struct expected_body: virtual exception {
+  utree got;
+
+  expected_body (utree const& got_): got(got_) { }
+  
+  virtual ~expected_body (void) throw() { }
+};
+
+struct expected_identifier: virtual exception {
+  utree got;
+
+  expected_identifier (utree const& got_): got(got_) { }
+  
+  virtual ~expected_identifier (void) throw() { }
+};
+
 struct expected_variable_argument: virtual exception {
   displacement n;
   scope environment;
