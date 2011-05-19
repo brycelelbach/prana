@@ -34,10 +34,14 @@ struct lambda: actor<lambda> {
   { BOOST_ASSERT(body); }
   
   utree eval (scope const& env) const {
+    using boost::fusion::at_c;
+
     BOOST_ASSERT(body);
 
     function_base* pf = new stored_function<procedure>
-      (procedure(body, env, sig, num_local_vars));
+      (procedure(body, env, signature
+        (at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), function_type::procedure),
+          num_local_vars));
 
     return utree(pf); 
   }

@@ -5,43 +5,41 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#if !defined(PHXPR_FA1922BE_A256_40EB_BBE8_DCF77AF94720)
-#define PHXPR_FA1922BE_A256_40EB_BBE8_DCF77AF94720
+#if !defined(PHXPR_77C41EF9_4258_471F_89E7_75087273BE79)
+#define PHXPR_77C41EF9_4258_471F_89E7_75087273BE79
 
 #include <phxpr/config.hpp>
 
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
+#include <phxpr/utree/predicates.hpp>
 #include <phxpr/primitives/actor.hpp>
 
 namespace phxpr {
 
-template <typename Derived>
-struct unary: actor<unary<Derived> > {
+struct begin: actor<begin> {
   const signature sig;
 
-  typedef unary<Derived> base_type;
-
-  Derived const& derived (void) const
-  { return *static_cast<Derived const*>(this); }
-
-  unary (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
-    sig(1, arity_type::fixed, eval, function_type::derived) { }
+  begin (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
+    sig(1, arity_type::variable, eval, function_type::derived) { }
 
   utree eval (scope const& args) const {
     using boost::fusion::at_c;
 
-    // {{{ arity checking (TODO: variable arity)
+    // {{{ arity checking 
     if (at_c<0>(sig) != args.size())
       BOOST_THROW_EXCEPTION
-        (invalid_arity(at_c<0>(sig), args.size(), arity_type::fixed));
+        (invalid_arity(at_c<0>(sig), args.size(), arity_type::variable));
     // }}}
 
-    return derived().eval(args[0]);
+    if (!prana::is_utree_container(args[0]))
+      BOOST_THROW_EXCEPTION(expected_variable_argument(at_c<0>(sig), args));
+
+    return args[0].back();
   }
 };
 
 } // phxpr
 
-#endif // PHXPR_FA1922BE_A256_40EB_BBE8_DCF77AF94720
+#endif // PHXPR_77C41EF9_4258_471F_89E7_75087273BE79
 

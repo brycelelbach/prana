@@ -95,11 +95,13 @@ struct utree_hasher {
 } // prana
 
 namespace boost {
+namespace spirit {
 
-std::size_t hash_value (boost::spirit::utree const& ut) {
-  return boost::spirit::utree::visit(ut, prana::utree_hasher());
+std::size_t hash_value (utree const& ut) {
+  return utree::visit(ut, prana::utree_hasher());
 }
 
+} // spirit
 } // boost
 
 #endif // PRANA_DBF60B12_8846_4B46_B883_11FBF7BF3ECC

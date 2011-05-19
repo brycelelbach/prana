@@ -47,8 +47,8 @@ struct evaluation_strategy {
 
 typedef std::size_t displacement;
 
-typedef boost::fusion::vector3<
-  displacement, arity_type::info, evaluation_strategy::info
+typedef boost::fusion::vector4<
+  displacement, arity_type::info, evaluation_strategy::info, function_type::info
 > signature;
 
 } // phxpr

@@ -25,14 +25,14 @@ namespace phxpr {
 
 struct procedure: actor<procedure> {
   boost::shared_ptr<function_body> body;
-  mutable scope environment; // FIXME: I don't like having this be mutable.
+  mutable scope parent_env; // FIXME: I don't like having this be mutable.
   signature sig;
   displacement num_local_vars;
 
   procedure (boost::shared_ptr<function_body> const& body_,
-             scope const& environment_, signature const& sig_,
+             scope const& parent_env_, signature const& sig_,
              displacement num_local_vars_):
-    body(body_), environment(environment_), sig(sig_),
+    body(body_), parent_env(parent_env_), sig(sig_),
     num_local_vars(num_local_vars_)
   { BOOST_ASSERT(body); }
 
@@ -50,23 +50,41 @@ struct procedure: actor<procedure> {
       BOOST_THROW_EXCEPTION(unsupported_arity_type(at_c<1>(sig)));
     // }}}
 
-    if (args.size() != 0 || num_local_vars != 0) {
-      const displacement ext_env_size = args.size() + num_local_vars;
+    if (args.size() != 0) {
+      if (num_local_vars != 0) {
+        // {{{ environment extension for local variables
+        const displacement ext_env_size = args.size() + num_local_vars;
 
-      // TODO: Implement make_shared_array<>.
-      boost::shared_array<utree> storage(new utree[ext_env_size]);
+        // TODO: Implement make_shared_array<>.
+        boost::shared_array<utree> ext_env(new utree[ext_env_size]);
 
-      for (std::size_t i = 0, end = args.size(); i != end; ++i)
-        storage[i] = args[i];
+        // Extend the environment.
+        for (std::size_t i = 0, end = args.size(); i != end; ++i)
+          ext_env[i] = args[i];
 
-      scope ext_env(storage, ext_env_size, &environment);
-      return body->eval(ext_env);
+        return body->eval(scope(ext_env, ext_env_size, &parent_env));
+      } // }}}
+
+      boost::shared_array<utree> const& ap = args.checkout();
+
+      // fastpath
+      if (ap) 
+        return body->eval(scope(ap, args.size(), &parent_env));
+
+      // slowpath
+      else {
+        boost::shared_array<utree> storage(new utree[args.size()]);
+
+        for (std::size_t i = 0, end = args.size(); i != end; ++i)
+          storage[i] = args[i];
+
+        return body->eval(scope(storage, args.size(), &parent_env));
+      }
     }
-    
-    else {
-      scope ext_env(0, 0, &environment);
-      return body->eval(ext_env);
-    }
+  
+    // nullary  
+    else 
+      return body->eval(scope(0, 0, &parent_env));
   }
 };
 

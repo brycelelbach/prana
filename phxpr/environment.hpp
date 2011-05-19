@@ -19,8 +19,6 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/spirit/include/support_utree.hpp>
 
-#include <phxpr/signature.hpp>
-
 namespace phxpr {
 
 template <typename T, typename Key = boost::iterator_range<char const*> >
@@ -32,10 +30,10 @@ struct environment {
   typedef typename map_type::key_type key_type;
   // }}}
 
-  environment (void): parent(0), definitions(), next_local_variable(0) { }
+  environment (void): parent(), definitions() { }
 
-  environment (environment* parent_):
-    parent(parent_), definitions(), next_local_variable(0) { }
+  environment (boost::shared_ptr<environment> const& parent_):
+    parent(parent_), definitions() { }
 
   mapped_type lookup (key_type const& name) {
     // {{{
@@ -45,7 +43,7 @@ struct environment {
     // for a definition.
     if (it == definitions.end()) {
       if (parent)
-        return (*parent)[name];
+        return parent->lookup(name);
 
       return mapped_type();
     }
@@ -75,10 +73,8 @@ struct environment {
     return definitions.count(name); 
   } 
 
-  displacement next_local_variable;  
-
  private:
-  environment* parent;
+  boost::shared_ptr<environment> parent;
   map_type definitions;
 };
 

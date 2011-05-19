@@ -26,7 +26,7 @@ struct nullary: actor<nullary<Derived> > {
   { return *static_cast<Derived const*>(this); }
 
   nullary (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
-    sig(0, arity_type::fixed, eval) { }
+    sig(0, arity_type::fixed, eval, function_type::derived) { }
 
   utree eval (scope const& args) const {
     using boost::fusion::at_c;

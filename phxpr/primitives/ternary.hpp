@@ -26,7 +26,7 @@ struct ternary: actor<ternary<Derived> > {
   { return *static_cast<Derived const*>(this); }
 
   ternary (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
-    sig(3, arity_type::fixed, eval) { }
+    sig(3, arity_type::fixed, eval, function_type::derived) { }
 
   utree eval (scope const& args) const {
     using boost::fusion::at_c;

@@ -26,7 +26,7 @@ struct binary: actor<binary<Derived> > {
   { return *static_cast<Derived const*>(this); }
 
   binary (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
-    sig(2, arity_type::fixed, eval) { }
+    sig(2, arity_type::fixed, eval, function_type::derived) { }
 
   utree eval (scope const& args) const {
     using boost::fusion::at_c;

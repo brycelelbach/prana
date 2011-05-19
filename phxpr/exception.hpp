@@ -12,11 +12,15 @@
 
 #include <boost/throw_exception.hpp>
 
+#include <prana/include/utree.hpp>
+
 #include <phxpr/signature.hpp>
 
 namespace phxpr {
 
-struct exception: virtual std::exception { };
+struct exception: virtual std::exception {
+  virtual ~exception (void) throw() { }
+};
 
 struct invalid_arity: virtual exception {
   displacement expected;
@@ -26,6 +30,22 @@ struct invalid_arity: virtual exception {
   invalid_arity (displacement expected_, displacement got_,
                  arity_type::info type_):
     expected(expected_), got(got_), type(type_) { }
+
+  virtual ~invalid_arity (void) throw() { }
+};
+
+struct invalid_placeholder: virtual exception {
+  displacement expected_n;
+  displacement expected_frame;
+  displacement got;
+  arity_type::info type;
+
+  invalid_placeholder (displacement expected_n_, displacement expected_frame_,
+                       displacement got_, arity_type::info type_):
+    expected_n(expected_n_), expected_frame(expected_frame_), got(got_),
+    type(type_) { }
+
+  virtual ~invalid_placeholder (void) throw() { }
 };
 
 struct invalid_local_variable: virtual exception {
@@ -34,12 +54,60 @@ struct invalid_local_variable: virtual exception {
 
   invalid_local_variable (displacement expected_, displacement got_):
     expected(expected_), got(got_) { }
+
+  virtual ~invalid_local_variable (void) throw() { }
+};
+
+struct invalid_operator_expression: virtual exception {
+  utree expression;
+
+  invalid_operator_expression (utree const& expression_):
+    expression(expression_) { }
+  
+  virtual ~invalid_operator_expression (void) throw() { }
+};
+
+struct procedure_call_or_macro_use_expected: virtual exception {
+  utree expression;
+
+  procedure_call_or_macro_use_expected (utree const& expression_):
+    expression(expression_) { }
+  
+  virtual ~procedure_call_or_macro_use_expected (void) throw() { }
+};
+
+struct identifier_not_found: virtual exception {
+  utree symbol;
+
+  identifier_not_found (utree const& symbol_): symbol(symbol_) { }
+  
+  virtual ~identifier_not_found (void) throw() { }
+};
+
+struct expected_formals_list: virtual exception {
+  utree got;
+
+  expected_formals_list (utree const& got_): got(got_) { }
+  
+  virtual ~expected_formals_list (void) throw() { }
+};
+
+struct expected_variable_argument: virtual exception {
+  displacement n;
+  scope environment;
+ 
+  expected_variable_argument (displacement n_, scope const& environment_):
+    n(n_), environment(environment_) { }
+  
+  virtual ~expected_variable_argument (void) throw() { }
 };
 
 struct unsupported_arity_type: virtual exception {
   arity_type::info type;
 
   unsupported_arity_type (arity_type::info type_): type(type_) { }
+  
+  virtual ~unsupported_arity_type (void) throw() { }
 };
 
 } // phxpr

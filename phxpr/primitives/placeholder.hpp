@@ -24,14 +24,25 @@ namespace phxpr {
 
 struct placeholder: actor<placeholder> {
   displacement n;
+  displacement frame;
 
-  placeholder (displacement n_): n(n_) { } 
+  placeholder (displacement n_, displacement frame_): n(n_), frame(frame_) { } 
 
   utree eval (scope const& env) const {
-    if (env.size() <= n)
-      BOOST_THROW_EXCEPTION(invalid_arity(n, env.size(), arity_type::fixed));
+    scope const* eptr = &env;
 
-    return utree(boost::ref(env[n]));
+    BOOST_ASSERT(eptr);
+
+    while (frame != eptr->level()) {
+      BOOST_ASSERT(eptr);
+      eptr = eptr->outer();
+    } 
+
+    if (eptr->size() <= n)
+      BOOST_THROW_EXCEPTION
+        (invalid_placeholder(n, frame, eptr->size(), arity_type::fixed));
+
+    return utree(boost::ref((*eptr)[n]));
   }
 };
 
