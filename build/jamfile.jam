@@ -13,3 +13,9 @@ lib phxpr
   : ../src/phxpr/evaluator.cpp
   ;
 
+exe phxi 
+  : ../src/drivers/phxi.cpp
+  : <library>/boost//program_options
+    <library>/prana//phxpr
+  ;
+
