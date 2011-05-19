@@ -18,6 +18,9 @@
 namespace phxpr {
 
 // {{{ internal evaluator algorithms
+evaluator::result_type
+evaluate_lambda_body (utree const& body, evaluator& ev);
+
 struct thunker {
   typedef evaluator::result_type result_type;
   typedef evaluator::symbol_type symbol_type;
@@ -34,13 +37,20 @@ struct thunker {
 
   // FIXME: This requires a string copy because utree can't hold symbol ranges. 
   result_type operator() (symbol_type const& str) {
-    // IMPLEMENT
-    return result_type();
+    using boost::fusion::at_c;
+  
+    boost::shared_ptr<utree> p = ev.variables->lookup(utree(str));
+  
+    if (!p)
+      BOOST_THROW_EXCEPTION(identifier_not_found(utree(str)));
+  
+    return *p;
   }
 
+  // IMPLEMENT: handle lambda expressions!
   result_type operator() (range_type const& range) {  
-    // IMPLEMENT
-    return result_type();
+    utree body(range, spirit::shallow);
+    return evaluate_lambda_body(body, ev);
   }
 };
 
@@ -63,7 +73,7 @@ evaluate_lambda_body (utree const& body, evaluator& ev) {
   return ut;
 }
 
-// IMPLEMENT: handle variable arguments
+// TODO: handle variable arguments
 void make_placeholder (utree const& formals, evaluator& ev) {
   typedef utree::const_iterator iterator;
 
