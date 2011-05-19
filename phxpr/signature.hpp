@@ -10,6 +10,8 @@
 
 #include <phxpr/config.hpp>
 
+#include <ostream>
+
 #include <boost/cstdint.hpp>
 
 #include <boost/fusion/include/vector.hpp>
@@ -49,6 +51,17 @@ typedef std::size_t displacement;
 typedef boost::fusion::vector4<
   displacement, arity_type::info, evaluation_strategy::info, function_type::info
 > signature;
+
+// {{{ streaming operators
+std::ostream&
+operator<< (std::ostream& out, arity_type::info const& info);
+
+std::ostream&
+operator<< (std::ostream& out, evaluation_strategy::info const& info);
+
+std::ostream&
+operator<< (std::ostream& out, function_type::info const& info);
+// }}}
 
 } // phxpr
 

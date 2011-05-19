@@ -7,6 +7,9 @@
 
 #include <iterator>
 
+#include <phxpr/config.hpp>
+
+#include <prana/utree/io.hpp>
 #include <prana/dispatch/visit_ref.hpp>
 #include <prana/utree/predicates.hpp>
 #include <phxpr/evaluator.hpp>
@@ -58,15 +61,18 @@ struct thunker {
 evaluator::result_type
 evaluate_lambda_body (utree const& body, evaluator& ev) {
   boost::shared_ptr<thunk::lazy_call_type> lazy_call
-    = boost::make_shared<thunk::lazy_call_type>(body.size());
+    = boost::make_shared<thunk::lazy_call_type>();
 
   thunker tr(ev);
 
-  std::size_t i = 0;
-  BOOST_FOREACH(utree const& element, body) {
-    (*lazy_call)[i++] = utree::visit(element, prana::visit_ref(tr));
+  if (prana::is_utree_container(body)) {
+    BOOST_FOREACH(utree const& element, body)
+    { lazy_call->push_back(utree::visit(element, prana::visit_ref(tr))); }
   }
 
+  else
+    lazy_call->push_back(utree::visit(body, prana::visit_ref(tr)));
+    
   thunk t(lazy_call, ev.global_procedure_table);
   utree ut = stored_function<thunk>(t);
 
@@ -91,7 +97,7 @@ void make_placeholder (utree const& formals, evaluator& ev) {
                         function_type::placeholder);
 
     ev.global_procedure_table->push_back(sig);
-    p->tag(ev.global_procedure_table->size());
+    p->tag(ev.global_procedure_table->size() - 1);
   }
 }
 
@@ -106,7 +112,7 @@ evaluate_lambda_expression (utree const& formals,
 
   arity_type::info type = arity_type::fixed;
 
-  if (formals.back() == "...")
+  if (formals.back() == utree(spirit::utf8_symbol_type("...")))
     type = arity_type::variable;
 
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
@@ -114,13 +120,15 @@ evaluate_lambda_expression (utree const& formals,
 
   make_placeholder(formals, local_env);
 
-  boost::shared_ptr<function_body> fbody = boost::make_shared<function_body>();
+  boost::shared_ptr<function_body> fbody
+    = boost::make_shared<function_body>
+      (boost::make_shared<function_body::code_type>());
 
   typedef evaluator::range_type::const_iterator iterator;
 
   iterator it = body.begin(), end = body.end();
 
-  if (it != end)
+  if (it == end)
     BOOST_THROW_EXCEPTION(expected_body(utree(body))); 
 
   for (; it != end; ++it) {
@@ -133,7 +141,7 @@ evaluate_lambda_expression (utree const& formals,
   local_env.global_procedure_table->push_back(sig);
 
   utree ut = stored_function<lambda>(l);
-  ut.tag(local_env.global_procedure_table->size());
+  ut.tag(local_env.global_procedure_table->size() - 1);
 
   return ut; 
 }
@@ -171,8 +179,8 @@ evaluator::operator() (evaluator::range_type const& range) {
   }
 
   // Evaluate the named operator.
-  if (prana::recursive_which(*it) == utree_type::symbol_type) {
-    if (*it == "lambda") {
+  else if (prana::recursive_which(*it) == utree_type::symbol_type) {
+    if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
       iterator formals = it; ++formals;
       iterator body = formals; ++body; 
       return evaluate_lambda_expression(*formals, range_type(body, end), *this); 
@@ -188,12 +196,28 @@ evaluator::operator() (evaluator::range_type const& range) {
     }
   }
 
-  else
+  else 
     BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(*it));
 
   // Invoke nullary procedures.
   if (++it == end)
     return f.eval(scope());
+
+  std::cout << "f: ";
+  prana::generate_sexpr(f, std::cout);
+  std::cout << std::endl;
+
+  if (global_procedure_table->size() > std::size_t(f.tag())) {
+    using boost::fusion::at_c; 
+    signature const& sig = (*global_procedure_table)[f.tag()];
+    std::cout << "displacement: " << at_c<0>(sig) << std::endl;
+    std::cout << "arity type: " << at_c<1>(sig) << std::endl;
+    std::cout << "evaluation strategy: " << at_c<2>(sig) << std::endl;
+    std::cout << "function type: " << at_c<3>(sig) << std::endl;
+  }
+  
+  else
+    std::cout << "tag is not in the gpt" << std::endl;
 
   // Invoke non-nullary procedures.
   const displacement env_size = num_local_variables + std::distance(it, end);  
@@ -209,6 +233,10 @@ evaluator::operator() (evaluator::range_type const& range) {
 // {{{ evaluate 
 utree evaluate (sexpr_parse_tree const& pt) {
   return evaluate(pt.ast());
+}
+
+utree evaluate (sexpr_parse_tree const& pt, evaluator& ev) {
+  return evaluate(pt.ast(), ev);
 }
 
 utree evaluate (utree const& ut) {

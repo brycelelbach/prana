@@ -11,18 +11,18 @@
 #include <fstream>
 
 #include <boost/program_options.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 #include <prana/version.hpp>
-
-#include <phxpr/version.hpp>
+#include <prana/utree/io.hpp>
 
 #include <sheol/adt/dynamic_array.hpp>
 
 #include <prana/parse/parse_tree.hpp>
 #include <prana/parse/grammar/sexpr.hpp>
 #include <prana/generate/generate_sexpr.hpp>
-#include <prana/utree/io.hpp>
     
+#include <phxpr/version.hpp>
 #include <phxpr/evaluator.hpp>
 
 using boost::program_options::variables_map;
@@ -33,7 +33,8 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
-using boost::spirit::nil;
+using boost::fusion::at_c;
+
 using boost::spirit::utree;
 using boost::spirit::utree_type;
 
@@ -43,7 +44,9 @@ using prana::parse_tree;
 using prana::tag::sexpr;
 using prana::generate_sexpr;
 
+using phxpr::signature;
 using phxpr::evaluator;
+using phxpr::evaluate;
 
 int main (int argc, char** argv) {
   variables_map vm;
@@ -111,19 +114,32 @@ int main (int argc, char** argv) {
 
     // eval
     if (!ifs.good()) {
-      r = e(asts.back()->ast());
+      r = evaluate(*asts.back(), e);
       break;
     }
 
     // invoke for side effects
     else 
-      e(asts.back()->ast());
+      evaluate(*asts.back(), e);
   }
 
   // print the result  
   std::cout << "return value: ";
   generate_sexpr(r, std::cout);
   std::cout << std::endl;
+
+  std::cout << "return value tag: " << r.tag() << std::endl;
+
+  if (e.global_procedure_table->size() > std::size_t(r.tag())) {
+    signature const& sig = (*e.global_procedure_table)[r.tag()];
+    std::cout << "displacement: " << at_c<0>(sig) << std::endl;
+    std::cout << "arity type: " << at_c<1>(sig) << std::endl;
+    std::cout << "evaluation strategy: " << at_c<2>(sig) << std::endl;
+    std::cout << "function type: " << at_c<3>(sig) << std::endl;
+  }
+  
+  else
+    std::cout << "tag is not in the gpt" << std::endl;
 
   return 0; 
 }

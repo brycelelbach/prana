@@ -11,6 +11,7 @@ project ;
 
 lib phxpr 
   : ../src/phxpr/evaluator.cpp
+    ../src/phxpr/signature.cpp
   ;
 
 exe phxi 

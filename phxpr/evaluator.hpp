@@ -63,6 +63,8 @@ typedef prana::parse_tree<prana::tag::sexpr> sexpr_parse_tree;
 
 utree evaluate (sexpr_parse_tree const& pt);
 
+utree evaluate (sexpr_parse_tree const& pt, evaluator& ev);
+
 utree evaluate (utree const& ut);
 
 utree evaluate (utree const& ut, evaluator& ev);

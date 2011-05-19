@@ -10,6 +10,8 @@
 #if !defined(PHXPR_F580B218_70FD_42EE_991F_52BA7814C51C)
 #define PHXPR_F580B218_70FD_42EE_991F_52BA7814C51C
 
+#include <phxpr/config.hpp>
+
 #include <boost/make_shared.hpp>
 
 #include <phxpr/signature.hpp>
