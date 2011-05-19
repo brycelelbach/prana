@@ -13,14 +13,54 @@
 #include <phxpr/exception.hpp>
 #include <phxpr/primitives/lambda.hpp>
 #include <phxpr/primitives/placeholder.hpp>
+#include <phxpr/primitives/thunk.hpp>
 
 namespace phxpr {
 
 // {{{ internal evaluator algorithms
+struct thunker {
+  typedef evaluator::result_type result_type;
+  typedef evaluator::symbol_type symbol_type;
+  typedef evaluator::range_type range_type;
+
+  evaluator& ev;
+
+  thunker (evaluator& ev_): ev(ev_) { }
+
+  // REVIEW: Can we instead return utree(boost::ref(val)) safely?
+  template <typename T>
+  result_type operator() (T const& val)
+  { return utree(val); }
+
+  // FIXME: This requires a string copy because utree can't hold symbol ranges. 
+  result_type operator() (symbol_type const& str) {
+    // IMPLEMENT
+    return result_type();
+  }
+
+  result_type operator() (range_type const& range) {  
+    // IMPLEMENT
+    return result_type();
+  }
+};
+
+// FIXME: do we need to tag the thunk itself in the gpt?
 evaluator::result_type
 evaluate_lambda_body (utree const& body, evaluator& ev) {
-  // IMPLEMENT
-  return evaluator::result_type();
+  boost::shared_ptr<thunk::lazy_call_type> lazy_call
+    = boost::make_shared<thunk::lazy_call_type>(body.size());
+
+  thunker tr(ev);
+
+  std::size_t i = 0;
+  BOOST_FOREACH(utree const& element, body) {
+    (*lazy_call)[i++] = utree::visit(element, prana::visit_ref(tr));
+  }
+
+  thunk t(lazy_call, ev.global_procedure_table);
+  utree ut = stored_function<thunk>(t);
+
+  return ut;
 }
 
 // IMPLEMENT: handle variable arguments

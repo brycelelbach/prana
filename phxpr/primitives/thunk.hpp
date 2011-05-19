@@ -30,9 +30,9 @@ struct thunk: actor<thunk> {
   boost::shared_ptr<lazy_call_type> lazy_call;
   boost::shared_ptr<gpt_type> global_procedure_table;
 
-  thunk (boost::shared_ptr<lazy_call_type> const& lazy_call_
+  thunk (boost::shared_ptr<lazy_call_type> const& lazy_call_,
          boost::shared_ptr<gpt_type> const& gpt):         
-    lazy_call(lazy_call_), global_procedure_table(gpt),
+    lazy_call(lazy_call_), global_procedure_table(gpt)
   {
     BOOST_ASSERT(gpt);
     BOOST_ASSERT(lazy_call);
@@ -46,7 +46,7 @@ struct thunk: actor<thunk> {
     BOOST_ASSERT(lazy_call);
     BOOST_ASSERT(lazy_call->size() > 0);
 
-    const displacement lazy_env_size = lazy_call.size();
+    const displacement lazy_env_size = lazy_call->size();
     boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 
     for (std::size_t i = 0, end = lazy_env_size; i != end; ++i) { 
@@ -70,10 +70,10 @@ struct thunk: actor<thunk> {
         lazy_env[i] = boost::ref(lazy_arg);
     }
 
-    utree const& lazy_f = (*lazy_env)[0];
+    utree const& lazy_f = lazy_env[0];
 
     if (prana::recursive_which(lazy_f) == utree_type::function_type) 
-      BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(f));
+      BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(lazy_f));
  
     return lazy_f.eval(scope(lazy_env, lazy_env_size));
   }
