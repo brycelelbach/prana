@@ -39,43 +39,46 @@ struct thunk: actor<thunk> {
     BOOST_ASSERT(lazy_call->size() > 0);
   }
 
-  // TODO: Optimize for the nullary case.
-  utree eval (scope const& args) const {
+  utree execute_lazy (utree const& lazy_arg, scope const& args) const { 
     using boost::fusion::at_c;
     
+    if (prana::recursive_which(lazy_arg) == utree_type::function_type) {
+      BOOST_ASSERT(lazy_arg.tag() <= global_procedure_table->size());
+
+      // Load the lazy argument's signature from the gpt.
+      signature const& sig = (*global_procedure_table)[lazy_arg.tag()];
+
+      if (at_c<3>(sig) == function_type::placeholder)
+        return lazy_arg.eval(args);
+      else
+        // REVIEW: How safe is this ref?
+        return utree(boost::ref(lazy_arg));
+    }
+
+    else
+      // REVIEW: How safe is this ref?
+      return utree(boost::ref(lazy_arg));
+  }
+
+  utree eval (scope const& args) const {
     BOOST_ASSERT(lazy_call);
     BOOST_ASSERT(lazy_call->size() > 0);
 
-    const displacement lazy_env_size = lazy_call->size();
+    utree const& lazy_f = execute_lazy((*lazy_call)[0], args);
+
+    const displacement lazy_env_size = lazy_call->size() - 1;
     boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 
-    for (std::size_t i = 0, end = lazy_env_size; i != end; ++i) { 
-      utree const& lazy_arg = (*lazy_call)[i];
+    for (std::size_t i = 0, end = lazy_env_size; i != end; ++i)
+      lazy_env[i] = execute_lazy((*lazy_call)[i + 1], args);
 
-      if (prana::recursive_which(lazy_arg) == utree_type::function_type) {
-        BOOST_ASSERT(lazy_arg.tag() <= global_procedure_table->size());
+    if (prana::recursive_which(lazy_f) != utree_type::function_type) 
+      return lazy_f;
 
-        // Load the lazy argument's signature from the gpt.
-        signature const& sig = (*global_procedure_table)[lazy_arg.tag()];
+    boost::shared_ptr<scope> new_scope
+      = boost::make_shared<scope>(lazy_env, lazy_env_size, args.get());
 
-        if (at_c<3>(sig) == function_type::placeholder)
-          lazy_env[i] = lazy_arg.eval(args);
-        else
-          // REVIEW: How safe is this?
-          lazy_env[i] = boost::ref(lazy_arg);
-      }
-
-      else
-        // REVIEW: How safe is this?
-        lazy_env[i] = boost::ref(lazy_arg);
-    }
-
-    utree const& lazy_f = lazy_env[0];
-
-    if (prana::recursive_which(lazy_f) == utree_type::function_type) 
-      BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(lazy_f));
- 
-    return lazy_f.eval(scope(lazy_env, lazy_env_size));
+    return lazy_f.eval(*new_scope);
   }
 };
 

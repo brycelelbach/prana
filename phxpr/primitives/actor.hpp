@@ -12,6 +12,8 @@
 
 #include <phxpr/config.hpp>
 
+#include <boost/make_shared.hpp>
+
 #include <prana/include/utree.hpp>
 
 namespace phxpr {
@@ -27,8 +29,10 @@ struct actor {
   utree operator() (scope const& env) const
   { return derived().eval(env); }
 
-  utree operator() (void) const
-  { return derived().eval(scope(0, 0)); }
+  utree operator() (void) const {
+    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>();
+    return derived().eval(*new_scope);
+  }
 };
 
 } // phxpr

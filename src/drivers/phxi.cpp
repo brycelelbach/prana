@@ -23,6 +23,7 @@
 #include <prana/generate/generate_sexpr.hpp>
     
 #include <phxpr/version.hpp>
+#include <phxpr/intrinsics/basic_arithmetic.hpp>
 #include <phxpr/evaluator.hpp>
 
 using boost::program_options::variables_map;
@@ -47,6 +48,11 @@ using prana::generate_sexpr;
 using phxpr::signature;
 using phxpr::evaluator;
 using phxpr::evaluate;
+
+using phxpr::addition;
+using phxpr::subtraction;
+using phxpr::multiplication;
+using phxpr::division;
 
 int main (int argc, char** argv) {
   variables_map vm;
@@ -101,7 +107,12 @@ int main (int argc, char** argv) {
 
   std::ifstream ifs(input.c_str(), std::ifstream::in);  
   evaluator e;
-  
+ 
+  e.define_intrinsic("+", addition());
+  e.define_intrinsic("-", subtraction());
+  e.define_intrinsic("*", multiplication());
+  e.define_intrinsic("/", division());
+ 
   dynamic_array<boost::shared_ptr<parse_tree<sexpr> > > asts(16);
   utree r;
 

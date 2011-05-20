@@ -11,6 +11,7 @@
 #include <phxpr/config.hpp>
 #include <phxpr/environment.hpp>
 #include <phxpr/signature.hpp>
+#include <phxpr/primitives/lambda.hpp>
 
 #include <sheol/adt/dynamic_array.hpp>
 
@@ -57,6 +58,25 @@ struct evaluator {
   result_type operator() (symbol_type const& str);
 
   result_type operator() (range_type const& range);
+
+  template <typename F>
+  void define_intrinsic (std::string const& name, F const& f) {
+    boost::shared_ptr<function_body> body
+      = boost::make_shared<function_body>(f);
+
+    // create a new lambda expression
+    lambda l(body, f.sig);
+
+    // evaluate the lambda expression, returning a procedure
+    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>(); 
+    utree proc = l.eval(*new_scope);
+
+    boost::shared_ptr<utree> p = variables->define
+      (utree(spirit::utf8_symbol_type(name)), proc); 
+
+    global_procedure_table->push_back(f.sig);
+    p->tag(global_procedure_table->size() - 1);
+  }
 };
 
 typedef prana::parse_tree<prana::tag::sexpr> sexpr_parse_tree;

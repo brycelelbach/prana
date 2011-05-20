@@ -18,7 +18,11 @@
 
 // TODO: move as much of this as possible into a source file.
 
-inline std::ostream& operator<< (std::ostream& out, prana::scope const& env) {
+namespace boost {
+namespace spirit {
+
+inline std::ostream& operator<< (std::ostream& out, scope const& env)
+{
   out << "level[" << env.level() << "]" << std::endl;
 
   for (prana::scope::size_type i = 0; i < env.size(); ++i) {
@@ -31,10 +35,14 @@ inline std::ostream& operator<< (std::ostream& out, prana::scope const& env) {
   return out;
 }
 
-inline std::ostream& operator<< (std::ostream& out, prana::utree const& ut) {
+inline std::ostream& operator<< (std::ostream& out, utree const& ut)
+{
   prana::generate_sexpr(ut, out);
   return out; 
 }
+
+} // spirit
+} // boost
 
 #endif // PRANA_9835A676_570F_40DE_A3B3_C62EEB1DCF36
 

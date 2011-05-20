@@ -110,9 +110,10 @@ struct expected_identifier: virtual exception {
 
 struct expected_variable_argument: virtual exception {
   displacement n;
-  scope environment;
+  boost::shared_ptr<scope> environment;
  
-  expected_variable_argument (displacement n_, scope const& environment_):
+  expected_variable_argument (displacement n_,
+                              boost::shared_ptr<scope> const& environment_):
     n(n_), environment(environment_) { }
   
   virtual ~expected_variable_argument (void) throw() { }

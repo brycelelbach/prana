@@ -14,7 +14,6 @@
 #include <prana/utree/predicates.hpp>
 #include <phxpr/evaluator.hpp>
 #include <phxpr/exception.hpp>
-#include <phxpr/primitives/lambda.hpp>
 #include <phxpr/primitives/placeholder.hpp>
 #include <phxpr/primitives/thunk.hpp>
 
@@ -24,38 +23,9 @@ namespace phxpr {
 evaluator::result_type
 evaluate_lambda_body (utree const& body, evaluator& ev);
 
-struct thunker {
-  typedef evaluator::result_type result_type;
-  typedef evaluator::symbol_type symbol_type;
-  typedef evaluator::range_type range_type;
-
-  evaluator& ev;
-
-  thunker (evaluator& ev_): ev(ev_) { }
-
-  // REVIEW: Can we instead return utree(boost::ref(val)) safely?
-  template <typename T>
-  result_type operator() (T const& val)
-  { return utree(val); }
-
-  // FIXME: This requires a string copy because utree can't hold symbol ranges. 
-  result_type operator() (symbol_type const& str) {
-    using boost::fusion::at_c;
-  
-    boost::shared_ptr<utree> p = ev.variables->lookup(utree(str));
-  
-    if (!p)
-      BOOST_THROW_EXCEPTION(identifier_not_found(utree(str)));
-  
-    return *p;
-  }
-
-  // IMPLEMENT: handle lambda expressions!
-  result_type operator() (range_type const& range) {  
-    utree body(range, spirit::shallow);
-    return evaluate_lambda_body(body, ev);
-  }
-};
+evaluator::result_type
+evaluate_lambda_expression (utree const& formals,
+                            evaluator::range_type const& body, evaluator& ev);
 
 // FIXME: do we need to tag the thunk itself in the gpt?
 evaluator::result_type
@@ -63,15 +33,26 @@ evaluate_lambda_body (utree const& body, evaluator& ev) {
   boost::shared_ptr<thunk::lazy_call_type> lazy_call
     = boost::make_shared<thunk::lazy_call_type>();
 
-  thunker tr(ev);
-
   if (prana::is_utree_container(body)) {
-    BOOST_FOREACH(utree const& element, body)
-    { lazy_call->push_back(utree::visit(element, prana::visit_ref(tr))); }
+    typedef utree::const_iterator iterator;
+
+    iterator it = body.begin(), end = body.end();
+
+    if ((it != end) && (*it == utree(spirit::utf8_symbol_type("lambda")))) {
+      iterator formals = it; ++formals;
+      iterator body = formals; ++body; 
+      lazy_call->push_back(evaluate_lambda_expression
+        (*formals, evaluator::range_type(body, end), ev)); 
+    }
+
+    else {
+      BOOST_FOREACH(utree const& element, body)
+      { lazy_call->push_back(utree::visit(element, ev)); }
+    }
   }
 
   else
-    lazy_call->push_back(utree::visit(body, prana::visit_ref(tr)));
+    lazy_call->push_back(utree::visit(body, ev));
     
   thunk t(lazy_call, ev.global_procedure_table);
   utree ut = stored_function<thunk>(t);
@@ -183,7 +164,8 @@ evaluator::operator() (evaluator::range_type const& range) {
     if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
       iterator formals = it; ++formals;
       iterator body = formals; ++body; 
-      return evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+      ++it; ++it; ++it;
     }
 
     else {
@@ -200,24 +182,10 @@ evaluator::operator() (evaluator::range_type const& range) {
     BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(*it));
 
   // Invoke nullary procedures.
-  if (++it == end)
-    return f.eval(scope());
-
-  std::cout << "f: ";
-  prana::generate_sexpr(f, std::cout);
-  std::cout << std::endl;
-
-  if (global_procedure_table->size() > std::size_t(f.tag())) {
-    using boost::fusion::at_c; 
-    signature const& sig = (*global_procedure_table)[f.tag()];
-    std::cout << "displacement: " << at_c<0>(sig) << std::endl;
-    std::cout << "arity type: " << at_c<1>(sig) << std::endl;
-    std::cout << "evaluation strategy: " << at_c<2>(sig) << std::endl;
-    std::cout << "function type: " << at_c<3>(sig) << std::endl;
+  if (++it == end) {
+    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>();
+    return f.eval(*new_scope);
   }
-  
-  else
-    std::cout << "tag is not in the gpt" << std::endl;
 
   // Invoke non-nullary procedures.
   const displacement env_size = num_local_variables + std::distance(it, end);  
@@ -227,7 +195,8 @@ evaluator::operator() (evaluator::range_type const& range) {
   for (std::size_t i = 0; it != end; ++it)
     env[i++] = evaluate(*it, *this);
 
-  return f.eval(scope(env, env_size));
+  boost::shared_ptr<scope> new_scope = boost::make_shared<scope>(env, env_size);
+  return f.eval(*new_scope);
 }
 
 // {{{ evaluate 

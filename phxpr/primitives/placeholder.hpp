@@ -14,6 +14,7 @@
 
 #include <boost/ref.hpp>
 
+#include <prana/utree/io.hpp>
 #include <prana/utree/predicates.hpp>
 
 #include <phxpr/signature.hpp>
@@ -29,7 +30,7 @@ struct placeholder: actor<placeholder> {
   placeholder (displacement n_, displacement frame_): n(n_), frame(frame_) { } 
 
   utree eval (scope const& env) const {
-    scope const* eptr = &env;
+    boost::shared_ptr<scope> eptr = env.get();
 
     BOOST_ASSERT(eptr);
 
@@ -38,11 +39,15 @@ struct placeholder: actor<placeholder> {
       eptr = eptr->outer();
     } 
 
-    if (eptr->size() <= n)
+    if (eptr->size() <= n) {
+      std::cout << "eptr size: " << eptr->size() << std::endl
+                << "n: " << n << std::endl
+                << env << std::endl;
       BOOST_THROW_EXCEPTION
         (invalid_placeholder(n, frame, eptr->size(), arity_type::fixed));
+    }
 
-    return utree(boost::ref((*eptr)[n]));
+    return utree((*eptr)[n]);
   }
 };
 

@@ -14,9 +14,17 @@
 
 #include <boost/spirit/include/support_utree.hpp>
 
-inline std::ostream& operator<< (std::ostream& out, prana::scope const& env);
+namespace boost {
+namespace spirit {
 
-inline std::ostream& operator<< (std::ostream& out, prana::utree const& ut);
+inline std::ostream&
+operator<< (std::ostream& out, scope const& env);
+
+inline std::ostream&
+operator<< (std::ostream& out, utree const& ut);
+
+} // spirit
+} // boost
 
 #endif // PRANA_F8E22779_56A3_4EB8_B9B3_D3D1E891CD68
 

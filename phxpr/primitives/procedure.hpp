@@ -25,12 +25,12 @@ namespace phxpr {
 
 struct procedure: actor<procedure> {
   boost::shared_ptr<function_body> body;
-  mutable scope parent_env; // FIXME: I don't like having this be mutable.
+  boost::shared_ptr<scope> parent_env;
   signature sig;
   displacement num_local_vars;
 
   procedure (boost::shared_ptr<function_body> const& body_,
-             scope const& parent_env_, signature const& sig_,
+             boost::shared_ptr<scope> const& parent_env_, signature const& sig_,
              displacement num_local_vars_):
     body(body_), parent_env(parent_env_), sig(sig_),
     num_local_vars(num_local_vars_)
@@ -61,30 +61,40 @@ struct procedure: actor<procedure> {
         // Extend the environment.
         for (std::size_t i = 0, end = args.size(); i != end; ++i)
           ext_env[i] = args[i];
-
-        return body->eval(scope(ext_env, ext_env_size, &parent_env));
+        
+        boost::shared_ptr<scope> new_scope = boost::make_shared<scope>
+          (ext_env, ext_env_size, parent_env);
+        return body->eval(*new_scope);
       } // }}}
 
       boost::shared_array<utree> const& ap = args.checkout();
 
       // fastpath
-      if (ap) 
-        return body->eval(scope(ap, args.size(), &parent_env));
+      if (ap) { 
+        boost::shared_ptr<scope> new_scope = boost::make_shared<scope>
+          (ap, args.size(), parent_env);
+        return body->eval(*new_scope);
+      }
 
-      // slowpath
+      // slowpath (TODO: shouldn't ever happen)
       else {
         boost::shared_array<utree> storage(new utree[args.size()]);
 
         for (std::size_t i = 0, end = args.size(); i != end; ++i)
           storage[i] = args[i];
 
-        return body->eval(scope(storage, args.size(), &parent_env));
+        boost::shared_ptr<scope> new_scope = boost::make_shared<scope>
+          (storage, args.size(), parent_env);
+        return body->eval(*new_scope);
       }
     }
   
     // nullary  
-    else 
-      return body->eval(scope(0, 0, &parent_env));
+    else { 
+      boost::shared_ptr<scope> new_scope
+        = boost::make_shared<scope>(parent_env);
+      return body->eval(*new_scope);
+    }
   }
 };
 

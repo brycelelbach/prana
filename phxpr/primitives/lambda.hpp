@@ -40,8 +40,15 @@ struct lambda: actor<lambda> {
 
     BOOST_ASSERT(body);
 
+    boost::shared_ptr<scope> saved_env;
+
+    if (env.level() == 0)
+      saved_env = env.get();
+    else
+      saved_env = env.outer();
+
     function_base* pf = new stored_function<procedure>
-      (procedure(body, env, signature
+      (procedure(body, saved_env, signature
         (at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), function_type::procedure),
           num_local_vars));
 
