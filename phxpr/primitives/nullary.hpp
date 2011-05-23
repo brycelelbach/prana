@@ -25,16 +25,18 @@ struct nullary: actor<nullary<Derived> > {
   Derived const& derived (void) const
   { return *static_cast<Derived const*>(this); }
 
-  nullary (evaluation_strategy::info eval = evaluation_strategy::call_by_value):
-    sig(0, arity_type::fixed, eval, function_type::derived) { }
+  nullary (evaluation_strategy::info stra = evaluation_strategy::call_by_value):
+    sig(0, arity_type::fixed, stra, function_type::derived) { }
 
-  utree eval (scope const& args) const {
+  utree eval (utree const& ut) const {
     using boost::fusion::at_c;
 
+    runtime_environment& env = *ut.get<runtime_environment*>();
+
     // {{{ arity checking (TODO: variable arity)
-    if (at_c<0>(sig) != args.size())
+    if (at_c<0>(sig) != env.size())
       BOOST_THROW_EXCEPTION
-        (invalid_arity(at_c<0>(sig), args.size(), arity_type::fixed));
+        (invalid_arity(at_c<0>(sig), env.size(), arity_type::fixed));
     // }}}
 
     return derived().eval();

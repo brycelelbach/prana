@@ -9,7 +9,7 @@
 
 #include <phxpr/environment.hpp>
 
-using phxpr::environment;
+using phxpr::compile_environment;
 
 struct item {
   std::string name;
@@ -25,7 +25,7 @@ struct item {
 };
 
 int main (void) {
-  typedef environment<item> env_type;
+  typedef compile_environment<item> env_type;
   typedef env_type::mapped_type mapped_type;
 
   char const* foo = "foo";

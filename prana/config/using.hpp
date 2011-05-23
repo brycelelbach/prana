@@ -15,8 +15,6 @@ struct utree_type;
 struct utree;
 struct utree_list;
 
-struct scope;
-
 struct function_base;
 
 template <typename F>
@@ -45,7 +43,6 @@ namespace karma = boost::spirit::karma;
 using boost::spirit::utree_type;
 using boost::spirit::utree;
 using boost::spirit::utree_list;
-using boost::spirit::scope;
 using boost::spirit::function_base;
 using boost::spirit::stored_function;
 

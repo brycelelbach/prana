@@ -18,9 +18,6 @@ namespace boost {
 namespace spirit {
 
 inline std::ostream&
-operator<< (std::ostream& out, scope const& env);
-
-inline std::ostream&
 operator<< (std::ostream& out, utree const& ut);
 
 } // spirit

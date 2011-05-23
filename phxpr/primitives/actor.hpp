@@ -26,12 +26,13 @@ struct actor {
   Derived const& derived (void) const
   { return *static_cast<Derived const*>(this); }
 
-  utree operator() (scope const& env) const
-  { return derived().eval(env); }
+  utree operator() (utree const& ut) const
+  { return derived().eval(ut); }
 
   utree operator() (void) const {
-    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>();
-    return derived().eval(*new_scope);
+    boost::shared_ptr<runtime_environment> new_scope
+      = boost::make_shared<runtime_environment>();
+    return new_scope->invoke(derived());
   }
 };
 

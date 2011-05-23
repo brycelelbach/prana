@@ -13,7 +13,10 @@
 #include <string>
 
 #include <boost/assert.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -22,7 +25,7 @@
 namespace phxpr {
 
 template <typename T, typename Key = boost::iterator_range<char const*> >
-struct environment {
+struct compile_environment {
   // {{{ types
   typedef boost::unordered_map<Key, boost::shared_ptr<T> > map_type;
 
@@ -30,9 +33,9 @@ struct environment {
   typedef typename map_type::key_type key_type;
   // }}}
 
-  environment (void): parent(), definitions() { }
+  compile_environment (void): parent(), definitions() { }
 
-  environment (boost::shared_ptr<environment> const& parent_):
+  compile_environment (boost::shared_ptr<compile_environment> const& parent_):
     parent(parent_), definitions() { }
 
   mapped_type lookup (key_type const& name) {
@@ -74,8 +77,60 @@ struct environment {
   } 
 
  private:
-  boost::shared_ptr<environment> parent;
+  boost::shared_ptr<compile_environment> parent;
   map_type definitions;
+};
+    
+struct runtime_environment:
+  boost::iterator_range<utree*>,
+  boost::enable_shared_from_this<runtime_environment>
+{
+ public:
+  runtime_environment (void): depth(0), parent(), upval(0) { }
+
+  runtime_environment (boost::shared_ptr<runtime_environment> const& parent_):
+    depth(parent_ ? (parent_->depth + 1) : 0), parent(parent_), upval(0) { }
+  
+  runtime_environment (boost::shared_array<utree> const& upval_,
+                       runtime_environment::size_type size_):
+    boost::iterator_range<utree*>(upval_.get(), upval_.get() + size_), depth(0),
+    parent(), upval(upval_) { }
+  
+  runtime_environment (boost::shared_array<utree> const& upval_,
+                       runtime_environment::size_type size_,
+                       boost::shared_ptr<runtime_environment> const& parent_):
+    boost::iterator_range<utree*>(upval_.get(), upval_.get() + size_),
+    depth(parent_ ? (parent_->depth + 1) : 0), parent(parent_),
+    upval(upval_) { }
+  
+  runtime_environment (runtime_environment const& other):
+    boost::iterator_range<utree*>(other.begin(), other.end()),
+    depth(other.depth), parent(other.parent), upval(other.upval) { }
+
+  boost::shared_ptr<runtime_environment> const& outer (void) const
+  { return parent; }
+  
+  runtime_environment::size_type level (void) const 
+  { return depth; }
+
+  boost::shared_array<utree> const& get() const
+  { return upval; }
+
+  boost::shared_ptr<runtime_environment> checkout() const
+  { return const_cast<runtime_environment*>(this)->shared_from_this(); }
+
+  template <typename F>
+  utree invoke (F const& f) const
+  { return f.eval(utree(spirit::any_ptr(checkout().get()))); }
+  
+  template <typename F>
+  utree invoke (boost::shared_ptr<F> const& f) const
+  { return f->eval(utree(spirit::any_ptr(checkout().get()))); }
+
+ private:
+  runtime_environment::size_type depth;
+  boost::shared_ptr<runtime_environment> parent;
+  boost::shared_array<utree> upval;
 };
 
 } // phxpr

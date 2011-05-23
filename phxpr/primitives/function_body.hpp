@@ -41,20 +41,22 @@ struct function_body: actor<function_body> {
   function_body (F const& code_): code(boost::make_shared<code_type>())
   { code->push_back(utree(stored_function<F>(code_))); }
 
-  utree eval (scope const& env) const {
+  utree eval (utree const& ut) const {
     BOOST_ASSERT(code);
     BOOST_ASSERT(code->size());
+    
+    runtime_environment& env = *ut.get<runtime_environment*>();
 
     code_type::size_type i = 0;
     const code_type::size_type end = code->size();
 
     for (; i != (end - 1); ++i) {
       if (prana::recursive_which((*code)[i]) == utree_type::function_type)
-        (*code)[i].eval(env);
+        env.invoke((*code)[i]);
     }
 
     if (prana::recursive_which((*code)[end - 1]) == utree_type::function_type)
-      return (*code)[end - 1].eval(env);
+      return env.invoke((*code)[end - 1]);
     else
       return utree(boost::ref((*code)[end - 1]));
   }

@@ -61,7 +61,7 @@ evaluate_lambda_body (utree const& body, evaluator& ev) {
 }
 
 // TODO: handle variable arguments
-void make_placeholder (utree const& formals, evaluator& ev) {
+void make_placeholders (utree const& formals, evaluator& ev) {
   typedef utree::const_iterator iterator;
 
   iterator it = formals.begin(), end = formals.end();
@@ -99,7 +99,7 @@ evaluate_lambda_expression (utree const& formals,
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
                       function_type::lambda);
 
-  make_placeholder(formals, local_env);
+  make_placeholders(formals, local_env);
 
   boost::shared_ptr<function_body> fbody
     = boost::make_shared<function_body>
@@ -183,8 +183,9 @@ evaluator::operator() (evaluator::range_type const& range) {
 
   // Invoke nullary procedures.
   if (++it == end) {
-    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>();
-    return f.eval(*new_scope);
+    boost::shared_ptr<runtime_environment> new_env
+      = boost::make_shared<runtime_environment>();
+    return new_env->invoke(f);
   }
 
   // Invoke non-nullary procedures.
@@ -195,8 +196,9 @@ evaluator::operator() (evaluator::range_type const& range) {
   for (std::size_t i = 0; it != end; ++it)
     env[i++] = evaluate(*it, *this);
 
-  boost::shared_ptr<scope> new_scope = boost::make_shared<scope>(env, env_size);
-  return f.eval(*new_scope);
+  boost::shared_ptr<runtime_environment> new_env
+    = boost::make_shared<runtime_environment>(env, env_size);
+  return new_env->invoke(f);
 }
 
 // {{{ evaluate 

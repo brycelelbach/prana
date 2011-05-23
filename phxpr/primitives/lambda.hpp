@@ -21,7 +21,7 @@ namespace phxpr {
 
 struct lambda: actor<lambda> {
   boost::shared_ptr<function_body> body;
-  signature sig;
+  const signature sig;
   displacement num_local_vars;
   
   lambda (function_body const& body_, signature const& sig_,
@@ -35,15 +35,17 @@ struct lambda: actor<lambda> {
     body(body_), sig(sig_), num_local_vars(num_local_vars_)
   { BOOST_ASSERT(body); }
   
-  utree eval (scope const& env) const {
+  utree eval (utree const& ut) const {
     using boost::fusion::at_c;
 
     BOOST_ASSERT(body);
+    
+    runtime_environment& env = *ut.get<runtime_environment*>();
 
-    boost::shared_ptr<scope> saved_env;
+    boost::shared_ptr<runtime_environment> saved_env;
 
     if (env.level() == 0)
-      saved_env = env.get();
+      saved_env = env.checkout();
     else
       saved_env = env.outer();
 

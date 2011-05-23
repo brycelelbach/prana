@@ -13,7 +13,7 @@ project
   ;
 
 run lambda.cpp ; 
-run environment.cpp ; 
+run compile_environment.cpp ; 
 run evaluator.cpp ; 
 run upvalue.cpp ; 
 

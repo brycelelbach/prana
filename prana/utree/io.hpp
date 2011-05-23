@@ -21,20 +21,6 @@
 namespace boost {
 namespace spirit {
 
-inline std::ostream& operator<< (std::ostream& out, scope const& env)
-{
-  out << "level[" << env.level() << "]" << std::endl;
-
-  for (prana::scope::size_type i = 0; i < env.size(); ++i) {
-    out << "  element[" << i << "]: " << env[i] << std::endl;
-  }
-
-  if (env.outer())
-    out << *env.outer();
-
-  return out;
-}
-
 inline std::ostream& operator<< (std::ostream& out, utree const& ut)
 {
   prana::generate_sexpr(ut, out);

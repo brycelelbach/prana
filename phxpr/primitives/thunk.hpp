@@ -39,7 +39,9 @@ struct thunk: actor<thunk> {
     BOOST_ASSERT(lazy_call->size() > 0);
   }
 
-  utree execute_lazy (utree const& lazy_arg, scope const& args) const { 
+  utree execute_lazy (utree const& lazy_arg,
+                      runtime_environment& env) const
+  { 
     using boost::fusion::at_c;
     
     if (prana::recursive_which(lazy_arg) == utree_type::function_type) {
@@ -49,7 +51,7 @@ struct thunk: actor<thunk> {
       signature const& sig = (*global_procedure_table)[lazy_arg.tag()];
 
       if (at_c<3>(sig) == function_type::placeholder)
-        return lazy_arg.eval(args);
+        return env.invoke(lazy_arg);
       else
         // REVIEW: How safe is this ref?
         return utree(boost::ref(lazy_arg));
@@ -60,25 +62,28 @@ struct thunk: actor<thunk> {
       return utree(boost::ref(lazy_arg));
   }
 
-  utree eval (scope const& args) const {
+  utree eval (utree const& ut) const {
     BOOST_ASSERT(lazy_call);
     BOOST_ASSERT(lazy_call->size() > 0);
 
-    utree const& lazy_f = execute_lazy((*lazy_call)[0], args);
+    runtime_environment& env = *ut.get<runtime_environment*>();
+
+    utree const& lazy_f = execute_lazy((*lazy_call)[0], env);
 
     const displacement lazy_env_size = lazy_call->size() - 1;
     boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 
     for (std::size_t i = 0, end = lazy_env_size; i != end; ++i)
-      lazy_env[i] = execute_lazy((*lazy_call)[i + 1], args);
+      lazy_env[i] = execute_lazy((*lazy_call)[i + 1], env);
 
     if (prana::recursive_which(lazy_f) != utree_type::function_type) 
       return lazy_f;
 
-    boost::shared_ptr<scope> new_scope
-      = boost::make_shared<scope>(lazy_env, lazy_env_size, args.get());
+    boost::shared_ptr<runtime_environment> new_env
+      = boost::make_shared<runtime_environment>
+        (lazy_env, lazy_env_size, env.checkout());
 
-    return lazy_f.eval(*new_scope);
+    return new_env->invoke(lazy_f);
   }
 };
 

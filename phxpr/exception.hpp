@@ -15,6 +15,7 @@
 #include <prana/include/utree.hpp>
 
 #include <phxpr/signature.hpp>
+#include <phxpr/environment.hpp>
 
 namespace phxpr {
 
@@ -110,11 +111,11 @@ struct expected_identifier: virtual exception {
 
 struct expected_variable_argument: virtual exception {
   displacement n;
-  boost::shared_ptr<scope> environment;
+  boost::shared_ptr<runtime_environment> environment;
  
-  expected_variable_argument (displacement n_,
-                              boost::shared_ptr<scope> const& environment_):
-    n(n_), environment(environment_) { }
+  expected_variable_argument (displacement n_, 
+                              boost::shared_ptr<runtime_environment> const& e_):
+    n(n_), environment(e_) { }
   
   virtual ~expected_variable_argument (void) throw() { }
 };

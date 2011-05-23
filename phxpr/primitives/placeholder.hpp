@@ -29,8 +29,9 @@ struct placeholder: actor<placeholder> {
 
   placeholder (displacement n_, displacement frame_): n(n_), frame(frame_) { } 
 
-  utree eval (scope const& env) const {
-    boost::shared_ptr<scope> eptr = env.get();
+  utree eval (utree const& ut) const {
+    boost::shared_ptr<runtime_environment> eptr
+      = ut.get<runtime_environment*>()->checkout();
 
     BOOST_ASSERT(eptr);
 
@@ -40,9 +41,6 @@ struct placeholder: actor<placeholder> {
     } 
 
     if (eptr->size() <= n) {
-      std::cout << "eptr size: " << eptr->size() << std::endl
-                << "n: " << n << std::endl
-                << env << std::endl;
       BOOST_THROW_EXCEPTION
         (invalid_placeholder(n, frame, eptr->size(), arity_type::fixed));
     }

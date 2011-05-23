@@ -28,7 +28,7 @@ struct evaluator {
   typedef boost::spirit::utf8_symbol_range_type symbol_type;
   typedef boost::iterator_range<utree::const_iterator> range_type;
 
-  typedef environment<utree, utree> variables_type;
+  typedef compile_environment<utree, utree> variables_type;
   typedef sheol::adt::dynamic_array<signature> gpt_type;
   // }}}
 
@@ -68,8 +68,9 @@ struct evaluator {
     lambda l(body, f.sig);
 
     // evaluate the lambda expression, returning a procedure
-    boost::shared_ptr<scope> new_scope = boost::make_shared<scope>(); 
-    utree proc = l.eval(*new_scope);
+    boost::shared_ptr<runtime_environment> new_env
+      = boost::make_shared<runtime_environment>(); 
+    utree proc = new_env->invoke(l);
 
     boost::shared_ptr<utree> p = variables->define
       (utree(spirit::utf8_symbol_type(name)), proc); 
