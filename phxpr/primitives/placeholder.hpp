@@ -33,16 +33,23 @@ struct placeholder: actor<placeholder> {
     boost::shared_ptr<runtime_environment> eptr
       = ut.get<runtime_environment*>()->checkout();
 
-    BOOST_ASSERT(eptr);
+    if (!eptr) {
+      BOOST_THROW_EXCEPTION
+        (invalid_placeholder(n, frame, ut, arity_type::fixed));
+    }
 
     while (frame != eptr->level()) {
-      BOOST_ASSERT(eptr);
       eptr = eptr->outer();
+    
+      if (!eptr) {
+        BOOST_THROW_EXCEPTION
+          (invalid_placeholder(n, frame, ut, arity_type::fixed));
+      }
     } 
 
     if (eptr->size() <= n) {
       BOOST_THROW_EXCEPTION
-        (invalid_placeholder(n, frame, eptr->size(), arity_type::fixed));
+        (invalid_placeholder(n, frame, ut, arity_type::fixed));
     }
 
     return utree((*eptr)[n]);

@@ -21,15 +21,34 @@ namespace phxpr {
 
 // {{{ internal evaluator algorithms
 evaluator::result_type
-evaluate_lambda_body (utree const& body, evaluator& ev);
-
-evaluator::result_type
 evaluate_lambda_expression (utree const& formals,
                             evaluator::range_type const& body, evaluator& ev);
-
-// FIXME: do we need to tag the thunk itself in the gpt?
+        
 evaluator::result_type
-evaluate_lambda_body (utree const& body, evaluator& ev) {
+evaluate_top_level_variable (utree const& identifier, utree const& value,
+                             evaluator& ev)
+{
+  // IMPLEMENT
+  return utree();
+}
+
+evaluator::result_type
+evaluate_internal_variable (utree const& identifier, utree const& value,
+                            evaluator& ev) 
+{
+  // IMPLEMENT
+  return utree();
+}
+
+evaluator::result_type
+evaluate_lambda_body_element (utree const& body, signature const& sig,
+                              evaluator& ev)
+{
+  using boost::fusion::at_c;
+
+  const signature body_sig
+    (at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), function_type::thunk);
+
   boost::shared_ptr<thunk::lazy_call_type> lazy_call
     = boost::make_shared<thunk::lazy_call_type>();
 
@@ -46,6 +65,7 @@ evaluate_lambda_body (utree const& body, evaluator& ev) {
     }
 
     else {
+//      lazy_call->push_back(evaluate_lambda_expression
       BOOST_FOREACH(utree const& element, body)
       { lazy_call->push_back(utree::visit(element, ev)); }
     }
@@ -55,7 +75,11 @@ evaluate_lambda_body (utree const& body, evaluator& ev) {
     lazy_call->push_back(utree::visit(body, ev));
     
   thunk t(lazy_call, ev.global_procedure_table);
+
+  ev.global_procedure_table->push_back(body_sig);
+
   utree ut = stored_function<thunk>(t);
+  ut.tag(ev.global_procedure_table->size() - 1);
 
   return ut;
 }
@@ -93,7 +117,8 @@ evaluate_lambda_expression (utree const& formals,
 
   arity_type::info type = arity_type::fixed;
 
-  if (formals.back() == utree(spirit::utf8_symbol_type("...")))
+  if (!formals.empty() &&
+      (formals.back() == utree(spirit::utf8_symbol_type("..."))))
     type = arity_type::variable;
 
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
@@ -113,7 +138,7 @@ evaluate_lambda_expression (utree const& formals,
     BOOST_THROW_EXCEPTION(expected_body(utree(body))); 
 
   for (; it != end; ++it) {
-    utree f = evaluate_lambda_body(*it, local_env);
+    utree f = evaluate_lambda_body_element(*it, sig, local_env);
     fbody->code->push_back(f);
   }
 
@@ -166,6 +191,23 @@ evaluator::operator() (evaluator::range_type const& range) {
       iterator body = formals; ++body; 
       f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
       ++it; ++it; ++it;
+    }
+    
+    else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
+      iterator identifier = it; ++identifier;
+      iterator value = identifier; ++value;
+      ++it; ++it;
+
+      if (++it != end)
+        BOOST_THROW_EXCEPTION(invalid_operator_expression
+          (utree(range_type(range.begin(), value)))); 
+       
+      // Top-level variable definition.
+      if (frame == 0)
+        return evaluate_top_level_variable(*identifier, *value, *this); 
+      // Internal variable definition.
+      else
+        return evaluate_internal_variable(*identifier, *value, *this); 
     }
 
     else {
