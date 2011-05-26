@@ -38,23 +38,23 @@ struct invalid_arity: virtual exception {
 struct invalid_placeholder: virtual exception {
   displacement expected_n;
   displacement expected_frame;
-  displacement got;
+  utree environment;
   arity_type::info type;
 
   invalid_placeholder (displacement expected_n_, displacement expected_frame_,
-                       displacement got_, arity_type::info type_):
-    expected_n(expected_n_), expected_frame(expected_frame_), got(got_),
-    type(type_) { }
+                       utree const& environment_, arity_type::info type_):
+    expected_n(expected_n_), expected_frame(expected_frame_),
+    environment(environment_), type(type_) { }
 
   virtual ~invalid_placeholder (void) throw() { }
 };
 
 struct invalid_local_variable: virtual exception {
   displacement expected;
-  displacement got;
+  utree environment;
 
-  invalid_local_variable (displacement expected_, displacement got_):
-    expected(expected_), got(got_) { }
+  invalid_local_variable (displacement expected_, utree const& environment_):
+    expected(expected_), environment(environment_) { }
 
   virtual ~invalid_local_variable (void) throw() { }
 };
