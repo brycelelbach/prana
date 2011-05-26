@@ -23,7 +23,8 @@ struct function_type {
     derived         = 0,
     lambda          = 1,
     placeholder     = 2,
-    procedure       = 3
+    procedure       = 3,
+    thunk           = 4
   };
 
   typedef boost::uint8_t integral;
