@@ -27,5 +27,7 @@ project
   : build-dir bin.v2
   ;
 
+build-project build ;
 build-project test/phxpr ;
+build-project test/prana ;
 
