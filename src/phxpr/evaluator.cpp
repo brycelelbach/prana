@@ -63,13 +63,7 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
     }
 
     else {
-//      std::cout << elements << std::endl;
-//      utree::list_type formals; // empty formals list 
-//      lazy_call->push_back(element_type(evaluate_lambda_expression
-//        (formals, evaluator::range_type(it, end), ev), true));
-      BOOST_FOREACH(utree const& element, elements)
-//      { lazy_call->push_back(utree::visit(element, ev)); }
-      {
+      BOOST_FOREACH(utree const& element, elements) {
         if (prana::is_utree_container(element))
           lazy_call->push_back(make_thunk(element, sig, ev));
         else
