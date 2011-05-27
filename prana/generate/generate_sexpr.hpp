@@ -68,6 +68,13 @@ bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
   #endif
 }
 
+template <typename Char>
+std::basic_ostream<Char>&
+operator<< (std::basic_ostream<Char>& out, parse_tree<tag::sexpr> const& in) {
+  generate_sexpr(in.ast(), out);
+  return out;
+}
+
 } // prana
 
 #endif // PRANA_EB93B6AB_F9CA_472E_9D47_844CB954C501

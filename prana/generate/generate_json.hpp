@@ -19,7 +19,7 @@
 
 namespace prana {
 
-template<class Char>
+template <typename Char>
 bool generate_json (parse_tree<tag::json> const& in,
                     std::basic_ostream<Char>& out)
 {
@@ -28,7 +28,7 @@ bool generate_json (parse_tree<tag::json> const& in,
   return true; 
 }
 
-template<class Char>
+template <typename Char>
 bool generate_json (parse_tree<tag::json> const& in,
                     std::basic_string<Char>& out)
 {
@@ -37,6 +37,13 @@ bool generate_json (parse_tree<tag::json> const& in,
   print(in.ast());
   out = oss.str();
   return true; 
+}
+
+template <typename Char>
+std::basic_ostream<Char>&
+operator<< (std::basic_ostream<Char>& out, parse_tree<tag::json> const& in) {
+  generate_json(in.ast(), out);
+  return out;
 }
 
 } // prana
