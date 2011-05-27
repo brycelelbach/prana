@@ -26,8 +26,9 @@ phxpr.run-phxi lambda ;
 phxpr.run-phxi nary_body_nested_lambda ;
 phxpr.run-phxi nested_anonymous_lambda ;
 phxpr.run-phxi nested_lambda ;
-phxpr.run-phxi procedure_argument ;
-phxpr.run-phxi procedure_call_argument ;
-phxpr.run-phxi procedure_call_argument_with_placeholders ;
+phxpr.run-phxi lambda_as_argument ;
+phxpr.run-phxi procedure_as_argument ;
+phxpr.run-phxi procedure_call_as_argument ;
+phxpr.run-phxi procedure_call_as_argument_with_placeholders ;
 phxpr.run-phxi return_constant ;
 
