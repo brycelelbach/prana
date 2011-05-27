@@ -174,8 +174,8 @@ struct sexpr_parser<Tag, Iterator, typename boost::enable_if<
          | integer
          | boolean
          | utf8
-         | symbol
-         | binary;
+         | binary
+         | symbol;
 
     nil_ = "nil" >> attr(spirit::nil); 
 
@@ -189,10 +189,10 @@ struct sexpr_parser<Tag, Iterator, typename boost::enable_if<
       ("#f", false)
       ("false", false);
 
-    std::string exclude = std::string(" ();\"\x01-\x1f\x7f") + '\0';
+    std::string exclude = std::string(" ();\"\x01-\x1f\x7f#") + '\0';
     symbol = lexeme[+(~char_(exclude))];
 
-    binary = lexeme['#' > *hex2 > '#'];
+    binary = lexeme['#' > *(hex2 - '#') > '#'];
 
     std::string name = mpl::c_str<typename Tag::name>::value;
 

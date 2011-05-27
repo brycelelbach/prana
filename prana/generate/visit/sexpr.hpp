@@ -8,6 +8,12 @@
 #if !defined(PRANA_41143C6D_6CE0_4314_B918_B12618A675D6)
 #define PRANA_41143C6D_6CE0_4314_B918_B12618A675D6
 
+#include <prana/config.hpp>
+
+#include <ios>
+
+#include <boost/io/ios_state.hpp>
+
 #include <prana/include/utree.hpp>
 
 namespace prana {
@@ -45,11 +51,16 @@ struct sexpr_printer {
     typedef spirit::binary_range_type::const_iterator iterator;
 
     iterator it = str.begin(), end = str.end();
+        
+    boost::io::ios_all_saver saver(out); 
 
-    out << '#';
+    out << '#' << std::hex;
+
+    out.width(2); 
+    out.fill('0');
 
     for (; it != end; ++it)
-      out << *it;
+      out << int((unsigned char)(*it));
 
     out << '#';
   }
