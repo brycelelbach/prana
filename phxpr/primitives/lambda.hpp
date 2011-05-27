@@ -20,20 +20,31 @@
 namespace phxpr {
 
 struct lambda: actor<lambda> {
+  typedef sheol::adt::dynamic_array<signature> gpt_type;
+
   boost::shared_ptr<function_body> body;
+  boost::shared_ptr<gpt_type> global_procedure_table;
   const signature sig;
   displacement num_local_vars;
   
-  lambda (function_body const& body_, signature const& sig_,
-          displacement num_local_vars_ = 0):
-    body(boost::make_shared<function_body>(body_)), sig(sig_),
-    num_local_vars(num_local_vars_)
-  { BOOST_ASSERT(body); }
+  lambda (function_body const& body_, boost::shared_ptr<gpt_type> const& gpt,
+          signature const& sig_, displacement num_local_vars_ = 0):
+    body(boost::make_shared<function_body>(body_)), global_procedure_table(gpt),
+    sig(sig_), num_local_vars(num_local_vars_)
+  {
+    BOOST_ASSERT(gpt);
+    BOOST_ASSERT(body);
+  }
 
-  lambda (boost::shared_ptr<function_body> const& body_, signature const& sig_,
+  lambda (boost::shared_ptr<function_body> const& body_, 
+          boost::shared_ptr<gpt_type> const& gpt, signature const& sig_,
           displacement num_local_vars_ = 0):
-    body(body_), sig(sig_), num_local_vars(num_local_vars_)
-  { BOOST_ASSERT(body); }
+    body(body_), global_procedure_table(gpt), sig(sig_), 
+    num_local_vars(num_local_vars_)
+  {
+    BOOST_ASSERT(gpt);
+    BOOST_ASSERT(body);
+  }
   
   utree eval (utree const& ut) const {
     using boost::fusion::at_c;
@@ -50,7 +61,7 @@ struct lambda: actor<lambda> {
       saved_env = env.outer();
 
     function_base* pf = new stored_function<procedure>
-      (procedure(body, saved_env, signature
+      (procedure(body, saved_env, global_procedure_table, signature
         (at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), function_type::procedure),
           num_local_vars));
 

@@ -65,7 +65,7 @@ struct evaluator {
       = boost::make_shared<function_body>(f);
 
     // create a new lambda expression
-    lambda l(body, f.sig);
+    lambda l(body, global_procedure_table, f.sig);
 
     // evaluate the lambda expression, returning a procedure
     boost::shared_ptr<runtime_environment> new_env

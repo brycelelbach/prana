@@ -16,6 +16,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 
+#include <prana/utree/predicates.hpp>
+
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
@@ -24,17 +26,46 @@
 namespace phxpr {
 
 struct procedure: actor<procedure> {
+  typedef sheol::adt::dynamic_array<signature> gpt_type;
+
   boost::shared_ptr<function_body> body;
   boost::shared_ptr<runtime_environment> parent_env;
+  boost::shared_ptr<gpt_type> global_procedure_table;
   const signature sig;
   displacement num_local_vars;
 
   procedure (boost::shared_ptr<function_body> const& body_,
              boost::shared_ptr<runtime_environment> const& parent_env_,
-             signature const& sig_, displacement num_local_vars_):
-    body(body_), parent_env(parent_env_), sig(sig_),
-    num_local_vars(num_local_vars_)
-  { BOOST_ASSERT(body); }
+             boost::shared_ptr<gpt_type> const& gpt, signature const& sig_,
+             displacement num_local_vars_):
+    body(body_), parent_env(parent_env_), global_procedure_table(gpt),
+    sig(sig_), num_local_vars(num_local_vars_)
+  {
+    BOOST_ASSERT(gpt);
+    BOOST_ASSERT(body);
+  }
+
+  // TODO: Refactor this code with the code in thunk
+  utree expand (utree const& arg, runtime_environment& env) const {
+    using boost::fusion::at_c;
+
+    if (prana::recursive_which(arg) == utree_type::function_type) {
+      BOOST_ASSERT(arg.tag() <= global_procedure_table->size());
+
+      // Load the argument's signature from the gpt.
+      signature const& sig = (*global_procedure_table)[arg.tag()];
+
+      if (at_c<3>(sig) == function_type::placeholder)
+        return env.invoke(arg);
+      else
+        // REVIEW: How safe is this ref?
+        return utree(boost::ref(arg));
+    }
+
+    else
+      // REVIEW: How safe is this ref?
+      return utree(boost::ref(arg));
+  }
 
   utree eval (utree const& ut) const {
     using boost::fusion::at_c;
@@ -70,6 +101,7 @@ struct procedure: actor<procedure> {
         return new_env->invoke(body);
       } // }}}
 
+      #if 0
       boost::shared_array<utree> const& ap = env.get();
 
       // fastpath
@@ -79,19 +111,21 @@ struct procedure: actor<procedure> {
             (ap, env.size(), parent_env);
         return new_env->invoke(body);
       }
+      #endif
 
       // slowpath (TODO: shouldn't ever happen)
-      else {
+//      else {
         boost::shared_array<utree> storage(new utree[env.size()]);
 
-        for (std::size_t i = 0, end = env.size(); i != end; ++i)
-          storage[i] = env[i];
+        for (std::size_t i = 0, end = env.size(); i != end; ++i) {
+          storage[i] = expand(env[i], env);
+        }
 
         boost::shared_ptr<runtime_environment> new_env
           = boost::make_shared<runtime_environment>
             (storage, env.size(), parent_env);
         return new_env->invoke(body);
-      }
+//      }
     }
   
     // nullary  

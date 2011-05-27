@@ -31,7 +31,7 @@ struct thunk: actor<thunk> {
   boost::shared_ptr<gpt_type> global_procedure_table;
 
   thunk (boost::shared_ptr<lazy_call_type> const& lazy_call_,
-         boost::shared_ptr<gpt_type> const& gpt):         
+         boost::shared_ptr<gpt_type> const& gpt):   
     lazy_call(lazy_call_), global_procedure_table(gpt)
   {
     BOOST_ASSERT(gpt);
@@ -39,27 +39,27 @@ struct thunk: actor<thunk> {
     BOOST_ASSERT(lazy_call->size() > 0);
   }
 
-  utree execute_lazy (utree const& lazy_arg,
-                      runtime_environment& env) const
-  { 
+  // TODO: Refactor this code with the code in procedure
+  utree execute_lazy (utree const& lazy, runtime_environment& env) const { 
     using boost::fusion::at_c;
-    
-    if (prana::recursive_which(lazy_arg) == utree_type::function_type) {
-      BOOST_ASSERT(lazy_arg.tag() <= global_procedure_table->size());
+
+    if (prana::recursive_which(lazy) == utree_type::function_type) {
+      BOOST_ASSERT(lazy.tag() <= global_procedure_table->size());
 
       // Load the lazy argument's signature from the gpt.
-      signature const& sig = (*global_procedure_table)[lazy_arg.tag()];
+      signature const& sig = (*global_procedure_table)[lazy.tag()];
 
-      if (at_c<3>(sig) == function_type::placeholder)
-        return env.invoke(lazy_arg);
+      if ((at_c<3>(sig) == function_type::placeholder) ||
+          (at_c<3>(sig) == function_type::thunk))
+        return env.invoke(lazy);
       else
         // REVIEW: How safe is this ref?
-        return utree(boost::ref(lazy_arg));
+        return utree(boost::ref(lazy));
     }
 
     else
       // REVIEW: How safe is this ref?
-      return utree(boost::ref(lazy_arg));
+      return utree(boost::ref(lazy));
   }
 
   utree eval (utree const& ut) const {

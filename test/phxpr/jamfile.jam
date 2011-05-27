@@ -9,14 +9,21 @@
 
 import phxpr ;
 
+
 phxpr.run-phxi anonymous_lambda ;
+phxpr.run-phxi deep_nested_anonymous_lambda ;
 phxpr.run-phxi empty_lambda_expression ;
 phxpr.run-phxi empty_lambda ;
+phxpr.run-phxi intrinsics_lambda ;
 phxpr.run-phxi intrinsics ;
+phxpr.run-phxi intrinsics_placeholder_argument ;
 phxpr.run-phxi lambda_expression ;
+phxpr.run-phxi lambda ;
 phxpr.run-phxi nary_body_nested_lambda ;
 phxpr.run-phxi nested_anonymous_lambda ;
 phxpr.run-phxi nested_lambda ;
 phxpr.run-phxi procedure_argument ;
+phxpr.run-phxi procedure_call_argument ;
+phxpr.run-phxi procedure_call_argument_with_placeholders ;
 phxpr.run-phxi return_constant ;
 

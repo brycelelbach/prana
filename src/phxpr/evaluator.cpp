@@ -41,21 +41,19 @@ evaluate_internal_variable (utree const& identifier, utree const& value,
 }
 
 evaluator::result_type
-evaluate_lambda_body_element (utree const& body, signature const& sig,
-                              evaluator& ev)
-{
+make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
   using boost::fusion::at_c;
 
-  const signature body_sig
-    (at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), function_type::thunk);
+  const signature body_sig(at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), 
+                           function_type::thunk);
 
   boost::shared_ptr<thunk::lazy_call_type> lazy_call
     = boost::make_shared<thunk::lazy_call_type>();
 
-  if (prana::is_utree_container(body)) {
+  if (prana::is_utree_container(elements)) {
     typedef utree::const_iterator iterator;
 
-    iterator it = body.begin(), end = body.end();
+    iterator it = elements.begin(), end = elements.end();
 
     if ((it != end) && (*it == utree(spirit::utf8_symbol_type("lambda")))) {
       iterator formals = it; ++formals;
@@ -65,14 +63,23 @@ evaluate_lambda_body_element (utree const& body, signature const& sig,
     }
 
     else {
-//      lazy_call->push_back(evaluate_lambda_expression
-      BOOST_FOREACH(utree const& element, body)
-      { lazy_call->push_back(utree::visit(element, ev)); }
+//      std::cout << elements << std::endl;
+//      utree::list_type formals; // empty formals list 
+//      lazy_call->push_back(element_type(evaluate_lambda_expression
+//        (formals, evaluator::range_type(it, end), ev), true));
+      BOOST_FOREACH(utree const& element, elements)
+//      { lazy_call->push_back(utree::visit(element, ev)); }
+      {
+        if (prana::is_utree_container(element))
+          lazy_call->push_back(make_thunk(element, sig, ev));
+        else
+          lazy_call->push_back(utree::visit(element, ev));
+      }
     }
   }
 
   else
-    lazy_call->push_back(utree::visit(body, ev));
+    lazy_call->push_back(utree::visit(elements, ev));
     
   thunk t(lazy_call, ev.global_procedure_table);
 
@@ -138,11 +145,11 @@ evaluate_lambda_expression (utree const& formals,
     BOOST_THROW_EXCEPTION(expected_body(utree(body))); 
 
   for (; it != end; ++it) {
-    utree f = evaluate_lambda_body_element(*it, sig, local_env);
+    utree f = make_thunk(*it, sig, local_env);
     fbody->code->push_back(f);
   }
 
-  lambda l(fbody, sig);
+  lambda l(fbody, local_env.global_procedure_table, sig);
 
   local_env.global_procedure_table->push_back(sig);
 
