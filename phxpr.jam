@@ -1,0 +1,35 @@
+
+################################################################################
+#   Copyright (c) 2005 Joao Abecasis
+#   Copyright (c) 2010 Bryce Lelbach
+#
+#   Distributed under the Boost Software License, Version 1.0. (See accompanying
+#   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+################################################################################
+
+import modules ;
+import targets ;
+import testing ;
+import project ;
+
+rule run-phxi ( target-name : input ? : requirements * ) {
+  input ?= $(target-name).phxpr ;
+
+  local project = [ project.current ] ;
+
+  local t = [ targets.create-typed-target RUN
+            : $(project)
+            : $(target-name)
+            : /prana//phxi 
+            : $(requirements)
+                <location-prefix>$(target-name).test
+                <testing.input-file>$(input)
+                <preserve-test-targets>on
+            ]
+            ;
+
+  modules.poke testing : .all-tests : \$\(all-tests\) $(t) ;
+
+  return $(t) ;
+}
+

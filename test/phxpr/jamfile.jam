@@ -7,13 +7,16 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project 
-  : requirements
-    <library>/prana//phxpr
-  ;
+import phxpr ;
 
-run lambda.cpp ; 
-run compile_environment.cpp ; 
-run evaluator.cpp ; 
-run upvalue.cpp ; 
+phxpr.run-phxi anonymous_lambda ;
+phxpr.run-phxi empty_lambda_expression ;
+phxpr.run-phxi empty_lambda ;
+phxpr.run-phxi intrinsics ;
+phxpr.run-phxi lambda_expression ;
+phxpr.run-phxi nary_body_nested_lambda ;
+phxpr.run-phxi nested_anonymous_lambda ;
+phxpr.run-phxi nested_lambda ;
+phxpr.run-phxi procedure_argument ;
+phxpr.run-phxi return_constant ;
 

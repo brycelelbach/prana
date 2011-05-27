@@ -8,19 +8,14 @@
 ################################################################################
 
 import os ;
-import testing ;
 
 local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
 local SHEOL_ROOT = [ os.environ SHEOL_ROOT ] ;
-
-variant valgrind : <testing.launcher>valgrind ;
 
 use-project /boost : $(BOOST_ROOT) ;
 use-project /sheol : $(SHEOL_ROOT) ;
 
 use-project /prana : build ;
-use-project /prana_tests : test/phxpr ;
-use-project /phxpr_tests : test/phxpr ;
 
 project 
   : requirements
@@ -32,7 +27,5 @@ project
   : build-dir bin.v2
   ;
 
-build-project build ;
-build-project test/prana ;
 build-project test/phxpr ;
 
