@@ -1,0 +1,17 @@
+################################################################################
+#   Copyright (c) 2010 Bryce Lelbach
+#
+#   Distributed under the Boost Software License, Version 1.0. (See accompanying
+#   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+################################################################################
+
+lib phxpr 
+  : $(PRANA_ROOT)/src/phxpr/evaluator.cpp
+    $(PRANA_ROOT)/src/phxpr/signature.cpp
+  ;
+
+exe phxi 
+  : $(PRANA_ROOT)/src/drivers/phxi.cpp
+  : <library>$(BOOST_PROGRAM_OPTIONS)
+    <library>/prana//phxpr
+  ;
