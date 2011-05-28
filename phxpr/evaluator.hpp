@@ -21,7 +21,7 @@
 
 namespace phxpr {
 
-struct evaluator {
+struct PHXPR_EXPORT evaluator {
   // {{{ types
   typedef utree result_type;
 
@@ -82,13 +82,13 @@ struct evaluator {
 
 typedef prana::parse_tree<prana::tag::sexpr> sexpr_parse_tree;
 
-utree evaluate (sexpr_parse_tree const& pt);
+utree PHXPR_EXPORT evaluate (sexpr_parse_tree const& pt);
 
-utree evaluate (sexpr_parse_tree const& pt, evaluator& ev);
+utree PHXPR_EXPORT evaluate (sexpr_parse_tree const& pt, evaluator& ev);
 
-utree evaluate (utree const& ut);
+utree PHXPR_EXPORT evaluate (utree const& ut);
 
-utree evaluate (utree const& ut, evaluator& ev);
+utree PHXPR_EXPORT evaluate (utree const& ut, evaluator& ev);
 
 } // phxpr
 

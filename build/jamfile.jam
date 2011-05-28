@@ -8,6 +8,7 @@
 lib phxpr 
   : $(PRANA_ROOT)/src/phxpr/evaluator.cpp
     $(PRANA_ROOT)/src/phxpr/signature.cpp
+  : <define>PHXPR_SOURCE
   ;
 
 exe phxi 

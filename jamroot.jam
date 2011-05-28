@@ -25,6 +25,7 @@ project
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
     <toolset>gcc:<cxxflags>-fdiagnostics-show-option
     <toolset>gcc:<cxxflags>-Wno-multichar
+    <toolset>gcc:<cxxflags>-Wattributes
     <toolset>clang:<cxxflags>-fdiagnostics-show-option
     <toolset>clang:<cxxflags>-Wno-multichar
     <warnings>on

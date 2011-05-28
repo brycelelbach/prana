@@ -10,6 +10,12 @@
 
 #include <prana/config.hpp>
 
+#if defined(PHXPR_SOURCE)
+  #define PHXPR_EXPORT SHEOL_SYMBOL_EXPORT
+#else
+  #define PHXPR_EXPORT SHEOL_SYMBOL_IMPORT
+#endif
+
 #include <phxpr/config/using.hpp>
 
 #endif // PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753

@@ -11,7 +11,7 @@ import phxpr ;
 
 project
   : requirements
-    <testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
+    <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
   ;
 
 phxpr.run-phxi anonymous_lambda ;

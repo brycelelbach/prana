@@ -9,7 +9,7 @@
 
 project
   : requirements
-    <testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
+    <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
   ;
 
 run sexpr/basic.cpp     : : : : sexpr_basic ;

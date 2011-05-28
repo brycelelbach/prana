@@ -10,6 +10,12 @@
 
 #include <sheol/config.hpp>
 
+#if defined(PRANA_SOURCE)
+  #define PRANA_EXPORT SHEOL_SYMBOL_EXPORT
+#else
+  #define PRANA_EXPORT SHEOL_SYMBOL_IMPORT
+#endif
+
 #define BOOST_SPIRIT_DISABLE_UTREE_IO
 
 // Decltype-based result_of won't work with Spirit style CPs.
