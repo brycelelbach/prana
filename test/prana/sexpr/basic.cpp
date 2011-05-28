@@ -5,94 +5,70 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include <sheol/lightweight_test.hpp>
-
+#include <prana/test/parser_harness.hpp>
 #include <prana/parse/parse_tree.hpp>
 #include <prana/parse/grammar/sexpr.hpp>
+#include <prana/generate/generate_sexpr.hpp>
 #include <prana/utree/io.hpp>
 
+using boost::spirit::nil;
+using boost::spirit::utf8_symbol_type;
+using boost::spirit::binary_string_type;
+
+using prana::utree;
+using prana::parse_tree;
+using prana::tag::sexpr;
+using prana::test::parser_harness;
+
 int main (void) { 
-  using prana::utree;
-  using prana::parse_tree;
-  using prana::tag::sexpr;
+  parser_harness<sexpr> ph;
 
-  { 
-    const std::string in = "nil";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "nil");
-  }
+  ph
+    ("nil")
+    ("nil", utree(nil))
 
-  { 
-    const std::string in = "#t";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "#t");
-  }
+    ("#t")
+    ("#t", utree(true))
 
-  { 
-    const std::string in = "10";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "10");
-  }
+    ("#f")
+    ("#f", utree(false))
 
-  { 
-    const std::string in = "#x10";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "16");
-  }
+    ("10")
+    ("10", utree(10))
 
-  { 
-    const std::string in = "#o10";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "8");
-  }
+    ("#x10", "16")
+    ("#x10", utree(16))
 
-  { 
-    const std::string in = "17.5";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "17.5");
-  }
+    ("#o10", "8")
+    ("#o10", utree(8))
 
-  { 
-    const std::string in = "\"foo\"";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "\"foo\"");
-  }
+    ("17.5", "17.5")
+    ("17.5", utree(17.5))
 
-  { 
-    const std::string in = "\"\"";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "\"\"");
-  }
+    ("\"foo\"")
+    ("\"foo\"", utree("foo"))
+    
+    ("bar")
+    ("bar", utree(utf8_symbol_type("bar")))
 
-  { 
-    const std::string in = "(\"\\\"\" \"a\\\"\" \"\\\"b\" \"a\\\"b\")";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "(\"\"\" \"a\"\" \"\"b\" \"a\"b\")");
-  }
+    ("\"\"")
+    ("\"\"", utree(""))
 
-  { 
-    const std::string in = "#\xDE\xAD\xBE\xEF#";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "#\xDE\xAD\xBE\xEF#");
-  }
+    ("\"\\\"\"", "\"\"\"")
+    ("\"\\\"\"", utree("\""))
 
-  { 
-    const std::string in = "##";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "##");
-  }
+    ("\"a\\\"\"", "\"a\"\"")
+    ("\"a\\\"\"", utree("a\""))
 
-  { 
-    const std::string in = "(### #\xBE## ##\xEF# #\xBE#\xEF#)";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "(### #\xBE## ##\xEF# #\xBE#\xEF#)"); 
-  }
+    ("\"\\\"b\"", "\"\"b\"")
+    ("\"\\\"b\"", utree("\"b"))
 
-  { 
-    const std::string in = "bar";
-    parse_tree<sexpr> pt(in);
-    SHEOL_TEST_STREQ(pt.ast(), "bar");
-  }
+    ("\"a\\\"b\"", "\"a\"b\"")
+    ("\"a\\\"b\"", utree("a\"b"))
+
+    ("#deadbeef#", utree(binary_string_type("\xde\xad\xbe\xef")))
+    ("##", utree(binary_string_type("")))
+  ;
   
   return sheol::report_errors();
 }

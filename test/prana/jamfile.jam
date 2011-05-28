@@ -7,8 +7,13 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-project ;
+project
+  : requirements
+    <testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
+  ;
 
 run sexpr/basic.cpp : : : : sexpr_basic ;
-run sexpr/list.cpp : : : : sexpr_list ;
+run sexpr/list.cpp  : : : : sexpr_list ;
+
+run json/array.cpp  : : : : json_array ;
 

@@ -5,112 +5,55 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include "harness.hpp"
+#include <prana/test/parser_harness.hpp>
+#include <prana/parse/parse_tree.hpp>
+#include <prana/parse/grammar/json.hpp>
+#include <prana/generate/generate_json.hpp>
+#include <prana/utree/io.hpp>
+#include <prana/utree/make_list.hpp>  
 
-#include <boost/spirit/home/prana/parse/parse_tree.hpp>
-#include <boost/spirit/home/prana/parse/grammar/json.hpp>
-#include <boost/spirit/home/prana/generate/generate_json.hpp>
+using boost::spirit::nil;
+using boost::spirit::utf8_symbol_type;
 
-int main (void) { try { 
-  using boost::spirit::utree;
-  using boost::spirit::prana::parse_tree;
-  using boost::spirit::prana::tag::json;
-  using boost::spirit::prana::generate_json;
-  using boost::spirit::prana::magic::extract_source_location;
+using prana::utree;
+using prana::parse_tree;
+using prana::tag::json;
+using prana::magic::extract_source_location;
+using prana::make_list;
+using prana::test::parser_harness;
 
-  std::cout << "empty array test: " << std::endl;
+int main (void) { 
+  parser_harness<json> ph;
 
-  { 
-    std::string in = "[[], [ ]]";
+  ph
+    ("[[], [ ]]", "[[], []]")
+    ("[[], [ ]]", make_list(utf8_symbol_type("[]"), utf8_symbol_type("[]")))
 
-    parse_tree<json> pt(in);
+    ("[null, null, null]")
+    ("[null, null, null]", make_list(nil, nil, nil))
 
-    std::cout << pt.ast() << std::endl;
+    ("[\"a\",\"b\", \"c\",  \"d\"]\n", "[\"a\", \"b\", \"c\", \"d\"]")
+    ("[\"a\",\"b\", \"c\",  \"d\"]\n", make_list("a", "b", "c", "d"))
 
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) ("[[], []]")))
-  }
+    ("[13053, null, 16.3, \"xyz\", false]")
+    ("[13053, null, 16.3, \"xyz\", false]",
+      make_list(13053, nil, 16.3, "xyz", false))
 
-  std::cout << std::endl << "basic array test: " << std::endl; 
-
-  { 
-    std::string in = "[null, null, null]";
-
-    parse_tree<json> pt(in);
-    
-    std::cout << pt.ast() << std::endl;
-    
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-  
-  std::cout << std::endl << "array skipping test: " << std::endl; 
-  
-  { 
-    std::string in = "[\"a\",\"b\", \"c\",  \"d\"]\n";
-
-    parse_tree<json> pt(in);
-    
-    std::cout << pt.ast() << std::endl;
-    
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) ("[\"a\", \"b\", \"c\", \"d\"]")))
-  }
-  
-  std::cout << std::endl << "multi type array test: " << std::endl; 
-  
-  { 
-    std::string in = "[13053, null, 16.3, \"xyz\", false]";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-    
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-  
-  std::cout << std::endl << "nested array test: " << std::endl; 
-  
-  { 
-    std::string in = "[[-1, -2, -3], true, [[[\"abc\"]]]]";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-    
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-  
-  std::cout << std::endl << "line position test: " << std::endl; 
+    ("[[-1, -2, -3], true, [[[\"abc\"]]]]")
+    ("[[-1, -2, -3], true, [[[\"abc\"]]]]",
+      make_list(make_list(-1, -2, -3), true,
+        make_list(make_list(make_list("abc")))))
+  ;
 
   { 
-    std::string in = "[[true, false],\ntrue\n]";
-
+    const std::string in = "[[true, false], \n[true]]";
     parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-    
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) ("[[true, false], true]")))
-
-    BSP_BOOLEAN_TESTS(
-      ((extract_source_location(pt.ast()[0], pt).line()) (1))
-      ((extract_source_location(pt.ast()[1], pt).line()) (2)))
+    SHEOL_TEST_STREQ(pt, "[[true, false], [true]]");
+    SHEOL_TEST_EQ(extract_source_location(pt.ast().front(), pt).column, 14U); 
+    SHEOL_TEST_EQ(extract_source_location(pt.ast().front(), pt).line, 1U); 
+    SHEOL_TEST_EQ(extract_source_location(pt.ast().back(), pt).line, 2U); 
   }
   
-  } catch (std::exception& e) {
-    std::cout << "caught: " << e.what() << "\n";
-    return -1;
-  }
-
-  return boost::report_errors();
+  return sheol::report_errors();
 }
  
