@@ -42,9 +42,6 @@ struct parser_harness {
   
   result_type operator() (std::string const& in, utree const& val) const { 
     parse_tree<Tag> pt(in);
-
-    std::cout << "in_type=" << pt.ast().which() << ", val_type=" << val.which() << std::endl;
-
     SHEOL_TEST_EQ(pt.ast(), val);
     return *this;
   }
