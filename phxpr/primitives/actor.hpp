@@ -20,6 +20,8 @@
 
 namespace phxpr {
 
+// TODO: reimplement dispatchers
+
 template <typename Derived>
 struct actor {
   typedef actor<Derived> base_type;
@@ -30,12 +32,6 @@ struct actor {
 
   utree operator() (utree const& ut) const
   { return derived().eval(ut); }
-
-  utree operator() (void) const {
-    boost::shared_ptr<runtime_environment> new_scope
-      = boost::make_shared<runtime_environment>();
-    return new_scope->invoke(derived());
-  }
 };
 
 } // phxpr

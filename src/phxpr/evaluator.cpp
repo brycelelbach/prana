@@ -23,7 +23,14 @@ namespace phxpr {
 evaluator::result_type
 evaluate_lambda_expression (utree const& formals,
                             evaluator::range_type const& body, evaluator& ev);
-        
+
+evaluator::result_type
+make_if_thunk (utree const& predicate, utree const& then, evaluator& ev);
+
+evaluator::result_type
+make_if_thunk (utree const& predicate, utree const& then, utree const& else_,
+               evaluator& ev);
+ 
 evaluator::result_type
 evaluate_module_level_variable (utree const& identifier, utree const& value,
                              evaluator& ev)
@@ -71,7 +78,17 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
       iterator identifier = it; ++identifier;
       iterator value = identifier; ++value;
-      return evaluate_internal_variable(*identifier, *value, ev); 
+      lazy_call->push_back(evaluate_internal_variable(*identifier, *value, ev)); 
+    }
+    
+    else if (*it == utree(spirit::utf8_symbol_type("if"))) {
+      iterator predicate = it; ++predicate;
+      iterator then = predicate; ++then;
+      iterator else_ = then; ++else_;
+      if (else_ == end)
+        lazy_call->push_back(make_if_thunk(*predicate, *then, ev)); 
+      else
+        lazy_call->push_back(make_if_thunk(*predicate, *then, *else_, ev)); 
     }
 
     else {
@@ -95,6 +112,18 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
   ut.tag(ev.global_procedure_table->size() - 1);
 
   return ut;
+}
+
+evaluator::result_type
+make_if_thunk (utree const& predicate, utree const& then, evaluator& ev) {
+  return utree();
+}
+
+evaluator::result_type
+make_if_thunk (utree const& predicate, utree const& then, utree const& else_,
+               evaluator& ev)
+{
+  return utree();
 }
 
 // TODO: handle variable arguments
