@@ -185,7 +185,7 @@ struct json_parser<Tag, Iterator, typename boost::enable_if<
 
     real_parser<double, strict_real_policies<double> > real;
         
-    as<utf8_symbol_type> as_symbol;
+    as<spirit::utf8_symbol_type> as_symbol;
 
     start = value.alias();
 
