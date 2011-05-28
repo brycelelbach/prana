@@ -49,7 +49,7 @@ struct push_annotation {
     annotations.push_back(v);
     size_type n = annotations.size() - 1;
 
-    BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
+    BOOST_ASSERT(n <= (std::numeric_limits<unsigned short>::max)());
     ast.tag(n);
   }
 };

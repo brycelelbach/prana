@@ -5,93 +5,39 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include "harness.hpp"
+#include <prana/test/parser_harness.hpp>
+#include <prana/parse/parse_tree.hpp>
+#include <prana/parse/grammar/json.hpp>
+#include <prana/generate/generate_json.hpp>
+#include <prana/utree/io.hpp>
 
-#include <boost/spirit/home/prana/parse/parse_tree.hpp>
-#include <boost/spirit/home/prana/parse/grammar/json.hpp>
-#include <boost/spirit/home/prana/generate/generate_json.hpp>
+using boost::spirit::nil;
 
-int main (void) { try {
-  using boost::spirit::utree;
-  using boost::spirit::prana::parse_tree;
-  using boost::spirit::prana::tag::json;
-  using boost::spirit::prana::generate_json;
+using prana::utree;
+using prana::parse_tree;
+using prana::tag::json;
+using prana::test::parser_harness;
 
-  std::cout << "null test: " << std::endl; 
+int main (void) { 
+  parser_harness<json> ph;
 
-  { 
-    std::string in = "null";
+  ph
+    ("null")
+    ("null", utree(nil))
 
-    parse_tree<json> pt(in);
+    ("true")
+    ("true", utree(true))
 
-    std::cout << pt.ast() << std::endl;
+    ("-19")
+    ("-19", utree(-19))
 
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
+    ("4532.5")
+    ("4532.5", utree(4532.5))
 
-  std::cout << std::endl << "boolean test: " << std::endl; 
+    ("\"abc\"")
+    ("\"abc\"", utree("abc"))
+  ;
 
-  { 
-    std::string in = "true";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-
-  std::cout << std::endl << "integer test: " << std::endl; 
-
-  { 
-    std::string in = "-19";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-  
-  std::cout << std::endl << "floating test: " << std::endl; 
-
-  {
-    std::string in = "4532.5";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-
-  std::cout << std::endl << "string test: " << std::endl; 
-
-  { 
-    std::string in = "\"abc\"";
-
-    parse_tree<json> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_json,
-      ((pt) (in)))
-  }
-
-  } catch (std::exception& e) {
-    std::cout << "caught: " << e.what() << "\n";
-    return -1;
-  }
-
-  return boost::report_errors();
+  return sheol::report_errors();
 }
  

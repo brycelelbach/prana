@@ -84,7 +84,7 @@ struct json_printer {
   }
 
   void operator() (utree::invalid_type) const {
-    out << "\"invalid\"";
+    out << "<invalid>";
   }
 
   void operator() (utree::nil_type) const {
@@ -101,7 +101,7 @@ struct json_printer {
   }
 
   void operator() (spirit::binary_range_type const& str) const {
-    out << "\"binary\"";
+    out << "<binary>";
   }
 
   void operator() (spirit::utf8_string_range_type const& str) const {
@@ -161,11 +161,11 @@ struct json_printer {
   }
 
   void operator() (spirit::any_ptr const& p) const {
-    return (*this)("pointer");
+    out << "<pointer " << &p << ">";
   }
 
   void operator() (spirit::function_base const& pf) const {
-    return (*this)("function");
+    out << "<function " << &pf << ">";
   }
 };
 

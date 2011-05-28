@@ -55,18 +55,21 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
 
     iterator it = elements.begin(), end = elements.end();
 
-    if (it != end) {
-      if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
-        iterator formals = it; ++formals;
-        iterator body = formals; ++body; 
-        lazy_call->push_back(evaluate_lambda_expression
-          (*formals, evaluator::range_type(body, end), ev)); 
-      }
+    if (it == end) {
+      BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(elements));
+    }
 
-      if (*it == utree(spirit::utf8_symbol_type("variable"))) {
-        iterator identifier = it; ++identifier;
-        iterator value = identifier; ++value;
-        return evaluate_internal_variable(*identifier, *value, ev); 
+    else if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
+      iterator formals = it; ++formals;
+      iterator body = formals; ++body; 
+      lazy_call->push_back(evaluate_lambda_expression
+        (*formals, evaluator::range_type(body, end), ev)); 
+    }
+
+    else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
+      iterator identifier = it; ++identifier;
+      iterator value = identifier; ++value;
+      return evaluate_internal_variable(*identifier, *value, ev); 
     }
 
     else {

@@ -22,9 +22,9 @@ rule run-phxi ( target-name : input ? : requirements * ) {
             : $(target-name)
             : /prana//phxi 
             : $(requirements)
-                <location-prefix>$(target-name).test
-                <testing.input-file>$(input)
-                <preserve-test-targets>on
+              <location-prefix>$(target-name).test
+              <testing.input-file>$(input)
+              <preserve-test-targets>on
             ]
             ;
 

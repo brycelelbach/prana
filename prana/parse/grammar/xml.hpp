@@ -182,6 +182,9 @@ struct xml_parser<Tag, Iterator, typename boost::enable_if<
   qi::rule<Iterator, utree(void), space_type>
     start, document, pi, empty, element, atom, value, attribute;
 
+  qi::rule<Iterator, int(void)>
+    integer;
+
   qi::rule<Iterator, utree::list_type(void), space_type>
     attributes, children;
 
@@ -206,6 +209,10 @@ struct xml_parser<Tag, Iterator, typename boost::enable_if<
     using qi::omit;
     using qi::bool_;
     using qi::int_;
+    using qi::hex;
+    using qi::oct;
+    using qi::lexeme;
+    using qi::no_case;
     using qi::real_parser;
     using qi::strict_real_policies;
     using qi::on_error;
@@ -231,15 +238,19 @@ struct xml_parser<Tag, Iterator, typename boost::enable_if<
             >> children >> "</" >> omit[name] >> '>';
 
     atom = real
-         | int_
+         | integer
          | bool_
          | char_data
          | document;
 
     value = real
-          | int_
+          | integer
           | bool_
           | attr_string;
+
+    integer = lexeme[ no_case["0x"] >  hex]
+            | lexeme[ no_case["0o"] >> oct]
+            | lexeme[-no_case["0d"] >> int_];
 
     attributes = annotate(_val, xml_attributes::value) >> *attribute;
 

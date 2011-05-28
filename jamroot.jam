@@ -8,26 +8,32 @@
 ################################################################################
 
 import os ;
+import path ;
 
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-local SHEOL_ROOT = [ os.environ SHEOL_ROOT ] ;
+constant BOOST_ROOT : [ os.environ BOOST_ROOT ] ;
+constant SHEOL_ROOT : [ os.environ SHEOL_ROOT ] ;
+constant PRANA_ROOT : [ path.pwd ] ;
 
-use-project /boost : $(BOOST_ROOT) ;
-use-project /sheol : $(SHEOL_ROOT) ;
+constant BOOST_PROGRAM_OPTIONS
+  : $(BOOST_ROOT)/libs/program_options/build//boost_program_options ;
 
-use-project /prana : build ;
+use-project /prana : $(PRANA_ROOT)/build ; 
 
 project 
   : requirements
+    <toolset>gcc:<cxxflags>-fvisibility=hidden
     <toolset>gcc:<cxxflags>-ftemplate-depth-500
+    <toolset>gcc:<cxxflags>-fdiagnostics-show-option
+    <toolset>gcc:<cxxflags>-Wno-multichar
+    <toolset>clang:<cxxflags>-fdiagnostics-show-option
+    <toolset>clang:<cxxflags>-Wno-multichar
     <warnings>on
-    <include>.
+    <include>$(PRANA_ROOT)
     <include>$(SHEOL_ROOT)
     <include>$(BOOST_ROOT)
   : build-dir bin.v2
   ;
 
-build-project build ;
-build-project test/phxpr ;
-build-project test/prana ;
+build-project $(PRANA_ROOT)/test/phxpr ;
+build-project $(PRANA_ROOT)/test/prana ;
 

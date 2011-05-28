@@ -50,7 +50,7 @@ struct push_subtype_annotation {
     size_type n = annotations.size() - 1;
 
     // TODO: make this an exception
-    BOOST_ASSERT(n <= (std::numeric_limits<short>::max)());
+    BOOST_ASSERT(n <= (std::numeric_limits<unsigned short>::max)());
     ast.tag(n);
   }
 };

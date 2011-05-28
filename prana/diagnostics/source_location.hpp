@@ -130,7 +130,7 @@ make_source_location (std::size_t line, std::size_t column) {
 }
 
 inline bool valid_location (source_location const& loc) {
-  return (loc.line != -1) && (loc.column != -1);
+  return (loc.line != std::size_t(-1)) && (loc.column != std::size_t(-1));
 }
 
 source_location const invalid_location = {-1, -1};

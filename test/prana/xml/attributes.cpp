@@ -5,18 +5,25 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include "harness.hpp"
+#include <iostream>
 
-#include <boost/spirit/home/prana/parse/parse_tree.hpp>
-#include <boost/spirit/home/prana/parse/grammar/xml.hpp>
-#include <boost/spirit/home/prana/generate/generate_sexpr.hpp>
+#include <prana/parse/parse_tree.hpp>
+#include <prana/parse/grammar/xml.hpp>
+#include <prana/generate/generate_xml.hpp>
+  
+using prana::utree;
+using prana::parse_tree;
+using prana::tag::xml;
+using prana::generate_xml;
 
-int main (void) { try {
-  using boost::spirit::utree;
-  using boost::spirit::prana::parse_tree;
-  using boost::spirit::prana::tag::xml;
-  using boost::spirit::prana::generate_sexpr;
+int main (void) { 
+  std::string in = "<abc def=\"true\" />";
 
+  parse_tree<xml> pt(in);
+
+  std::cout << pt << std::endl;
+
+#if 0
   std::cout << "boolean test: " << std::endl;
 
   { //[boolean
@@ -83,5 +90,6 @@ int main (void) { try {
   }
 
   return boost::report_errors();
+#endif
 }
  
