@@ -15,9 +15,13 @@
 #include <prana/include/utree.hpp>
 
 #include <phxpr/signature.hpp>
-#include <phxpr/environment.hpp>
+
+// TODO: Pass runtime_environments instead of utrees holding
+// runtime_environments to ease debugging with GDB.
 
 namespace phxpr {
+
+struct runtime_environment;
 
 struct exception: virtual std::exception {
   virtual ~exception (void) throw() { }
@@ -126,6 +130,15 @@ struct unsupported_arity_type: virtual exception {
   unsupported_arity_type (arity_type::info type_): type(type_) { }
   
   virtual ~unsupported_arity_type (void) throw() { }
+};
+
+template <typename Key>
+struct multiple_definitions: virtual exception {
+  Key identifier;
+
+  multiple_definitions (Key const& identifier_): identifier(identifier_) { }
+  
+  virtual ~multiple_definitions (void) throw() { }
 };
 
 } // phxpr

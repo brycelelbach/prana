@@ -36,17 +36,21 @@ struct PHXPR_EXPORT evaluator {
   boost::shared_ptr<gpt_type> global_procedure_table;
   displacement num_local_variables;
   const displacement frame;
+  const signature sig;
 
   evaluator (void):
     variables(boost::make_shared<variables_type>()),
     global_procedure_table(boost::make_shared<gpt_type>()),
-    num_local_variables(0), frame(0) { }
+    num_local_variables(0), frame(0),
+    sig(0, arity_type::fixed, evaluation_strategy::call_by_value,
+        function_type::module) { }
 
   evaluator (boost::shared_ptr<variables_type> const& parent_,
              boost::shared_ptr<gpt_type> const& gpt,
-             displacement frame_):
+             displacement frame_, signature const& sig_):
     variables(boost::make_shared<variables_type>(parent_)),
-    global_procedure_table(gpt), num_local_variables(0), frame(frame_)
+    global_procedure_table(gpt), num_local_variables(0), frame(frame_),
+    sig(sig_)
     { BOOST_ASSERT(parent_); }
 
   // REVIEW: Can we instead return utree(boost::ref(val)) safely?

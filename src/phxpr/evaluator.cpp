@@ -25,10 +25,12 @@ evaluate_lambda_expression (utree const& formals,
                             evaluator::range_type const& body, evaluator& ev);
         
 evaluator::result_type
-evaluate_top_level_variable (utree const& identifier, utree const& value,
+evaluate_module_level_variable (utree const& identifier, utree const& value,
                              evaluator& ev)
 {
-  // IMPLEMENT
+  boost::shared_ptr<utree> p(ev.variables->declare(identifier));
+  *p = evaluate(value, ev);
+  // return value of a definition is unspecified (aka invalid utree)
   return utree();
 }
 
@@ -121,8 +123,6 @@ evaluator::result_type
 evaluate_lambda_expression (utree const& formals,
                             evaluator::range_type const& body, evaluator& ev)
 {
-  evaluator local_env(ev.variables, ev.global_procedure_table, ev.frame + 1);
-
   if (!prana::is_utree_container(formals))
     BOOST_THROW_EXCEPTION(expected_formals_list(formals));
 
@@ -134,6 +134,9 @@ evaluate_lambda_expression (utree const& formals,
 
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
                       function_type::lambda);
+
+  evaluator local_env
+    (ev.variables, ev.global_procedure_table, ev.frame + 1, sig);
 
   make_placeholders(formals, local_env);
 
@@ -166,8 +169,6 @@ evaluate_lambda_expression (utree const& formals,
 
 evaluator::result_type
 evaluator::operator() (evaluator::symbol_type const& str) {
-  using boost::fusion::at_c;
-
   boost::shared_ptr<utree> p = variables->lookup(utree(str));
 
   if (!p)
@@ -213,9 +214,9 @@ evaluator::operator() (evaluator::range_type const& range) {
         BOOST_THROW_EXCEPTION(invalid_operator_expression
           (utree(range_type(range.begin(), value)))); 
        
-      // Top-level variable definition.
+      // Module-level variable definition.
       if (frame == 0)
-        return evaluate_top_level_variable(*identifier, *value, *this); 
+        return evaluate_module_level_variable(*identifier, *value, *this); 
       // Internal variable definition.
       else
         return evaluate_internal_variable(*identifier, *value, *this); 

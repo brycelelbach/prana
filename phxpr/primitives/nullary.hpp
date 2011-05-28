@@ -13,6 +13,7 @@
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
+#include <phxpr/environment.hpp>
 
 namespace phxpr {
 

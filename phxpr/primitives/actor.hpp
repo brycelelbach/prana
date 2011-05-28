@@ -16,6 +16,8 @@
 
 #include <prana/include/utree.hpp>
 
+#include <phxpr/environment.hpp>
+
 namespace phxpr {
 
 template <typename Derived>

@@ -32,3 +32,9 @@ phxpr.run-phxi procedure_call_as_argument ;
 phxpr.run-phxi procedure_call_as_argument_with_placeholders ;
 phxpr.run-phxi return_constant ;
 
+phxpr.run-phxi module_level_variables/boolean_literal ;
+phxpr.run-phxi module_level_variables/double_literal ;
+phxpr.run-phxi module_level_variables/integer_literal ;
+phxpr.run-phxi module_level_variables/nil_literal ;
+phxpr.run-phxi module_level_variables/string_literal ;
+

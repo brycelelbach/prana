@@ -22,6 +22,8 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/spirit/include/support_utree.hpp>
 
+#include <phxpr/exception.hpp>
+
 namespace phxpr {
 
 template <typename T, typename Key = boost::iterator_range<char const*> >
@@ -53,10 +55,16 @@ struct compile_environment {
 
     return it->second; 
   } // }}}
+  
+  mapped_type declare (key_type const& name) {
+    if (definitions.count(name))
+    { BOOST_THROW_EXCEPTION(multiple_definitions<Key>(name)); }
+    return (definitions[name] = boost::make_shared<T>());
+  }
 
   mapped_type define (key_type const& name, T const& val) {
-    // TODO: replace with exception (multiple definition)
-    BOOST_ASSERT(!definitions.count(name));
+    if (definitions.count(name))
+    { BOOST_THROW_EXCEPTION(multiple_definitions<Key>(name)); }
     return (definitions[name] = boost::make_shared<T>(val));
   }
 

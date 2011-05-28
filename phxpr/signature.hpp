@@ -18,17 +18,7 @@
 
 namespace phxpr {
 
-struct function_type {
-  enum info {
-    derived         = 0,
-    lambda          = 1,
-    placeholder     = 2,
-    procedure       = 3,
-    thunk           = 4
-  };
-
-  typedef boost::uint8_t integral;
-};
+typedef std::size_t displacement;
 
 struct arity_type {
   enum info {
@@ -47,7 +37,18 @@ struct evaluation_strategy {
   typedef boost::uint8_t integral;
 };
 
-typedef std::size_t displacement;
+struct function_type {
+  enum info {
+    derived         = 0,
+    lambda          = 1,
+    placeholder     = 2,
+    procedure       = 3,
+    thunk           = 4,
+    module          = 5
+  };
+
+  typedef boost::uint8_t integral;
+};
 
 typedef boost::fusion::vector4<
   displacement, arity_type::info, evaluation_strategy::info, function_type::info
@@ -55,13 +56,14 @@ typedef boost::fusion::vector4<
 
 // {{{ streaming operators
 std::ostream&
+operator<< (std::ostream& out, function_type::info const& info) PHXPR_EXPORT;
+
+std::ostream&
 operator<< (std::ostream& out, arity_type::info const& info) PHXPR_EXPORT;
 
 std::ostream& 
-operator<< (std::ostream& out, evaluation_strategy::info const& info) PHXPR_EXPORT;
-
-std::ostream&
-operator<< (std::ostream& out, function_type::info const& info) PHXPR_EXPORT;
+operator<< (std::ostream& out, evaluation_strategy::info const& info)
+PHXPR_EXPORT;
 // }}}
 
 } // phxpr
