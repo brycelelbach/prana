@@ -42,7 +42,8 @@ bool generate_json (parse_tree<tag::json> const& in,
 template <typename Char>
 std::basic_ostream<Char>&
 operator<< (std::basic_ostream<Char>& out, parse_tree<tag::json> const& in) {
-  generate_json(in.ast(), out);
+  json_printer<std::basic_ostream<Char> > print(out, in.annotations());
+  print(in.ast());
   return out;
 }
 
