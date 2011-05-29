@@ -31,7 +31,7 @@ struct sexpr_printer {
   } 
 
   void operator() (utree::invalid_type) const {
-    out << "#<invalid>";
+    out << "#<unspecified>";
   }
 
   void operator() (utree::nil_type) const {
