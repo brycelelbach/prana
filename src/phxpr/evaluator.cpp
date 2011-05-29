@@ -5,15 +5,20 @@
 //  file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <phxpr/config.hpp>
+
 #include <iterator>
 
-#include <phxpr/config.hpp>
+#include <boost/assert.hpp>
 
 #include <prana/utree/io.hpp>
 #include <prana/dispatch/visit_ref.hpp>
 #include <prana/utree/predicates.hpp>
+
 #include <phxpr/evaluator.hpp>
+#include <phxpr/predicate.hpp>
 #include <phxpr/exception.hpp>
+#include <phxpr/primitives/conditional.hpp>
 #include <phxpr/primitives/placeholder.hpp>
 #include <phxpr/primitives/thunk.hpp>
 
@@ -25,15 +30,15 @@ evaluate_lambda_expression (utree const& formals,
                             evaluator::range_type const& body, evaluator& ev);
 
 evaluator::result_type
-make_if_thunk (utree const& predicate, utree const& then, evaluator& ev);
+make_if_thunk (utree const& test, utree const& then, evaluator& ev);
 
 evaluator::result_type
-make_if_thunk (utree const& predicate, utree const& then, utree const& else_,
-               evaluator& ev);
+make_if_else_thunk (utree const& test, utree const& then, utree const& else_,
+                    evaluator& ev);
  
 evaluator::result_type
 evaluate_module_level_variable (utree const& identifier, utree const& value,
-                             evaluator& ev)
+                                evaluator& ev)
 {
   boost::shared_ptr<utree> p(ev.variables->declare(identifier));
   *p = evaluate(value, ev);
@@ -68,6 +73,7 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
       BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(elements));
     }
 
+    // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
       iterator formals = it; ++formals;
       iterator body = formals; ++body; 
@@ -75,20 +81,22 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
         (*formals, evaluator::range_type(body, end), ev)); 
     }
 
+    // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
       iterator identifier = it; ++identifier;
       iterator value = identifier; ++value;
       lazy_call->push_back(evaluate_internal_variable(*identifier, *value, ev)); 
     }
     
+    // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("if"))) {
-      iterator predicate = it; ++predicate;
-      iterator then = predicate; ++then;
+      iterator test= it; ++test;
+      iterator then = test; ++then;
       iterator else_ = then; ++else_;
       if (else_ == end)
-        lazy_call->push_back(make_if_thunk(*predicate, *then, ev)); 
+        lazy_call->push_back(make_if_thunk(*test, *then, ev)); 
       else
-        lazy_call->push_back(make_if_thunk(*predicate, *then, *else_, ev)); 
+        lazy_call->push_back(make_if_else_thunk(*test, *then, *else_, ev)); 
     }
 
     else {
@@ -96,13 +104,13 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
         if (prana::is_utree_container(element))
           lazy_call->push_back(make_thunk(element, sig, ev));
         else
-          lazy_call->push_back(utree::visit(element, ev));
+          lazy_call->push_back(evaluate(element, ev));
       }
     }
   }
 
   else
-    lazy_call->push_back(utree::visit(elements, ev));
+    lazy_call->push_back(evaluate(elements, ev));
     
   thunk t(lazy_call, ev.global_procedure_table);
 
@@ -114,16 +122,39 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
   return ut;
 }
 
+// TODO: Optimize for test and/or then being a literal.
 evaluator::result_type
-make_if_thunk (utree const& predicate, utree const& then, evaluator& ev) {
-  return utree();
+make_if_thunk (utree const& test, utree const& then, evaluator& ev) {
+  const signature sig(2, arity_type::fixed, evaluation_strategy::call_by_value, 
+                      function_type::conditional);
+
+  phxpr::if_ c(make_thunk(test, sig, ev), make_thunk(then, sig, ev));
+
+  ev.global_procedure_table->push_back(sig);
+
+  utree ut = stored_function<phxpr::if_>(c);
+  ut.tag(ev.global_procedure_table->size() -1);
+
+  return ut;
 }
 
+// TODO: Optimize for test, then and/or else_ being a literal.
 evaluator::result_type
-make_if_thunk (utree const& predicate, utree const& then, utree const& else_,
-               evaluator& ev)
+make_if_else_thunk (utree const& test, utree const& then, utree const& else_,
+                    evaluator& ev)
 {
-  return utree();
+  const signature sig(3, arity_type::fixed, evaluation_strategy::call_by_value, 
+                      function_type::conditional);
+
+  phxpr::if_else c(make_thunk(test, sig, ev), make_thunk(then, sig, ev),
+    make_thunk(else_, sig, ev));
+
+  ev.global_procedure_table->push_back(sig);
+
+  utree ut = stored_function<phxpr::if_else>(c);
+  ut.tag(ev.global_procedure_table->size() -1);
+
+  return ut;
 }
 
 // TODO: handle variable arguments
@@ -227,6 +258,7 @@ evaluator::operator() (evaluator::range_type const& range) {
 
   // Evaluate the named operator.
   else if (prana::recursive_which(*it) == utree_type::symbol_type) {
+    // TODO: syntax checks
     if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
       iterator formals = it; ++formals;
       iterator body = formals; ++body; 
@@ -240,7 +272,7 @@ evaluator::operator() (evaluator::range_type const& range) {
       ++it; ++it;
 
       if (++it != end)
-        BOOST_THROW_EXCEPTION(invalid_operator_expression
+        BOOST_THROW_EXCEPTION(invalid_variable_definition
           (utree(range_type(range.begin(), value)))); 
        
       // Module-level variable definition.
@@ -250,7 +282,25 @@ evaluator::operator() (evaluator::range_type const& range) {
       else
         return evaluate_internal_variable(*identifier, *value, *this); 
     }
+    
+    // TODO: syntax checks
+    else if (*it == utree(spirit::utf8_symbol_type("if"))) {
+      iterator test = it; ++test;
+      iterator then = test; ++then;
+      iterator else_ = then; ++else_;
 
+      bool r = predicate(evaluate(*test, *this));
+
+      if (r)
+        return evaluate(*then, *this);
+
+      // (if <false> <then>) returns unspecified (aka invalid)
+      if (else_ == end)
+        return utree(); 
+
+      return evaluate(*else_, *this);
+    }
+    
     else {
       boost::shared_ptr<utree> pf = variables->lookup(*it);
 

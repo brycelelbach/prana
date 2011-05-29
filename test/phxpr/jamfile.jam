@@ -32,9 +32,17 @@ phxpr.run-phxi procedure_call_as_argument ;
 phxpr.run-phxi procedure_call_as_argument_with_placeholders ;
 phxpr.run-phxi return_constant ;
 
+phxpr.run-phxi module_level_variables/alias_procedure ;
 phxpr.run-phxi module_level_variables/boolean_literal ;
 phxpr.run-phxi module_level_variables/double_literal ;
 phxpr.run-phxi module_level_variables/integer_literal ;
+phxpr.run-phxi module_level_variables/named_lambda ;
 phxpr.run-phxi module_level_variables/nil_literal ;
+phxpr.run-phxi module_level_variables/return_procedure ;
 phxpr.run-phxi module_level_variables/string_literal ;
+
+phxpr.run-phxi conditional_expressions/boolean_literal_if ;
+phxpr.run-phxi conditional_expressions/lambda_lazy_branch_evaluation ;
+phxpr.run-phxi conditional_expressions/lazy_branch_evaluation ;
+phxpr.run-phxi conditional_expressions/nested_if ;
 

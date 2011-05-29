@@ -72,6 +72,15 @@ struct invalid_operator_expression: virtual exception {
   virtual ~invalid_operator_expression (void) throw() { }
 };
 
+struct invalid_variable_definition: virtual exception {
+  utree definition;
+
+  invalid_variable_definition (utree const& definition_):
+    definition(definition_) { }
+  
+  virtual ~invalid_variable_definition (void) throw() { }
+};
+
 struct procedure_call_or_macro_use_expected: virtual exception {
   utree expression;
 

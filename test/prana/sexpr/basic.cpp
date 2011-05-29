@@ -11,7 +11,6 @@
 #include <prana/generate/generate_sexpr.hpp>
 #include <prana/utree/io.hpp>
 
-using boost::spirit::nil;
 using boost::spirit::utf8_symbol_type;
 using boost::spirit::binary_string_type;
 
@@ -24,9 +23,6 @@ int main (void) {
   parser_harness<sexpr> ph;
 
   ph
-    ("nil")
-    ("nil", utree(nil))
-
     ("#t")
     ("#t", utree(true))
 
@@ -50,6 +46,12 @@ int main (void) {
     
     ("bar")
     ("bar", utree(utf8_symbol_type("bar")))
+    
+    ("b?ar")
+    ("b?ar", utree(utf8_symbol_type("b?ar")))
+    
+    ("matches?")
+    ("matches?", utree(utf8_symbol_type("matches?")))
 
     ("\"\"")
     ("\"\"", utree(""))

@@ -24,6 +24,7 @@
     
 #include <phxpr/version.hpp>
 #include <phxpr/intrinsics/basic_arithmetic.hpp>
+#include <phxpr/intrinsics/basic_io.hpp>
 #include <phxpr/intrinsics/equivalence_predicates.hpp>
 #include <phxpr/intrinsics/type_predicates.hpp>
 #include <phxpr/evaluator.hpp>
@@ -38,6 +39,7 @@ using boost::program_options::notify;
 
 using boost::fusion::at_c;
 
+using boost::spirit::nil;
 using boost::spirit::utree;
 using boost::spirit::utree_type;
 
@@ -66,6 +68,9 @@ using phxpr::number_predicate;
 using phxpr::string_predicate;
 using phxpr::nil_predicate;
 using phxpr::invalid_predicate;
+
+using phxpr::display;
+using phxpr::newline;
 
 int main (int argc, char** argv) {
   variables_map vm;
@@ -120,14 +125,20 @@ int main (int argc, char** argv) {
 
   std::ifstream ifs(input.c_str(), std::ifstream::in);  
   evaluator e;
- 
+
+  // globals
+  e.define_global("nil", nil);
+
+  // basic arithmetic 
   e.define_intrinsic("+", addition());
   e.define_intrinsic("-", subtraction());
   e.define_intrinsic("*", multiplication());
   e.define_intrinsic("/", division());
-  
-  e.define_intrinsic("=?", equal_predicate());
  
+  // equivalence predicates 
+  e.define_intrinsic("=?", equal_predicate());
+
+  // type predicates
   e.define_intrinsic("boolean?", boolean_predicate());
   e.define_intrinsic("symbol?", symbol_predicate());
   e.define_intrinsic("procedure?", procedure_predicate());
@@ -135,7 +146,11 @@ int main (int argc, char** argv) {
   e.define_intrinsic("number?", number_predicate());
   e.define_intrinsic("string?", string_predicate());
   e.define_intrinsic("nil?", nil_predicate());
-  e.define_intrinsic("invalid?", invalid_predicate());
+  e.define_intrinsic("unspecified?", invalid_predicate());
+
+  // basic io
+  e.define_intrinsic("display", display(std::cout));
+  e.define_intrinsic("newline", newline(std::cout));
 
   dynamic_array<boost::shared_ptr<parse_tree<sexpr> > > asts(16);
   utree r;

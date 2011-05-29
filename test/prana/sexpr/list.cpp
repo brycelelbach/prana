@@ -12,7 +12,6 @@
 #include <prana/utree/io.hpp>
 #include <prana/utree/make_list.hpp>  
 
-using boost::spirit::nil;
 using boost::spirit::utf8_symbol_type;
 using boost::spirit::binary_string_type;
 
@@ -35,8 +34,8 @@ int main (void) {
     ("(1  2   3    4)", "(1 2 3 4)")
     ("(1  2   3    4)", make_list(1, 2, 3, 4))
 
-    ("(nil #f 35 0.57 \"bizz\" #deed# sizzle)",
-      make_list(nil, false, 35, 0.57, "bizz",
+    ("(#f 35 0.57 \"bizz\" #deed# sizzle)",
+      make_list(false, 35, 0.57, "bizz",
         binary_string_type("\xde\xed"), utf8_symbol_type("sizzle")))
 
     ("(((1)) (-5003 #t) \"foobar\")")

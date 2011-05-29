@@ -39,12 +39,13 @@ struct evaluation_strategy {
 
 struct function_type {
   enum info {
-    derived         = 0,
-    lambda          = 1,
-    placeholder     = 2,
-    procedure       = 3,
-    thunk           = 4,
-    module          = 5
+    derived     = 0,
+    lambda      = 1,
+    placeholder = 2,
+    procedure   = 3,
+    thunk       = 4,
+    module      = 5,
+    conditional = 6
   };
 
   typedef boost::uint8_t integral;

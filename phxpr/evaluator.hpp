@@ -9,9 +9,8 @@
 #define PHXPR_8A7BB292_8252_42D4_AEC4_F7F827B95E68
 
 #include <phxpr/config.hpp>
-#include <phxpr/environment.hpp>
-#include <phxpr/signature.hpp>
-#include <phxpr/primitives/lambda.hpp>
+
+#include <boost/noncopyable.hpp>
 
 #include <sheol/adt/dynamic_array.hpp>
 
@@ -19,9 +18,13 @@
 #include <prana/parse/parse_tree.hpp> 
 #include <prana/parse/grammar/sexpr.hpp>
 
+#include <phxpr/environment.hpp>
+#include <phxpr/signature.hpp>
+#include <phxpr/primitives/lambda.hpp>
+
 namespace phxpr {
 
-struct PHXPR_EXPORT evaluator {
+struct PHXPR_EXPORT evaluator: boost::noncopyable {
   // {{{ types
   typedef utree result_type;
 
@@ -82,17 +85,20 @@ struct PHXPR_EXPORT evaluator {
     global_procedure_table->push_back(f.sig);
     p->tag(global_procedure_table->size() - 1);
   }
+
+  void define_global (std::string const& name, utree const& val)
+  { variables->define(utree(spirit::utf8_symbol_type(name)), val); }
 };
 
 typedef prana::parse_tree<prana::tag::sexpr> sexpr_parse_tree;
 
-utree PHXPR_EXPORT evaluate (sexpr_parse_tree const& pt);
+utree evaluate (sexpr_parse_tree const& pt) PHXPR_EXPORT;
 
-utree PHXPR_EXPORT evaluate (sexpr_parse_tree const& pt, evaluator& ev);
+utree evaluate (sexpr_parse_tree const& pt, evaluator& ev) PHXPR_EXPORT;
 
-utree PHXPR_EXPORT evaluate (utree const& ut);
+utree evaluate (utree const& ut) PHXPR_EXPORT;
 
-utree PHXPR_EXPORT evaluate (utree const& ut, evaluator& ev);
+utree evaluate (utree const& ut, evaluator& ev) PHXPR_EXPORT;
 
 } // phxpr
 

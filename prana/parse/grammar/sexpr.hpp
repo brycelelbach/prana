@@ -169,15 +169,12 @@ struct sexpr_parser<Tag, Iterator, typename boost::enable_if<
 
     list = '(' > annotate(_val) > *element > ')';
 
-    atom = nil_ 
-         | real
+    atom = real
          | integer
          | boolean
          | utf8
          | binary
          | symbol;
-
-    nil_ = "nil" >> attr(spirit::nil); 
 
     integer = lexeme[ no_case["#x"] >  hex]
             | lexeme[ no_case["#o"] >> oct]
@@ -200,7 +197,6 @@ struct sexpr_parser<Tag, Iterator, typename boost::enable_if<
     element.name(name + ":element");
     list.name(name + ":list");
     atom.name(name + ":atom");
-    nil_.name(name + ":nil");
     integer.name(name + ":integer");
     symbol.name(name + ":symbol");
     binary.name(name + ":binary");
