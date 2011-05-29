@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach 
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <prana/generate/generate_sexpr.hpp>
     
 #include <phxpr/version.hpp>
+#include <phxpr/intrinsics/assert.hpp>
 #include <phxpr/intrinsics/basic_arithmetic.hpp>
 #include <phxpr/intrinsics/basic_io.hpp>
 #include <phxpr/intrinsics/equivalence_predicates.hpp>
@@ -72,6 +73,8 @@ using phxpr::invalid_predicate;
 using phxpr::display;
 using phxpr::newline;
 
+using phxpr::assertion;
+
 int main (int argc, char** argv) {
   variables_map vm;
 
@@ -80,7 +83,8 @@ int main (int argc, char** argv) {
   std::string input(""), args("");
  
   visible.add_options()
-    ("help,h", "print this message")
+    ("help,h", "display this message")
+    ("print-return", "print return value after evaluation")
     ("version,v", "display the version and copyright information")
   ;
 
@@ -108,7 +112,7 @@ int main (int argc, char** argv) {
 
   else if (vm.count("version")) {
     std::cout <<
-      "phxi, the phxpr interpreter (v" PHXPR_VERSION_STR "\n"
+      "phxi, the phxpr interpreter (v" PHXPR_VERSION_STR ")\n"
       "Prana v" PRANA_VERSION_STR "\n"
       "\n"
       "Copyright (c) 2010-2011 Bryce Lelbach, Joel de Guzman and Hartmut Kaiser\n"
@@ -151,45 +155,55 @@ int main (int argc, char** argv) {
   // basic io
   e.define_intrinsic("display", display(std::cout));
   e.define_intrinsic("newline", newline(std::cout));
+  
+  // basic io
+  e.define_intrinsic("assert", assertion());
 
   dynamic_array<boost::shared_ptr<parse_tree<sexpr> > > asts(16);
-  utree r;
 
-  // interpreter REL
-  while (ifs.good()) {
-    asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
+  if (vm.count("print-return")) {
+    utree r;
 
-    // read
-    asts.back().reset(new parse_tree<sexpr>(ifs));
+    // interpreter file REL
+    while (ifs.good()) {
+      asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
 
-    // eval
-    if (!ifs.good()) {
-      r = evaluate(*asts.back(), e);
-      break;
+      // read
+      asts.back().reset(new parse_tree<sexpr>(ifs));
+
+      // eval
+      if (!ifs.good()) {
+        r = evaluate(*asts.back(), e);
+        break;
+      }
+
+      // invoke for side effects
+      else 
+        evaluate(*asts.back(), e);
     }
 
-    // invoke for side effects
-    else 
-      evaluate(*asts.back(), e);
+    std::cout << "(return-value ";
+    generate_sexpr(r, std::cout);
+    std::cout << ")\n";
   }
 
-  // print the result  
-  std::cout << "return value: ";
-  generate_sexpr(r, std::cout);
-  std::cout << std::endl;
+  else {
+    // interpreter file REL
+    while (ifs.good()) {
+      asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
 
-  std::cout << "return value tag: " << r.tag() << std::endl;
+      // read
+      asts.back().reset(new parse_tree<sexpr>(ifs));
 
-  if (e.global_procedure_table->size() > std::size_t(r.tag())) {
-    signature const& sig = (*e.global_procedure_table)[r.tag()];
-    std::cout << "displacement: " << at_c<0>(sig) << std::endl;
-    std::cout << "arity type: " << at_c<1>(sig) << std::endl;
-    std::cout << "evaluation strategy: " << at_c<2>(sig) << std::endl;
-    std::cout << "function type: " << at_c<3>(sig) << std::endl;
+      // eval
+      if (!ifs.good())
+        break;
+
+      // invoke for side effects
+      else 
+        evaluate(*asts.back(), e);
+    }
   }
-  
-  else
-    std::cout << "tag is not in the gpt" << std::endl;
 
   return 0; 
 }
