@@ -13,7 +13,7 @@ import testing ;
 import project ;
 
 rule run-phxi ( target-name : input ? : requirements * ) {
-  input ?= $(target-name).phxpr ;
+  input ?= $(target-name) ;
 
   local project = [ project.current ] ;
 
@@ -23,7 +23,7 @@ rule run-phxi ( target-name : input ? : requirements * ) {
             : /prana//phxi 
             : $(requirements)
               <location-prefix>$(target-name).test
-              <testing.input-file>$(input)
+              <testing.input-file>$(input).phxpr
               <preserve-test-targets>on
             ]
             ;

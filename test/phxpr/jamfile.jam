@@ -14,35 +14,54 @@ project
     <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
   ;
 
-phxpr.run-phxi anonymous_lambda ;
-phxpr.run-phxi deep_nested_anonymous_lambda ;
-phxpr.run-phxi empty_lambda_expression ;
-phxpr.run-phxi empty_lambda ;
-phxpr.run-phxi intrinsics_lambda ;
-phxpr.run-phxi intrinsics ;
-phxpr.run-phxi intrinsics_placeholder_argument ;
-phxpr.run-phxi lambda_expression ;
-phxpr.run-phxi lambda ;
-phxpr.run-phxi nary_body_nested_lambda ;
-phxpr.run-phxi nested_anonymous_lambda ;
-phxpr.run-phxi nested_lambda ;
-phxpr.run-phxi lambda_as_argument ;
-phxpr.run-phxi procedure_as_argument ;
-phxpr.run-phxi procedure_call_as_argument ;
-phxpr.run-phxi procedure_call_as_argument_with_placeholders ;
-phxpr.run-phxi return_constant ;
+phxpr.run-phxi conditionals_boolean_literal_if_else : conditionals/boolean_literal_if_else ;
+phxpr.run-phxi conditionals_boolean_literal_if : conditionals/boolean_literal_if ;
+phxpr.run-phxi conditionals_lambda_if_delayed_evaluation : conditionals/lambda_if_delayed_evaluation ;
+phxpr.run-phxi conditionals_lambda_if_else_delayed_evaluation : conditionals/lambda_if_else_delayed_evaluation ;
+phxpr.run-phxi conditionals_if_delayed_evaluation : conditionals/if_delayed_evaluation ;
+phxpr.run-phxi conditionals_if_else_delayed_evaluation : conditionals/if_else_delayed_evaluation ;
+phxpr.run-phxi conditionals_nested_if_else : conditionals/nested_if_else ;
+phxpr.run-phxi conditionals_nested_if : conditionals/nested_if ;
 
-phxpr.run-phxi module_level_variables/alias_procedure ;
-phxpr.run-phxi module_level_variables/boolean_literal ;
-phxpr.run-phxi module_level_variables/double_literal ;
-phxpr.run-phxi module_level_variables/integer_literal ;
-phxpr.run-phxi module_level_variables/named_lambda ;
-phxpr.run-phxi module_level_variables/nil_literal ;
-phxpr.run-phxi module_level_variables/return_procedure ;
-phxpr.run-phxi module_level_variables/string_literal ;
+phxpr.run-phxi intrinsics_basic : intrinsics/basic ;
+phxpr.run-phxi intrinsics_lambda : intrinsics/lambda ;
+phxpr.run-phxi intrinsics_placeholder_argument : intrinsics/placeholder_argument ;
 
-phxpr.run-phxi conditional_expressions/boolean_literal_if ;
-phxpr.run-phxi conditional_expressions/lambda_lazy_branch_evaluation ;
-phxpr.run-phxi conditional_expressions/lazy_branch_evaluation ;
-phxpr.run-phxi conditional_expressions/nested_if ;
+phxpr.run-phxi lambda_basic : lambda/basic ;
+phxpr.run-phxi lambda_block : lambda/block ;
+phxpr.run-phxi lambda_deep_nested_anonymous : lambda/deep_nested_anonymous ;
+phxpr.run-phxi lambda_delayed_evaluation : lambda/delayed_evaluation ;
+phxpr.run-phxi lambda_empty_expression : lambda/empty_expression ;
+phxpr.run-phxi lambda_empty : lambda/empty ;
+phxpr.run-phxi lambda_expression : lambda/expression ;
+phxpr.run-phxi lambda_nested_anonymous : lambda/nested_anonymous ;
+phxpr.run-phxi lambda_nested_block : lambda/nested_block ;
+phxpr.run-phxi lambda_nested : lambda/nested ;
+
+phxpr.run-phxi module_level_variables_alias_procedure : module_level_variables/alias_procedure ;
+phxpr.run-phxi module_level_variables_boolean_literal : module_level_variables/boolean_literal ;
+phxpr.run-phxi module_level_variables_double_literal : module_level_variables/double_literal ;
+phxpr.run-phxi module_level_variables_integer_literal : module_level_variables/integer_literal ;
+phxpr.run-phxi module_level_variables_named_lambda : module_level_variables/named_lambda ;
+phxpr.run-phxi module_level_variables_nil_literal : module_level_variables/nil_literal ;
+phxpr.run-phxi module_level_variables_return_procedure : module_level_variables/return_procedure ;
+phxpr.run-phxi module_level_variables_string_literal : module_level_variables/string_literal ;
+
+phxpr.run-phxi module_return_block : module_return/block ;
+phxpr.run-phxi module_return_boolean_literal : module_return/boolean_literal ;
+phxpr.run-phxi module_return_double_literal : module_return/double_literal ;
+phxpr.run-phxi module_return_integer_literal : module_return/integer_literal ;
+phxpr.run-phxi module_return_intrinsic : module_return/intrinsic ;
+phxpr.run-phxi module_return_lambda : module_return/lambda ;
+phxpr.run-phxi module_return_nil_literal : module_return/nil_literal ;
+phxpr.run-phxi module_return_string_literal : module_return/string_literal ;
+
+phxpr.run-phxi operator_expressions_lambda : operator_expressions/lambda ;
+phxpr.run-phxi operator_expressions_lambda_side_effects : operator_expressions/lambda_side_effects ;
+
+phxpr.run-phxi procedure_calls_as_arguments_basic : procedure_calls_as_arguments/basic ;
+phxpr.run-phxi procedure_calls_as_arguments_placeholders : procedure_calls_as_arguments/placeholders ;
+
+phxpr.run-phxi procedures_as_arguments_intrinsic : procedures_as_arguments/intrinsic ;
+phxpr.run-phxi procedures_as_arguments_lambda : procedures_as_arguments/lambda ;
 
