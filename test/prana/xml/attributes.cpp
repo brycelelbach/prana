@@ -5,91 +5,67 @@
     file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include <iostream>
-
+#include <prana/test/parser_harness.hpp>
 #include <prana/parse/parse_tree.hpp>
 #include <prana/parse/grammar/xml.hpp>
 #include <prana/generate/generate_xml.hpp>
-  
+#include <prana/utree/io.hpp>
+#include <prana/utree/make_list.hpp>  
+
+using boost::spirit::utf8_symbol_type;
+
 using prana::utree;
 using prana::parse_tree;
 using prana::tag::xml;
-using prana::generate_xml;
+using prana::make_list;
+using prana::test::parser_harness;
 
 int main (void) { 
-  std::string in = "<abc def=\"true\" />";
+  parser_harness<xml> ph;
 
-  parse_tree<xml> pt(in);
+  ph
+    ("<abc def=\"true\" />")
+    ("<abc def=\"true\" />",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("def"), true))))
 
-  std::cout << pt << std::endl;
+    ("<abc def=\"123\" />")
+    ("<abc def=\"123\" />",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("def"), 123))))
 
-#if 0
-  std::cout << "boolean test: " << std::endl;
+    ("<abc def=\"1.23\" />")
+    ("<abc def=\"1.23\" />",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("def"), 1.23))))
 
-  { //[boolean
-    std::string in = "<abc def=\"true\" />";
+    ("<abc def=\"ghi\" />")
+    ("<abc def=\"ghi\" />",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("def"), "ghi"))))
+    
+    ("<abc d=\"1\" e=\"0.5\" f=\"bar\" />")
+    ("<abc d=\"1\" e=\"0.5\" f=\"bar\" />",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("d"), 1),
+                  make_list(utf8_symbol_type("e"), 0.5),
+                  make_list(utf8_symbol_type("f"), "bar"))))
+    
+    ("<abc def=\"123\">foo</abc>")
+    ("<abc def=\"123\">foo</abc>",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("def"), 123)),
+        make_list("foo")))
+    
+    ("<abc d=\"1\" e=\"0.5\" f=\"bar\">foo</abc>")
+    ("<abc d=\"1\" e=\"0.5\" f=\"bar\">foo</abc>",
+      make_list(utf8_symbol_type("abc"),
+        make_list(make_list(utf8_symbol_type("d"), 1),
+                  make_list(utf8_symbol_type("e"), 0.5),
+                  make_list(utf8_symbol_type("f"), "bar")),
+        make_list("foo")))
+  ;
 
-    parse_tree<xml> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("(abc ((def #t)))")))
-    //]  
-  }
-
-  std::cout << std::endl << "integer test: " << std::endl;
-
-  { //[integer
-    std::string in = "<abc def=\"123\" />";
-
-    parse_tree<xml> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("(abc ((def 123)))")))
-    //]  
-  }
-  
-  std::cout << std::endl << "floating test: " << std::endl;
-
-  { //[floating
-    std::string in = "<abc def=\"1.23\" />";
-
-    parse_tree<xml> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("(abc ((def 1.23)))")))
-    //]  
-  }
-
-  std::cout << std::endl << "string test: " << std::endl;
-
-  { //[string
-    std::string in = "<abc def=\"ghi\" />";
-
-    parse_tree<xml> pt(in);
-
-    std::cout << pt.ast() << std::endl;
-
-    BSP_STRINGIFY_TESTS(
-      generate_sexpr,
-      ((pt.ast()) ("(abc ((def \"ghi\")))")))
-    //]  
-  }
-
-  } catch (std::exception& e) {
-    std::cout << "caught: " << e.what() << "\n";
-    return -1;
-  }
-
-  return boost::report_errors();
-#endif
+  return sheol::report_errors();
 }
  

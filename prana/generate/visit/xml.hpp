@@ -36,20 +36,17 @@ struct xml_printer {
 
     utree::visit(*it, *this); ++it;
 
-    if (!it->empty())
-      out << " ";
-
     print_attributes(*it); ++it;
 
     out << ">";
 
     print_children(*it);
 
-    out << "<";
+    out << "</";
 
     utree::visit(ut.front(), *this);
 
-    out << " />";
+    out << ">";
   }
   
   void print_empty_element (utree const& ut) const {
@@ -57,12 +54,9 @@ struct xml_printer {
 
     utree::visit(ut.front(), *this);
 
-    if (!ut.back().empty())
-      out << " ";
-
     print_attributes(ut.back());
 
-    out << "/>";
+    out << " />";
   }
 
   void print_attributes (utree const& ut) const {
@@ -71,18 +65,20 @@ struct xml_printer {
   }
 
   void print_attribute (utree const& ut) const {
+    out << " ";
+
     utree::visit(ut.front(), *this);
 
     out << "=\"";
 
     utree::visit(ut.back(), *this);
 
-    out << "\" ";
+    out << "\"";
   }
   
   void print_children (utree const& ut) const {
     BOOST_FOREACH(utree const& child, ut)
-    { utree::visit(child, *this); }    
+    { (*this)(child); }    
   }
 
   void print_instruction (utree const& ut) const {
@@ -139,7 +135,8 @@ struct xml_printer {
 
   template<typename Iterator>
   void operator() (boost::iterator_range<Iterator> const& range) const {
-    BOOST_ASSERT(false);
+    BOOST_FOREACH(utree const& element, range)
+    { (*this)(element); }
   }
 
   void operator() (utree const& ut) const {

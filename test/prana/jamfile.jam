@@ -19,5 +19,7 @@ run json/basic.cpp      : : : : json_basic ;
 run json/array.cpp      : : : : json_array ;
 run json/object.cpp     : : : : json_object ;
 
+run xml/basic.cpp       : : : : xml_basic ;
 run xml/attributes.cpp  : : : : xml_attributes ;
+run xml/children.cpp    : : : : xml_children ;
 

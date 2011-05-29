@@ -204,6 +204,7 @@ struct xml_parser<Tag, Iterator, typename boost::enable_if<
     xml_parser::base_type(start, mpl::c_str<typename Tag::name>::value),
     error(error_handler_type(source)), annotate(annotations)
   {
+    using spirit::standard::space;
     using qi::char_;
     using qi::no_skip;
     using qi::omit;
@@ -237,11 +238,9 @@ struct xml_parser<Tag, Iterator, typename boost::enable_if<
             >> annotate(_val, xml_element::value)
             >> children >> "</" >> omit[name] >> '>';
 
-    atom = real
-         | integer
-         | bool_
-         | char_data
-         | document;
+    atom = empty
+         | element
+         | char_data;
 
     value = real
           | integer
