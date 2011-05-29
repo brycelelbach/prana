@@ -1,0 +1,4 @@
+invoking lambda one
+invoking lambda two
+10
+(return-value #<unspecified>)

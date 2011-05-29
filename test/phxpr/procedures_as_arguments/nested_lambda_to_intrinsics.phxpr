@@ -1,0 +1,24 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Copyright (c) 2011 Bryce Lelbach
+;
+;   Distributed under the Boost Software License, Version 1.0. (See accompanying
+;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+((lambda ()
+  (display
+    ((lambda (f x y)
+        (display "invoking lambda one")
+        (newline)
+        (f x y))
+      ; first argument
+      (lambda (x y)
+        (display "invoking lambda two")
+        (newline)
+        (+ (- x 1) y))
+      ; second argument
+      17
+      ; third argument
+      -43))
+  (newline)))
+

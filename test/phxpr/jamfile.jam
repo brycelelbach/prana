@@ -11,7 +11,7 @@ import phxpr ;
 
 project
   : requirements
-    <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
+#    <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
   ;
 
 phxpr.run-phxi conditionals_boolean_literal_if_else : conditionals/boolean_literal_if_else ;
@@ -71,5 +71,9 @@ phxpr.run-phxi procedure_calls_as_arguments_basic : procedure_calls_as_arguments
 phxpr.run-phxi procedure_calls_as_arguments_placeholders : procedure_calls_as_arguments/placeholders ;
 
 phxpr.run-phxi procedures_as_arguments_intrinsic : procedures_as_arguments/intrinsic ;
-phxpr.run-phxi procedures_as_arguments_lambda : procedures_as_arguments/lambda ;
+phxpr.run-phxi procedures_as_arguments_lambda_to_intrinsics : procedures_as_arguments/lambda_to_intrinsics ;
+phxpr.run-phxi procedures_as_arguments_lambda_to_lambda : procedures_as_arguments/lambda_to_lambda ;
+phxpr.run-phxi procedures_as_arguments_lambda_with_upvals : procedures_as_arguments/lambda_with_upvals ;
+phxpr.run-phxi procedures_as_arguments_nested_lambda_to_intrinsics : procedures_as_arguments/nested_lambda_to_intrinsics ;
+phxpr.run-phxi procedures_as_arguments_nested_lambda_to_lambda : procedures_as_arguments/nested_lambda_to_lambda ;
 

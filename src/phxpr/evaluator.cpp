@@ -283,8 +283,10 @@ evaluator::operator() (evaluator::range_type const& range) {
 //      iterator body = formals; ++body; 
       iterator formals = ++it; 
       iterator body = ++it; 
-      ++it;
-      return evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+      boost::shared_ptr<runtime_environment> new_env
+        = boost::make_shared<runtime_environment>();
+      return new_env->invoke(f);
 //      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
 //      ++it; ++it; ++it;
     }

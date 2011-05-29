@@ -1,0 +1,4 @@
+invoking lambda one
+invoking lambda two
+-27
+(return-value #<unspecified>)

@@ -5,6 +5,9 @@
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(display ((lambda (f x y) (f x y)) (lambda (x y) (+ (- x 1) y)) 5 6))
+(display 
+  ((lambda (f x) (f x))
+    ((lambda (x) (lambda (y) (* x y))) 2)
+    4))
 (newline)
 
