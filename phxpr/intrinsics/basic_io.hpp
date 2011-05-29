@@ -22,8 +22,10 @@ namespace phxpr {
 
 struct display: phxpr::unary<display> {
   std::ostream& out;
+  const bool print_pointers;
 
-  display (std::ostream& out_): out(out_) { }
+  display (std::ostream& out_, bool print_pointers_ = true):
+    out(out_), print_pointers(print_pointers_) { }
 
   utree eval (utree const& ut) const {
     if (prana::is_utree_string(ut)) {
@@ -34,7 +36,7 @@ struct display: phxpr::unary<display> {
     }
 
     else 
-      prana::generate_sexpr(ut, out);
+      prana::generate_sexpr(ut, out, print_pointers);
 
     return utree();
   }

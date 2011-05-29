@@ -31,29 +31,31 @@ namespace prana {
 
 template<class Char>
 bool generate_sexpr (parse_tree<tag::sexpr> const& in,
-                     std::basic_ostream<Char>& out)
-{ return generate_sexpr(in.ast(), out); }
+                     std::basic_ostream<Char>& out, bool print_pointers = true)
+{ return generate_sexpr(in.ast(), out, print_pointers); }
 
 template<class Char>
 bool generate_sexpr (parse_tree<tag::sexpr> const& in,
-                     std::basic_string<Char>& out)
-{ return generate_sexpr(in.ast(), out); }
+                     std::basic_string<Char>& out, bool print_pointers = true)
+{ return generate_sexpr(in.ast(), out, print_pointers); }
 
 template<class Char>
-bool generate_sexpr (utree const& in, std::basic_ostream<Char>& out) {
+bool generate_sexpr (utree const& in, std::basic_ostream<Char>& out,
+                     bool print_pointers = true) {
   #if !defined(PRANA_NO_UTREE_KARMA)
     typedef spirit::ostream_iterator iterator_type;
     sexpr_generator<iterator_type> g;
     return karma::generate(iterator_type(out), g, in);
   #else
-    sexpr_printer<std::basic_ostream<Char> > print(out);
+    sexpr_printer<std::basic_ostream<Char> > print(out, print_pointers);
     print(in);
     return true; 
   #endif
 }
 
 template<class Char>
-bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
+bool generate_sexpr (utree const& in, std::basic_string<Char>& out,
+                     bool print_pointers = true) {
   #if !defined(PRANA_NO_UTREE_KARMA)
     typedef std::basic_string<Char> string_type;
     typedef std::back_insert_iterator<string_type> iterator_type;
@@ -61,7 +63,7 @@ bool generate_sexpr (utree const& in, std::basic_string<Char>& out) {
     return karma::generate(iterator_type(out), g, in);
   #else
     std::basic_stringstream<Char> oss;
-    sexpr_printer<std::basic_stringstream<Char> > print(oss);
+    sexpr_printer<std::basic_stringstream<Char> > print(oss, print_pointers);
     print(in);
     out = oss.str();
     return true; 

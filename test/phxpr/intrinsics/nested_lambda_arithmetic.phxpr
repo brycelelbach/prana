@@ -5,5 +5,9 @@
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-((lambda () (+ 2 2)))
+(display ((lambda () (+ 1 (- 2 (+ 14 (* 8 (/ 64 2))))))))
+(newline)
+
+(display ((lambda () (- (+ 2 1) (+ 1 2)))))
+(newline)
 

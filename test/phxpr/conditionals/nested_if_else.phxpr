@@ -16,7 +16,11 @@
       #f)))
 
 (display (matches? nil #f "foo"))
+(newline)
 (display (matches? nil 1 "foo"))
+(newline)
 (display (matches? nil #f 12.3))
+(newline)
 (display (matches? * #f "foo"))
+(newline)
 

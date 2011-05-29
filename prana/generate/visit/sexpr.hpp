@@ -23,8 +23,10 @@ struct sexpr_printer {
   typedef void result_type;
 
   Out& out;
+  const bool print_pointers;
 
-  sexpr_printer (Out& out): out(out) { }
+  sexpr_printer (Out& out_, bool print_pointers_ = true):
+    out(out_), print_pointers(print_pointers_) { }
 
   void operator() (utree const& ut) const {
     utree::visit(ut, *this);
@@ -109,11 +111,17 @@ struct sexpr_printer {
   }
 
   void operator() (spirit::any_ptr const& p) const {
-    out << "#<pointer " << &p << ">";
+    if (print_pointers)
+      out << "#<object " << &p << ">";
+    else
+      out << "#<object>";
   }
 
   void operator() (function_base const& pf) const {
-    out << "#<procedure " << &pf << ">";
+    if (print_pointers)
+      out << "#<procedure " << &pf << ">";
+    else
+      out << "#<procedure>";
   }
 };
 

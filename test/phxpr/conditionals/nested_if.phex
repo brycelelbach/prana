@@ -1,1 +1,5 @@
-(return-value #t)
+#t
+#<unspecified>
+#<unspecified>
+#<unspecified>
+(return-value #<unspecified>)

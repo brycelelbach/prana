@@ -85,6 +85,8 @@ int main (int argc, char** argv) {
   visible.add_options()
     ("help,h", "display this message")
     ("print-return", "print return value after evaluation")
+    ("hide-pointers",
+     "do not show C++ pointer values when displaying objects and procedures")
     ("version,v", "display the version and copyright information")
   ;
 
@@ -130,6 +132,8 @@ int main (int argc, char** argv) {
   std::ifstream ifs(input.c_str(), std::ifstream::in);  
   evaluator e;
 
+  const bool hide_pointers = vm.count("hide-pointers");
+
   // globals
   e.define_global("nil", nil);
 
@@ -153,7 +157,7 @@ int main (int argc, char** argv) {
   e.define_intrinsic("unspecified?", invalid_predicate());
 
   // basic io
-  e.define_intrinsic("display", display(std::cout));
+  e.define_intrinsic("display", display(std::cout, !hide_pointers));
   e.define_intrinsic("newline", newline(std::cout));
   
   // basic io
@@ -183,7 +187,7 @@ int main (int argc, char** argv) {
     }
 
     std::cout << "(return-value ";
-    generate_sexpr(r, std::cout);
+    generate_sexpr(r, std::cout, !hide_pointers);
     std::cout << ")\n";
   }
 

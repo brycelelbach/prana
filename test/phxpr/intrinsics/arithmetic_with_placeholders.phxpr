@@ -5,18 +5,15 @@
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(variable matches?
-  (lambda (x y z)
-    (if (nil? x)
-      (if (boolean? y)
-        (if (string? z) #t)))))
+(display ((lambda (x) (+ x x)) 2))
+(newline)
 
-(display (matches? nil #f "foo"))
+(display ((lambda (f g) (- f g)) 2 4.14))
 (newline)
-(display (matches? nil 1 "foo"))
+
+(display ((lambda (a b) (* a b)) 6.5 8))
 (newline)
-(display (matches? nil #f 12.3))
-(newline)
-(display (matches? * #f "foo"))
+
+(display ((lambda (x y) (/ x y)) 9 3))
 (newline)
 

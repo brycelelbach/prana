@@ -23,9 +23,17 @@ phxpr.run-phxi conditionals_if_else_delayed_evaluation : conditionals/if_else_de
 phxpr.run-phxi conditionals_nested_if_else : conditionals/nested_if_else ;
 phxpr.run-phxi conditionals_nested_if : conditionals/nested_if ;
 
-phxpr.run-phxi intrinsics_basic : intrinsics/basic ;
-phxpr.run-phxi intrinsics_lambda : intrinsics/lambda ;
-phxpr.run-phxi intrinsics_placeholder_argument : intrinsics/placeholder_argument ;
+phxpr.run-phxi intrinsics_arithmetic : intrinsics/arithmetic ;
+phxpr.run-phxi intrinsics_arithmetic_with_placeholders : intrinsics/arithmetic_with_placeholders ;
+phxpr.run-phxi intrinsics_lambda_arithmetic : intrinsics/lambda_arithmetic ;
+phxpr.run-phxi intrinsics_nested_arithmetic : intrinsics/nested_arithmetic ;
+phxpr.run-phxi intrinsics_nested_arithmetic_with_placeholders : intrinsics/nested_arithmetic_with_placeholders ;
+phxpr.run-phxi intrinsics_nested_lambda_arithmetic : intrinsics/nested_lambda_arithmetic ;
+
+phxpr.run-phxi shadowing_anonymous_module_variable : shadowing/anonymous_module_variable ;
+phxpr.run-phxi shadowing_anonymous_upvalue : shadowing/anonymous_upvalue ;
+phxpr.run-phxi shadowing_nested_module_variable : shadowing/nested_module_variable ;
+phxpr.run-phxi shadowing_nested_upvalue : shadowing/nested_upvalue ;
 
 phxpr.run-phxi lambda_basic : lambda/basic ;
 phxpr.run-phxi lambda_block : lambda/block ;
