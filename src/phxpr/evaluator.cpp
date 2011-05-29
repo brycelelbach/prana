@@ -75,24 +75,32 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
 
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
-      iterator formals = it; ++formals;
-      iterator body = formals; ++body; 
+//      iterator formals = it; ++formals;
+//      iterator body = formals; ++body; 
+      iterator formals = ++it;
+      iterator body = ++it; 
+      ++it;
       lazy_call->push_back(evaluate_lambda_expression
         (*formals, evaluator::range_type(body, end), ev)); 
     }
 
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
-      iterator identifier = it; ++identifier;
-      iterator value = identifier; ++value;
+//      iterator identifier = it; ++identifier;
+//      iterator value = identifier; ++value;
+      iterator identifier = ++it; 
+      iterator value = ++it; 
       lazy_call->push_back(evaluate_internal_variable(*identifier, *value, ev)); 
     }
     
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("if"))) {
-      iterator test= it; ++test;
-      iterator then = test; ++then;
-      iterator else_ = then; ++else_;
+//      iterator test= it; ++test;
+//      iterator then = test; ++then;
+//      iterator else_ = then; ++else_;
+      iterator test= ++it; 
+      iterator then = ++it;
+      iterator else_ = ++it;
       if (else_ == end)
         lazy_call->push_back(make_if_thunk(*test, *then, ev)); 
       else
@@ -158,7 +166,9 @@ make_if_else_thunk (utree const& test, utree const& then, utree const& else_,
 }
 
 // TODO: handle variable arguments
-void make_placeholders (utree const& formals, evaluator& ev) {
+void make_placeholders (utree const& formals, signature const& sig,
+                        evaluator& ev)
+{
   typedef utree::const_iterator iterator;
 
   iterator it = formals.begin(), end = formals.end();
@@ -198,7 +208,14 @@ evaluate_lambda_expression (utree const& formals,
   evaluator local_env
     (ev.variables, ev.global_procedure_table, ev.frame + 1, sig);
 
-  make_placeholders(formals, local_env);
+  if (arity_type::variable == type) {
+    utree range(evaluator::range_type
+      (formals.begin(), --formals.end()), spirit::shallow);
+    make_placeholders(range, sig, local_env);
+  }
+
+  else
+    make_placeholders(formals, sig, local_env);
 
   boost::shared_ptr<function_body> fbody
     = boost::make_shared<function_body>
@@ -239,6 +256,8 @@ evaluator::operator() (evaluator::symbol_type const& str) {
 
 evaluator::result_type
 evaluator::operator() (evaluator::range_type const& range) {
+  using boost::fusion::at_c;
+
   typedef evaluator::range_type::const_iterator iterator;
 
   iterator it = range.begin(), end = range.end();
@@ -260,16 +279,22 @@ evaluator::operator() (evaluator::range_type const& range) {
   else if (prana::recursive_which(*it) == utree_type::symbol_type) {
     // TODO: syntax checks
     if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
-      iterator formals = it; ++formals;
-      iterator body = formals; ++body; 
-      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
-      ++it; ++it; ++it;
+//      iterator formals = it; ++formals;
+//      iterator body = formals; ++body; 
+      iterator formals = ++it; 
+      iterator body = ++it; 
+      ++it;
+      return evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+//      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
+//      ++it; ++it; ++it;
     }
     
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
-      iterator identifier = it; ++identifier;
-      iterator value = identifier; ++value;
-      ++it; ++it;
+//      iterator identifier = it; ++identifier;
+//      iterator value = identifier; ++value;
+      iterator identifier = ++it;
+      iterator value = ++it; 
+//      ++it; ++it;
 
       if (++it != end)
         BOOST_THROW_EXCEPTION(invalid_variable_definition
@@ -285,9 +310,12 @@ evaluator::operator() (evaluator::range_type const& range) {
     
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("if"))) {
-      iterator test = it; ++test;
-      iterator then = test; ++then;
-      iterator else_ = then; ++else_;
+//      iterator test = it; ++test;
+//      iterator then = test; ++then;
+//      iterator else_ = then; ++else_;
+      iterator test = ++it; 
+      iterator then = ++it; 
+      iterator else_ = ++it;
 
       bool r = predicate(evaluate(*test, *this));
 
@@ -313,6 +341,19 @@ evaluator::operator() (evaluator::range_type const& range) {
 
   else 
     BOOST_THROW_EXCEPTION(procedure_call_or_macro_use_expected(*it));
+      
+  BOOST_ASSERT(unsigned(f.tag()) <= global_procedure_table->size());
+
+  // Load the lazy argument's signature from the gpt.
+  signature const& sig = (*global_procedure_table)[f.tag()];
+
+  if ((at_c<3>(sig) == function_type::thunk) ||
+      (at_c<3>(sig) == function_type::lambda))
+  {
+    boost::shared_ptr<runtime_environment> new_env
+      = boost::make_shared<runtime_environment>();
+    f = new_env->invoke(f);
+  }
 
   // Invoke nullary procedures.
   if (++it == end) {
