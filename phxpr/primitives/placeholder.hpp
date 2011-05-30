@@ -35,21 +35,21 @@ struct placeholder: actor<placeholder> {
 
     if (!eptr) {
       BOOST_THROW_EXCEPTION
-        (invalid_placeholder(n, frame, ut, arity_type::fixed));
+        (invalid_placeholder(n, frame, eptr, arity_type::fixed));
     }
 
     while (frame != eptr->level()) {
-      eptr = eptr->outer();
-    
-      if (!eptr) {
+      if (!eptr->outer()) {
         BOOST_THROW_EXCEPTION
-          (invalid_placeholder(n, frame, ut, arity_type::fixed));
+          (invalid_placeholder(n, frame, eptr, arity_type::fixed));
       }
+
+      eptr = eptr->outer();
     } 
 
     if (eptr->size() <= n) {
       BOOST_THROW_EXCEPTION
-        (invalid_placeholder(n, frame, ut, arity_type::fixed));
+        (invalid_placeholder(n, frame, eptr, arity_type::fixed));
     }
 
     return utree((*eptr)[n]);

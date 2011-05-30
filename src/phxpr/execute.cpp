@@ -118,7 +118,7 @@ evaluator::execute (evaluator::range_type const& range) {
   }
 
   // Invoke non-nullary procedures.
-  const displacement env_size = num_local_variables + std::distance(it, end);  
+  const displacement env_size = num_local_vars + std::distance(it, end);  
   boost::shared_array<utree> env(new utree[env_size]);
 
   // Evaluate the arguments.

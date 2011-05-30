@@ -16,9 +16,6 @@
 
 #include <phxpr/signature.hpp>
 
-// TODO: Pass runtime_environments instead of utrees holding
-// runtime_environments to ease debugging with GDB.
-
 namespace phxpr {
 
 struct runtime_environment;
@@ -42,23 +39,25 @@ struct invalid_arity: virtual exception {
 struct invalid_placeholder: virtual exception {
   displacement expected_n;
   displacement expected_frame;
-  utree environment;
+  boost::shared_ptr<runtime_environment> environment;
   arity_type::info type;
 
   invalid_placeholder (displacement expected_n_, displacement expected_frame_,
-                       utree const& environment_, arity_type::info type_):
+                       boost::shared_ptr<runtime_environment> const& e,
+                       arity_type::info type_):
     expected_n(expected_n_), expected_frame(expected_frame_),
-    environment(environment_), type(type_) { }
+    environment(e), type(type_) { }
 
   virtual ~invalid_placeholder (void) throw() { }
 };
 
 struct invalid_local_variable: virtual exception {
   displacement expected;
-  utree environment;
+  boost::shared_ptr<runtime_environment> environment;
 
-  invalid_local_variable (displacement expected_, utree const& environment_):
-    expected(expected_), environment(environment_) { }
+  invalid_local_variable (displacement expected_,
+                          boost::shared_ptr<runtime_environment> const& e):
+    expected(expected_), environment(e) { }
 
   virtual ~invalid_local_variable (void) throw() { }
 };

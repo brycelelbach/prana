@@ -81,7 +81,8 @@ evaluator::make_lambda_expression (utree const& formals,
     fbody->code->push_back(f);
   }
 
-  lambda l(fbody, local_env.global_procedure_table, sig);
+  lambda l
+    (fbody, local_env.global_procedure_table, sig, local_env.num_local_vars);
 
   local_env.global_procedure_table->push_back(sig);
 

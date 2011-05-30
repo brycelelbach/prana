@@ -70,6 +70,7 @@ struct thunk: actor<thunk> {
 
     utree const& lazy_f = execute_lazy((*lazy_call)[0], env);
 
+    // IMPLEMENT: Allocate space for locals here.
     const displacement lazy_env_size = lazy_call->size() - 1;
     boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 
