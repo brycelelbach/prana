@@ -6,9 +6,12 @@
 ################################################################################
 
 lib phxpr 
-  : $(PRANA_ROOT)/src/phxpr/evaluator.cpp
-    $(PRANA_ROOT)/src/phxpr/signature.cpp
+  : $(PRANA_ROOT)/src/phxpr/evaluate.cpp
+    $(PRANA_ROOT)/src/phxpr/execute.cpp
+    $(PRANA_ROOT)/src/phxpr/make_lambda_expression.cpp
+    $(PRANA_ROOT)/src/phxpr/make_thunk.cpp
     $(PRANA_ROOT)/src/phxpr/predicate.cpp
+    $(PRANA_ROOT)/src/phxpr/signature.cpp
   : <define>PHXPR_SOURCE
   ;
 
