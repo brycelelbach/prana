@@ -57,14 +57,13 @@ typedef boost::fusion::vector4<
 
 // {{{ streaming operators
 std::ostream&
-operator<< (std::ostream& out, function_type::info const& info) PHXPR_EXPORT;
+operator<< (std::ostream&, function_type::info const&) PHXPR_EXPORT;
 
 std::ostream&
-operator<< (std::ostream& out, arity_type::info const& info) PHXPR_EXPORT;
+operator<< (std::ostream&, arity_type::info const&) PHXPR_EXPORT;
 
 std::ostream& 
-operator<< (std::ostream& out, evaluation_strategy::info const& info)
-PHXPR_EXPORT;
+operator<< (std::ostream&, evaluation_strategy::info const&) PHXPR_EXPORT;
 // }}}
 
 } // phxpr

@@ -75,8 +75,6 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
 
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
-//      iterator formals = it; ++formals;
-//      iterator body = formals; ++body; 
       iterator formals = ++it;
       iterator body = ++it; 
       ++it;
@@ -86,8 +84,6 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
 
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
-//      iterator identifier = it; ++identifier;
-//      iterator value = identifier; ++value;
       iterator identifier = ++it; 
       iterator value = ++it; 
       lazy_call->push_back(evaluate_internal_variable(*identifier, *value, ev)); 
@@ -95,9 +91,6 @@ make_thunk (utree const& elements, signature const& sig, evaluator& ev) {
     
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("if"))) {
-//      iterator test= it; ++test;
-//      iterator then = test; ++then;
-//      iterator else_ = then; ++else_;
       iterator test= ++it; 
       iterator then = ++it;
       iterator else_ = ++it;
@@ -279,24 +272,17 @@ evaluator::operator() (evaluator::range_type const& range) {
   else if (prana::recursive_which(*it) == utree_type::symbol_type) {
     // TODO: syntax checks
     if (*it == utree(spirit::utf8_symbol_type("lambda"))) {
-//      iterator formals = it; ++formals;
-//      iterator body = formals; ++body; 
       iterator formals = ++it; 
       iterator body = ++it; 
       f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
       boost::shared_ptr<runtime_environment> new_env
         = boost::make_shared<runtime_environment>();
       return new_env->invoke(f);
-//      f = evaluate_lambda_expression(*formals, range_type(body, end), *this); 
-//      ++it; ++it; ++it;
     }
     
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
-//      iterator identifier = it; ++identifier;
-//      iterator value = identifier; ++value;
       iterator identifier = ++it;
       iterator value = ++it; 
-//      ++it; ++it;
 
       if (++it != end)
         BOOST_THROW_EXCEPTION(invalid_variable_definition
@@ -312,9 +298,6 @@ evaluator::operator() (evaluator::range_type const& range) {
     
     // TODO: syntax checks
     else if (*it == utree(spirit::utf8_symbol_type("if"))) {
-//      iterator test = it; ++test;
-//      iterator then = test; ++then;
-//      iterator else_ = then; ++else_;
       iterator test = ++it; 
       iterator then = ++it; 
       iterator else_ = ++it;

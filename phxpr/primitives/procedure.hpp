@@ -101,20 +101,6 @@ struct procedure: actor<procedure> {
         return new_env->invoke(body);
       } // }}}
 
-      #if 0
-      boost::shared_array<utree> const& ap = env.get();
-
-      // fastpath
-      if (ap) { 
-        boost::shared_ptr<runtime_environment> new_env
-          = boost::make_shared<runtime_environment>
-            (ap, env.size(), parent_env);
-        return new_env->invoke(body);
-      }
-      #endif
-
-      // slowpath (TODO: shouldn't ever happen)
-//      else {
         boost::shared_array<utree> storage(new utree[env.size()]);
 
         for (std::size_t i = 0, end = env.size(); i != end; ++i) {
@@ -125,7 +111,6 @@ struct procedure: actor<procedure> {
           = boost::make_shared<runtime_environment>
             (storage, env.size(), parent_env);
         return new_env->invoke(body);
-//      }
     }
   
     // nullary  
