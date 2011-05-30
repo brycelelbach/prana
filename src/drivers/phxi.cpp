@@ -273,14 +273,14 @@ int main (int argc, char** argv) {
     
     phex_ifs.unsetf(std::ios::skipws);
 
-    std::streampos length = 0;
+    std::size_t length = 0;
     char* buffer = 0;
 
     phex_ifs.seekg(0, std::ios::end);
     length = phex_ifs.tellg();
     phex_ifs.seekg(0, std::ios::beg);
 
-    buffer = new char [length + 1];
+    buffer = new char [length + std::size_t(1)];
 
     phex_ifs.read(buffer, length);
     phex_ifs.close();
