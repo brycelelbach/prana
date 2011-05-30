@@ -97,7 +97,7 @@ struct utree_hasher {
 namespace boost {
 namespace spirit {
 
-std::size_t hash_value (utree const& ut) {
+inline std::size_t hash_value (utree const& ut) {
   return utree::visit(ut, prana::utree_hasher());
 }
 
