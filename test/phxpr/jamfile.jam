@@ -9,11 +9,6 @@
 
 import phxpr ;
 
-project
-  : requirements
-#    <toolset>gcc:<testing.launcher>"valgrind --memcheck:leak-check=yes --error-exitcode=1"
-  ;
-
 phxpr.run-phxi conditionals_boolean_literal_if_else : conditionals/boolean_literal_if_else ;
 phxpr.run-phxi conditionals_boolean_literal_if : conditionals/boolean_literal_if ;
 phxpr.run-phxi conditionals_lambda_if_delayed_evaluation : conditionals/lambda_if_delayed_evaluation ;

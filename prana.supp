@@ -1,0 +1,6 @@
+{
+   1 byte reads from strlen 
+   Memcheck:Addr1
+   fun:__GI_strlen
+}
+

@@ -7,9 +7,12 @@
 
 #include <phxpr/config.hpp>
 
+#include <ios>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
@@ -43,6 +46,10 @@ using boost::fusion::at_c;
 using boost::spirit::nil;
 using boost::spirit::utree;
 using boost::spirit::utree_type;
+
+using boost::filesystem::path;
+using boost::filesystem::exists;
+using boost::filesystem::is_directory;
 
 using sheol::adt::dynamic_array;  
 
@@ -80,13 +87,15 @@ int main (int argc, char** argv) {
 
   options_description visible("Usage: phxi [options]"), hidden;
    
-  std::string input(""), args("");
+  std::string input(""), phex_input("");
  
   visible.add_options()
     ("help,h", "display this message")
     ("print-return", "print return value after evaluation")
     ("hide-pointers",
      "do not show C++ pointer values when displaying objects and procedures")
+    ("phex,p", value<std::string>(&phex_input),
+     "run in expectation mode, comparing evaluator stdout to expectation file")
     ("version,v", "display the version and copyright information")
   ;
 
@@ -129,6 +138,41 @@ int main (int argc, char** argv) {
     return 1; 
   }
 
+  else {
+    path ip(input);
+
+    if (!exists(ip)) {
+      std::cerr << "error: phxpr input '" << input << "' does not exist\n";
+      return 1;
+    }
+
+    else if (is_directory(ip)) {
+      std::cerr << "error: phxpr input '" << input << "' is a directory\n";
+      return 1;
+    }
+  }
+
+  // phex variables
+  boost::shared_ptr<std::ostringstream> phex_stdout;
+
+  if (vm.count("phex")) {
+    phex_stdout = boost::make_shared<std::ostringstream>();
+    
+    path ip(phex_input);
+
+    if (!exists(ip)) {
+      std::cerr << "error: phex expectation file '"
+                << input << "' does not exist\n";
+      return 1;
+    }
+
+    else if (is_directory(ip)) {
+      std::cerr << "error: phex expectation file '"
+                << input << "' is a directory\n";
+      return 1;
+    }
+  }
+
   std::ifstream ifs(input.c_str(), std::ifstream::in);  
   evaluator e;
 
@@ -157,8 +201,15 @@ int main (int argc, char** argv) {
   e.define_intrinsic("unspecified?", invalid_predicate());
 
   // basic io
-  e.define_intrinsic("display", display(std::cout, !hide_pointers));
-  e.define_intrinsic("newline", newline(std::cout));
+  if (vm.count("phex")) {
+    e.define_intrinsic("display", display(*phex_stdout, !hide_pointers));
+    e.define_intrinsic("newline", newline(*phex_stdout));
+  }
+
+  else {
+    e.define_intrinsic("display", display(std::cout, !hide_pointers));
+    e.define_intrinsic("newline", newline(std::cout));
+  }
   
   // basic io
   e.define_intrinsic("assert", assertion());
@@ -186,9 +237,17 @@ int main (int argc, char** argv) {
         evaluate(*asts.back(), e);
     }
 
-    std::cout << "(return-value ";
-    generate_sexpr(r, std::cout, !hide_pointers);
-    std::cout << ")\n";
+    if (vm.count("phex")) {
+      (*phex_stdout) << "(return-value ";
+      generate_sexpr(r, *phex_stdout, !hide_pointers);
+      (*phex_stdout) << ")\n";
+    }
+
+    else {
+      std::cout << "(return-value ";
+      generate_sexpr(r, std::cout, !hide_pointers);
+      std::cout << ")\n";
+    }
   }
 
   else {
@@ -207,6 +266,42 @@ int main (int argc, char** argv) {
       else 
         evaluate(*asts.back(), e);
     }
+  }
+
+  if (vm.count("phex")) {
+    std::ifstream phex_ifs(phex_input.c_str(), std::ifstream::in);  
+    
+    phex_ifs.unsetf(std::ios::skipws);
+
+    std::streampos length = 0;
+    char* buffer = 0;
+
+    phex_ifs.seekg(0, std::ios::end);
+    length = phex_ifs.tellg();
+    phex_ifs.seekg(0, std::ios::beg);
+
+    buffer = new char [length + 1];
+
+    phex_ifs.read(buffer, length);
+    phex_ifs.close();
+
+    buffer[length] = '\0';
+
+    std::string phex_str = phex_stdout->str();
+
+    if (phex_str != buffer) {
+      std::cerr << "error: evaluation output did not match phex expectation "
+                << "file '" << phex_input << "'\n"
+                <<   "=got=================================================\n"
+                << phex_str
+                << "\n=expected============================================\n"
+                << buffer
+                << "\n=====================================================\n";
+
+      return 1;
+    }
+
+    delete[] buffer;
   }
 
   return 0; 

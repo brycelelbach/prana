@@ -1,4 +1,3 @@
-
 ################################################################################
 #   Copyright (c) 2005 Joao Abecasis
 #   Copyright (c) 2010 Bryce Lelbach
@@ -7,6 +6,7 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
+import path ;
 import modules ;
 import targets ;
 import testing ;
@@ -14,6 +14,9 @@ import project ;
 
 rule run-phxi ( target-name : input ? : requirements * ) {
   input ?= $(target-name) ;
+
+#  local phxpr_input = [ path.root $(input).phxpr [ path.pwd ] ] ;
+#  local phex_input = [ path.root $(input).phex [ path.pwd ] ] ;
 
   local project = [ project.current ] ;
 
@@ -23,6 +26,10 @@ rule run-phxi ( target-name : input ? : requirements * ) {
             : /prana//phxi 
             : $(requirements)
               <location-prefix>$(target-name).test
+              <testing.arg>--hide-pointers
+              <testing.arg>--print-return
+              <testing.arg>-p
+              <testing.input-file>$(input).phex
               <testing.input-file>$(input).phxpr
               <preserve-test-targets>on
             ]

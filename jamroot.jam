@@ -17,6 +17,19 @@ constant PRANA_ROOT : [ path.pwd ] ;
 constant BOOST_PROGRAM_OPTIONS
   : $(BOOST_ROOT)/libs/program_options/build//boost_program_options ;
 
+constant BOOST_FILESYSTEM
+  : $(BOOST_ROOT)/libs/filesystem/build//boost_filesystem ;
+
+constant VG_SUPPS : "--suppressions=$(PRANA_ROOT)/prana.supp" ;
+
+constant VG_OPTIONS : "--memcheck:leak-check=yes --error-exitcode=1" ;
+
+variant release_with_valgrind : release :
+  <testing.launcher>"valgrind $(VG_SUPPS) $(VG_OPTIONS)" ;
+
+variant debug_with_valgrind : debug :
+  <testing.launcher>"valgrind $(VG_SUPPS) $(VG_OPTIONS)" ;
+
 use-project /prana : $(PRANA_ROOT)/build ; 
 
 project 
@@ -33,6 +46,7 @@ project
     <include>$(SHEOL_ROOT)
     <include>$(BOOST_ROOT)
   : build-dir bin.v2
+  : default-build release_with_valgrind debug_with_valgrind release debug
   ;
 
 build-project $(PRANA_ROOT)/test/phxpr ;

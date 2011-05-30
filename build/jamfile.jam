@@ -15,6 +15,7 @@ lib phxpr
 exe phxi 
   : $(PRANA_ROOT)/src/drivers/phxi.cpp
   : <library>$(BOOST_PROGRAM_OPTIONS)
+    <library>$(BOOST_FILESYSTEM)
     <library>/prana//phxpr
-    <cxxflags>-pie
   ;
+
