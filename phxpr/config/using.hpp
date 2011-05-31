@@ -17,9 +17,6 @@ struct utree_list;
 
 struct function_base;
 
-template <typename F>
-struct stored_function;
-
 namespace qi { }
 namespace karma { }
 
@@ -44,7 +41,6 @@ using boost::spirit::utree_type;
 using boost::spirit::utree;
 using boost::spirit::utree_list;
 using boost::spirit::function_base;
-using boost::spirit::stored_function;
 
 } // phxpr
 

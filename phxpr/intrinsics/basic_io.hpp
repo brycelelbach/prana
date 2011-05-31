@@ -40,6 +40,9 @@ struct display: phxpr::unary<display> {
 
     return utree();
   }
+  
+  function_base* duplicate (void) const
+  { return new display(out, print_pointers); } 
 };
 
 struct newline: phxpr::nullary<newline> {
@@ -51,6 +54,9 @@ struct newline: phxpr::nullary<newline> {
     out << "\n";
     return utree();
   }
+  
+  function_base* duplicate (void) const
+  { return new newline(out); } 
 };
 
 } // phxpr

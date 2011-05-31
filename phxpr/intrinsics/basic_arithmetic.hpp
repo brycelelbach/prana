@@ -15,21 +15,33 @@ namespace phxpr {
 struct addition: phxpr::binary<addition> {
   utree eval (utree const& lhs, utree const& rhs) const
   { return lhs + rhs; }
+  
+  function_base* duplicate (void) const
+  { return new addition; } 
 };
 
 struct subtraction: phxpr::binary<subtraction> {
   utree eval (utree const& lhs, utree const& rhs) const
   { return lhs - rhs; }
+  
+  function_base* duplicate (void) const
+  { return new subtraction; } 
 };
 
 struct multiplication: phxpr::binary<multiplication> {
   utree eval (utree const& lhs, utree const& rhs) const
   { return lhs * rhs; }
+  
+  function_base* duplicate (void) const
+  { return new multiplication; } 
 };
 
 struct division: phxpr::binary<division> {
   utree eval (utree const& lhs, utree const& rhs) const
   { return lhs / rhs; }
+  
+  function_base* duplicate (void) const
+  { return new division; } 
 };
 
 } // phxpr

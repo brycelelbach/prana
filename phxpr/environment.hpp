@@ -128,15 +128,19 @@ struct runtime_environment:
   { return const_cast<runtime_environment*>(this)->shared_from_this(); }
 
   template <typename F>
-  utree invoke (F const& f) const
-  { return f.eval(utree(spirit::any_ptr(checkout().get()))); }
+  utree invoke (F const& f) const {
+    utree ut(spirit::any_ptr(checkout().get()));
+    return f.eval(ut);
+  }
   
   template <typename F>
-  utree invoke (boost::shared_ptr<F> const& f) const
-  { return f->eval(utree(spirit::any_ptr(checkout().get()))); }
+  utree invoke (boost::shared_ptr<F> const& f) const {
+    utree ut(spirit::any_ptr(checkout().get()));
+    return f->eval(ut);
+  }
 
  private:
-  runtime_environment::size_type depth;
+  const runtime_environment::size_type depth;
   boost::shared_ptr<runtime_environment> parent;
   boost::shared_array<utree> upval;
 };

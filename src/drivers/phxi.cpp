@@ -57,7 +57,6 @@ using prana::parse_tree;
 using prana::tag::sexpr;
 using prana::generate_sexpr;
 
-using phxpr::signature;
 using phxpr::evaluator;
 using phxpr::evaluate;
 

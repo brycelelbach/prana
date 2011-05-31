@@ -25,13 +25,13 @@ void evaluator::make_placeholders (utree const& formals, signature const& sig) {
       BOOST_THROW_EXCEPTION(expected_identifier(*it)); 
 
     boost::shared_ptr<utree> p = variables->define(*it, utree
-      (stored_function<placeholder>(placeholder(i, frame)))); 
+      (new placeholder(i, frame))); 
 
     const signature ph_sig(i, ((end - 1) == i)
                               ? at_c<1>(sig)
                               : arity_type::fixed,
                            evaluation_strategy::call_by_value, 
-                           function_type::placeholder);
+                           function_type::placeholder, 0);
 
     global_procedure_table->push_back(ph_sig);
     p->tag(global_procedure_table->size() - 1);
@@ -52,18 +52,18 @@ evaluator::make_lambda_expression (utree const& formals,
     type = arity_type::variable;
 
   const signature sig(formals.size(), type, evaluation_strategy::call_by_value,
-                      function_type::lambda);
+                      function_type::lambda, 0);
 
   evaluator local_env(variables, global_procedure_table, frame + 1, sig);
 
   if (arity_type::variable == type) {
     utree range(evaluator::range_type
       (formals.begin(), --formals.end()), spirit::shallow);
-    local_env.make_placeholders(range, sig);
+    local_env.make_placeholders(range, local_env.sig);
   }
 
   else
-    local_env.make_placeholders(formals, sig);
+    local_env.make_placeholders(formals, local_env.sig);
 
   boost::shared_ptr<function_body> fbody
     = boost::make_shared<function_body>
@@ -77,16 +77,13 @@ evaluator::make_lambda_expression (utree const& formals,
     BOOST_THROW_EXCEPTION(expected_body(utree(body))); 
 
   for (; it != end; ++it) {
-    utree f = local_env.make_thunk(*it, sig);
+    utree f = local_env.make_thunk(*it, local_env.sig);
     fbody->code->push_back(f);
   }
 
-  lambda l
-    (fbody, local_env.global_procedure_table, sig, local_env.num_local_vars);
+  utree ut = new lambda(fbody, local_env.global_procedure_table, local_env.sig);
 
-  local_env.global_procedure_table->push_back(sig);
-
-  utree ut = stored_function<lambda>(l);
+  local_env.global_procedure_table->push_back(local_env.sig);
   ut.tag(local_env.global_procedure_table->size() - 1);
 
   return ut; 

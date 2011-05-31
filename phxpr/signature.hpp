@@ -51,8 +51,12 @@ struct function_type {
   typedef boost::uint8_t integral;
 };
 
-typedef boost::fusion::vector4<
-  displacement, arity_type::info, evaluation_strategy::info, function_type::info
+typedef boost::fusion::vector5<
+  displacement, // arity
+  arity_type::info,
+  evaluation_strategy::info,
+  function_type::info,
+  displacement // # of local variables
 > signature;
 
 // {{{ streaming operators

@@ -40,7 +40,7 @@ struct thunk: actor<thunk> {
   }
 
   // TODO: Refactor this code with the code in procedure
-  utree execute_lazy (utree const& lazy, runtime_environment& env) const { 
+  utree execute_lazy (utree& lazy, runtime_environment& env) const { 
     using boost::fusion::at_c;
 
     if (prana::recursive_which(lazy) == utree_type::function_type) {
@@ -52,17 +52,12 @@ struct thunk: actor<thunk> {
       if ((at_c<3>(sig) == function_type::placeholder) ||
           (at_c<3>(sig) == function_type::thunk))
         return env.invoke(lazy);
-      else
-        // REVIEW: How safe is this ref?
-        return utree(boost::ref(lazy));
     }
 
-    else
-      // REVIEW: How safe is this ref?
-      return utree(boost::ref(lazy));
+    return lazy;
   }
 
-  utree eval (utree const& ut) const {
+  utree eval (utree& ut) const {
     BOOST_ASSERT(lazy_call);
     BOOST_ASSERT(lazy_call->size() > 0);
 
@@ -86,6 +81,11 @@ struct thunk: actor<thunk> {
 
     return new_env->invoke(lazy_f);
   }
+
+  // REVIEW: Will passing shallow references via smart pointers screw with
+  // assignment once it's implemented?
+  function_base* copy (void) const
+  { return new thunk(lazy_call, global_procedure_table); }
 };
 
 } // phxpr

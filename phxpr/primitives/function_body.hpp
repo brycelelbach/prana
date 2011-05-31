@@ -28,6 +28,7 @@ struct function_body: actor<function_body> {
 
   boost::shared_ptr<code_type> code;
 
+  // {{{ REVIEW: How many of these constructors do we actually need?
   function_body (void): code() { }
 
   function_body (utree const& code_): code(boost::make_shared<code_type>())
@@ -37,20 +38,20 @@ struct function_body: actor<function_body> {
 
   function_body (function_body const& other): code(other.code) { }
 
-  template <typename F>
-  function_body (F const& code_): code(boost::make_shared<code_type>())
-  { code->push_back(utree(stored_function<F>(code_))); }
+//  template <typename F>
+//  function_body (F const& code_): code(boost::make_shared<code_type>())
+//  { code->push_back(utree(stored_function<F>(code_))); }
+  // }}}
 
-  utree eval (utree const& ut) const {
+  utree eval (utree& ut) const {
     BOOST_ASSERT(code);
     BOOST_ASSERT(code->size());
     
     runtime_environment& env = *ut.get<runtime_environment*>();
 
-    code_type::size_type i = 0;
     const code_type::size_type end = code->size();
 
-    for (; i != (end - 1); ++i) {
+    for (code_type::size_type i = 0; i != (end - 1); ++i) {
       if (prana::recursive_which((*code)[i]) == utree_type::function_type)
         env.invoke((*code)[i]);
     }
@@ -60,6 +61,11 @@ struct function_body: actor<function_body> {
     else
       return utree(boost::ref((*code)[end - 1]));
   }
+
+  // REVIEW: Will passing shallow references via smart pointers screw with
+  // assignment once it's implemented?
+  function_base* copy (void) const
+  { return new function_body(code); }
 };
 
 } // phxpr

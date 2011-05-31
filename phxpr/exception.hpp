@@ -153,6 +153,10 @@ struct assertion_failed: virtual exception {
   virtual ~assertion_failed (void) throw() { }
 };
 
+struct illegal_dispatch: virtual exception {
+  virtual ~illegal_dispatch (void) throw() { }
+};
+
 } // phxpr
 
 #endif // PHXPR_2F9A7918_D1BE_49F1_BA9C_47C2CB1F3BD1

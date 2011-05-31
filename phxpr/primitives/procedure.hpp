@@ -32,21 +32,18 @@ struct procedure: actor<procedure> {
   boost::shared_ptr<runtime_environment> parent_env;
   boost::shared_ptr<gpt_type> global_procedure_table;
   const signature sig;
-  displacement num_local_vars;
 
   procedure (boost::shared_ptr<function_body> const& body_,
              boost::shared_ptr<runtime_environment> const& parent_env_,
-             boost::shared_ptr<gpt_type> const& gpt, signature const& sig_,
-             displacement num_local_vars_):
-    body(body_), parent_env(parent_env_), global_procedure_table(gpt),
-    sig(sig_), num_local_vars(num_local_vars_)
+             boost::shared_ptr<gpt_type> const& gpt, signature const& sig_):
+    body(body_), parent_env(parent_env_), global_procedure_table(gpt), sig(sig_)
   {
     BOOST_ASSERT(gpt);
     BOOST_ASSERT(body);
   }
 
   // TODO: Refactor this code with the code in thunk
-  utree expand (utree const& arg, runtime_environment& env) const {
+  utree expand (utree& arg, runtime_environment& env) const {
     using boost::fusion::at_c;
 
     if (prana::recursive_which(arg) == utree_type::function_type) {
@@ -57,17 +54,12 @@ struct procedure: actor<procedure> {
 
       if (at_c<3>(sig) == function_type::placeholder)
         return env.invoke(arg);
-      else
-        // REVIEW: How safe is this ref?
-        return utree(boost::ref(arg));
     }
 
-    else
-      // REVIEW: How safe is this ref?
-      return utree(boost::ref(arg));
+    return arg;
   }
 
-  utree eval (utree const& ut) const {
+  utree eval (utree& ut) const {
     using boost::fusion::at_c;
     
     runtime_environment& env = *ut.get<runtime_environment*>();
@@ -84,9 +76,9 @@ struct procedure: actor<procedure> {
     // }}}
 
     if (env.size() != 0) {
-      if (num_local_vars != 0) {
+      if (at_c<4>(sig) != 0) {
         // {{{ environment extension for local variables
-        const displacement ext_env_size = env.size() + num_local_vars;
+        const displacement ext_env_size = env.size() + at_c<4>(sig);
 
         // TODO: Implement make_shared_array<>.
         boost::shared_array<utree> ext_env(new utree[ext_env_size]);
@@ -120,6 +112,9 @@ struct procedure: actor<procedure> {
       return new_env->invoke(body);
     }
   }
+
+  function_base* copy (void) const
+  { return new procedure(body, parent_env, global_procedure_table, sig); }
 };
 
 } // phxpr

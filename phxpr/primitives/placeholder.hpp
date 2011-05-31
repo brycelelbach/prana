@@ -29,7 +29,7 @@ struct placeholder: actor<placeholder> {
 
   placeholder (displacement n_, displacement frame_): n(n_), frame(frame_) { } 
 
-  utree eval (utree const& ut) const {
+  utree eval (utree& ut) const {
     boost::shared_ptr<runtime_environment> eptr
       = ut.get<runtime_environment*>()->checkout();
 
@@ -54,6 +54,9 @@ struct placeholder: actor<placeholder> {
 
     return utree((*eptr)[n]);
   }
+
+  function_base* copy (void) const
+  { return new placeholder(n, frame); }
 };
 
 } // phxpr

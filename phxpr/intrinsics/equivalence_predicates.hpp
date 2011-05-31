@@ -15,6 +15,9 @@ namespace phxpr {
 struct equal_predicate: phxpr::binary<equal_predicate> {
   utree eval (utree const& lhs, utree const& rhs) const
   { return lhs == rhs; }
+  
+  function_base* duplicate (void) const
+  { return new equal_predicate; } 
 };
 
 } // phxpr

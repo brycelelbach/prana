@@ -20,6 +20,9 @@ struct assertion: phxpr::unary<assertion> {
       BOOST_THROW_EXCEPTION(assertion_failed());
     return utree();
   } 
+
+  function_base* duplicate (void) const
+  { return new assertion; } 
 };
 
 } // phxpr

@@ -50,24 +50,22 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
 
   boost::shared_ptr<variables_type> variables;
   boost::shared_ptr<gpt_type> global_procedure_table;
-  displacement num_local_vars;
   const displacement frame;
-  const signature sig;
+  signature sig;
 
   evaluator (void):
     variables(boost::make_shared<variables_type>()),
     global_procedure_table(boost::make_shared<gpt_type>()),
-    num_local_vars(0), frame(0),
-    sig(0, arity_type::fixed, evaluation_strategy::call_by_value,
-        function_type::module) { }
+    frame(0), sig(0, arity_type::fixed, evaluation_strategy::call_by_value,
+                  function_type::module, 0) 
+  { }
 
   evaluator (boost::shared_ptr<variables_type> const& parent_,
              boost::shared_ptr<gpt_type> const& gpt,
              displacement frame_, signature const& sig_):
     variables(boost::make_shared<variables_type>(parent_)),
-    global_procedure_table(gpt), num_local_vars(0), frame(frame_),
-    sig(sig_)
-    { BOOST_ASSERT(parent_); }
+    global_procedure_table(gpt), frame(frame_), sig(sig_)
+  { BOOST_ASSERT(parent_); }
 
   // REVIEW: Can we instead return utree(boost::ref(val)) safely?
   template <typename T>
@@ -139,15 +137,12 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   }
 
   result_type
-  make_internal_variable (utree const& identifier, utree const& value,
-                          signature const& sig)
-  {
+  make_internal_variable (utree const& identifier, utree const& value) {
     // IMPLEMENT: Don't use placeholder, use some sort of thunk that will
-    // set value when invoked. Also, we may need to put num_local_vars in
-    // signature so that thunks can access it from the GPT.
+    // set value when invoked.
     using boost::fusion::at_c;
-    variables->define(identifier, utree(stored_function<placeholder>
-      (placeholder(++num_local_vars + at_c<0>(sig), frame)))); 
+    variables->define(identifier, utree(new 
+      placeholder(++at_c<4>(sig) + at_c<0>(sig), frame))); 
     return utree();
   }
 };

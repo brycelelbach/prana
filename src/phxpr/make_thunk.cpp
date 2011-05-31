@@ -22,7 +22,7 @@ evaluator::result_type
 evaluator::make_thunk (utree const& elements, signature const& sig) {
   // {{{
   const signature body_sig(at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), 
-                           function_type::thunk);
+                           function_type::thunk, at_c<4>(sig));
 
   boost::shared_ptr<thunk::lazy_call_type> lazy_call
     = boost::make_shared<thunk::lazy_call_type>();
@@ -49,8 +49,7 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
       iterator identifier = ++it; 
       iterator value = ++it; 
-      lazy_call->push_back(make_internal_variable
-        (*identifier, *value, sig)); 
+      lazy_call->push_back(make_internal_variable(*identifier, *value)); 
     }
     
     // TODO: syntax checks
@@ -77,11 +76,8 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
   else
     lazy_call->push_back(evaluate(elements, *this));
     
-  thunk t(lazy_call, global_procedure_table);
-
+  utree ut = new thunk(lazy_call, global_procedure_table);
   global_procedure_table->push_back(body_sig);
-
-  utree ut = stored_function<thunk>(t);
   ut.tag(global_procedure_table->size() - 1);
 
   return ut;
@@ -92,15 +88,13 @@ evaluator::result_type
 evaluator::make_if_thunk (utree const& test, utree const& then) {
   // {{{
   const signature sig(2, arity_type::fixed, evaluation_strategy::call_by_value, 
-                      function_type::conditional);
+                      function_type::conditional, 0);
 
-  phxpr::if_ c(make_thunk(test, sig),
-               make_thunk(then, sig));
+  utree ut = new phxpr::if_(make_thunk(test, sig),
+                            make_thunk(then, sig));
 
   global_procedure_table->push_back(sig);
-
-  utree ut = stored_function<phxpr::if_>(c);
-  ut.tag(global_procedure_table->size() -1);
+  ut.tag(global_procedure_table->size() - 1);
 
   return ut;
 } // }}}
@@ -111,16 +105,14 @@ evaluator::make_if_else_thunk (utree const& test, utree const& then,
                                utree const& else_)
 { // {{{
   const signature sig(3, arity_type::fixed, evaluation_strategy::call_by_value, 
-                      function_type::conditional);
+                      function_type::conditional, 0);
 
-  phxpr::if_else c(make_thunk(test, sig),
-                   make_thunk(then, sig),
-                   make_thunk(else_, sig));
+  utree ut = new phxpr::if_else(make_thunk(test, sig),
+                                make_thunk(then, sig),
+                                make_thunk(else_, sig));
 
   global_procedure_table->push_back(sig);
-
-  utree ut = stored_function<phxpr::if_else>(c);
-  ut.tag(global_procedure_table->size() -1);
+  ut.tag(global_procedure_table->size() - 1);
 
   return ut;
 } // }}}
