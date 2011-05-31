@@ -111,7 +111,7 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
     if (!p)
       BOOST_THROW_EXCEPTION(identifier_not_found(utree(str)));
 
-    return *p;
+    return *p; 
   }
 
   result_type
@@ -129,6 +129,13 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   make_if_else_thunk (utree const& test, utree const& then, utree const& else_);
 
   result_type
+  make_internal_variable_thunk (utree const& value, displacement n,
+                                displacement frame);
+  
+  result_type
+  make_variable_reference_thunk (utree const& datum);
+
+  result_type
   make_module_level_variable (utree const& identifier, utree const& value) {
     boost::shared_ptr<utree> p(variables->declare(identifier));
     *p = evaluate(value, *this);
@@ -141,9 +148,9 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
     // IMPLEMENT: Don't use placeholder, use some sort of thunk that will
     // set value when invoked.
     using boost::fusion::at_c;
-    variables->define(identifier, utree(new 
-      placeholder(++at_c<4>(sig) + at_c<0>(sig), frame))); 
-    return utree();
+    const displacement n = at_c<4>(sig)++ + at_c<0>(sig);
+    variables->define(identifier, utree(new placeholder(n, frame))); 
+    return make_internal_variable_thunk(value, n, frame);
   }
 };
 

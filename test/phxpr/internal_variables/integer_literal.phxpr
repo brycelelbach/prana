@@ -5,6 +5,6 @@
 ;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(display ((lambda () (define foo 2) foo)))
+(display ((lambda () (variable foo 2) foo)))
 (newline)
 

@@ -34,11 +34,13 @@ struct ternary: actor<ternary<Derived> > {
     
     runtime_environment& env = *ut.get<runtime_environment*>();
 
+#if 0
     // {{{ arity checking 
     if (at_c<0>(sig) != env.size())
       BOOST_THROW_EXCEPTION
         (invalid_arity(at_c<0>(sig), env.size(), arity_type::fixed));
     // }}}
+#endif
 
     return derived().eval(env[0], env[1], env[2]);
   }

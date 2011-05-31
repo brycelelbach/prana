@@ -43,7 +43,7 @@ struct procedure: actor<procedure> {
   }
 
   // TODO: Refactor this code with the code in thunk
-  utree expand (utree& arg, runtime_environment& env) const {
+  utree expand (utree const& arg, runtime_environment& env) const {
     using boost::fusion::at_c;
 
     if (prana::recursive_which(arg) == utree_type::function_type) {
@@ -64,6 +64,7 @@ struct procedure: actor<procedure> {
     
     runtime_environment& env = *ut.get<runtime_environment*>();
 
+#if 0
     // {{{ arity checking (TODO: variable arity)
     if (at_c<1>(sig) == arity_type::fixed) {
       if (at_c<0>(sig) != env.size())
@@ -74,6 +75,7 @@ struct procedure: actor<procedure> {
     else
       BOOST_THROW_EXCEPTION(unsupported_arity_type(at_c<1>(sig)));
     // }}}
+#endif
 
     if (env.size() != 0) {
       if (at_c<4>(sig) != 0) {
@@ -93,20 +95,34 @@ struct procedure: actor<procedure> {
         return new_env->invoke(body);
       } // }}}
 
-        boost::shared_array<utree> storage(new utree[env.size()]);
+      boost::shared_array<utree> storage(new utree[env.size()]);
 
-        for (std::size_t i = 0, end = env.size(); i != end; ++i) {
-          storage[i] = expand(env[i], env);
-        }
+      for (std::size_t i = 0, end = env.size(); i != end; ++i) {
+        storage[i] = expand(env[i], env);
+      }
 
-        boost::shared_ptr<runtime_environment> new_env
-          = boost::make_shared<runtime_environment>
-            (storage, env.size(), parent_env);
-        return new_env->invoke(body);
+      boost::shared_ptr<runtime_environment> new_env
+        = boost::make_shared<runtime_environment>
+          (storage, env.size(), parent_env);
+      return new_env->invoke(body);
     }
   
     // nullary  
     else { 
+      if (at_c<4>(sig) != 0) {
+        // TODO: Implement make_shared_array<>.
+        boost::shared_array<utree> ext_env(new utree[at_c<4>(sig)]);
+
+        // Extend the environment.
+        for (std::size_t i = 0, end = env.size(); i != end; ++i)
+          ext_env[i] = env[i];
+        
+        boost::shared_ptr<runtime_environment> new_env
+          = boost::make_shared<runtime_environment>
+            (ext_env, at_c<4>(sig), parent_env);
+        return new_env->invoke(body);
+      } // }}}
+
       boost::shared_ptr<runtime_environment> new_env
         = boost::make_shared<runtime_environment>(parent_env);
       return new_env->invoke(body);

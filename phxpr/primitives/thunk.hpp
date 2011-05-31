@@ -50,7 +50,8 @@ struct thunk: actor<thunk> {
       signature const& sig = (*global_procedure_table)[lazy.tag()];
 
       if ((at_c<3>(sig) == function_type::placeholder) ||
-          (at_c<3>(sig) == function_type::thunk))
+          (at_c<3>(sig) == function_type::thunk) ||
+          (at_c<3>(sig) == function_type::reference))
         return env.invoke(lazy);
     }
 
@@ -65,7 +66,7 @@ struct thunk: actor<thunk> {
 
     utree const& lazy_f = execute_lazy((*lazy_call)[0], env);
 
-    // IMPLEMENT: Allocate space for locals here.
+    // IMPLEMENT: Allocate space for locals here (actually maybe not).
     const displacement lazy_env_size = lazy_call->size() - 1;
     boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 

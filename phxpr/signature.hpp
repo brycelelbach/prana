@@ -45,7 +45,9 @@ struct function_type {
     procedure   = 3,
     thunk       = 4,
     module      = 5,
-    conditional = 6
+    conditional = 6,
+    definition  = 7,
+    reference   = 8
   };
 
   typedef boost::uint8_t integral;

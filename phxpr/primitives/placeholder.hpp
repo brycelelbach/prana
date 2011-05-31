@@ -12,8 +12,6 @@
 
 #include <phxpr/config.hpp>
 
-#include <boost/ref.hpp>
-
 #include <prana/utree/io.hpp>
 #include <prana/utree/predicates.hpp>
 

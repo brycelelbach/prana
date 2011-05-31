@@ -42,6 +42,16 @@ operator<< (std::ostream& out, function_type::info const& info) {
       { out << "placeholder"; return out; }
     case function_type::procedure:
       { out << "procedure"; return out; }
+    case function_type::thunk:
+      { out << "thunk"; return out; }
+    case function_type::module:
+      { out << "module"; return out; }
+    case function_type::conditional:
+      { out << "conditional"; return out; }
+    case function_type::definition:
+      { out << "definition"; return out; }
+    case function_type::reference:
+      { out << "reference"; return out; }
     default:
       { out << "unknown"; return out; }
   };

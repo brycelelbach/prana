@@ -13,6 +13,8 @@
 #include <phxpr/exception.hpp>
 #include <phxpr/primitives/conditional.hpp>
 #include <phxpr/primitives/thunk.hpp>
+#include <phxpr/primitives/assignment.hpp>
+#include <phxpr/primitives/reference.hpp>
   
 using boost::fusion::at_c;
 
@@ -68,13 +70,13 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
         if (prana::is_utree_container(element))
           lazy_call->push_back(make_thunk(element, sig));
         else
-          lazy_call->push_back(evaluate(element, *this));
+          lazy_call->push_back(make_variable_reference_thunk(element));
       }
     }
   }
 
   else
-    lazy_call->push_back(evaluate(elements, *this));
+    lazy_call->push_back(make_variable_reference_thunk(elements)); 
     
   utree ut = new thunk(lazy_call, global_procedure_table);
   global_procedure_table->push_back(body_sig);
@@ -110,6 +112,38 @@ evaluator::make_if_else_thunk (utree const& test, utree const& then,
   utree ut = new phxpr::if_else(make_thunk(test, sig),
                                 make_thunk(then, sig),
                                 make_thunk(else_, sig));
+
+  global_procedure_table->push_back(sig);
+  ut.tag(global_procedure_table->size() - 1);
+
+  return ut;
+} // }}}
+
+// TODO: Optimize for value being a literal. 
+evaluator::result_type
+evaluator::make_internal_variable_thunk (utree const& value, displacement n,
+                                         displacement frame) 
+{ // {{{
+  const signature sig(n, arity_type::fixed, evaluation_strategy::call_by_value, 
+                      function_type::definition, 0);
+
+  utree ut = new local_assignment(make_thunk(value, sig), n, frame);
+
+  global_procedure_table->push_back(sig);
+  ut.tag(global_procedure_table->size() - 1);
+
+  return ut;
+} // }}}
+
+// TODO: Optimize for value being a datum. 
+evaluator::result_type
+evaluator::make_variable_reference_thunk (utree const& datum) {
+  // {{{
+  const signature sig(0, arity_type::fixed, evaluation_strategy::call_by_value, 
+                      function_type::reference, 0);
+
+  utree ut = new variable_reference
+    (evaluate(datum, *this), global_procedure_table);
 
   global_procedure_table->push_back(sig);
   ut.tag(global_procedure_table->size() - 1);

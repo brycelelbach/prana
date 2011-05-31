@@ -51,15 +51,19 @@ struct invalid_placeholder: virtual exception {
   virtual ~invalid_placeholder (void) throw() { }
 };
 
-struct invalid_local_variable: virtual exception {
-  displacement expected;
+struct invalid_local_assignment: virtual exception {
+  displacement expected_n;
+  displacement expected_frame;
   boost::shared_ptr<runtime_environment> environment;
+  arity_type::info type;
 
-  invalid_local_variable (displacement expected_,
-                          boost::shared_ptr<runtime_environment> const& e):
-    expected(expected_), environment(e) { }
+  invalid_local_assignment (displacement expected_n_, displacement expected_frame_,
+                      boost::shared_ptr<runtime_environment> const& e,
+                      arity_type::info type_):
+    expected_n(expected_n_), expected_frame(expected_frame_),
+    environment(e), type(type_) { }
 
-  virtual ~invalid_local_variable (void) throw() { }
+  virtual ~invalid_local_assignment (void) throw() { }
 };
 
 struct invalid_operator_expression: virtual exception {

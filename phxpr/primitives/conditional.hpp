@@ -13,6 +13,7 @@
 #include <prana/utree/predicates.hpp>
 
 #include <phxpr/predicate.hpp>
+#include <phxpr/primitives/actor.hpp>
 
 namespace phxpr {
 
