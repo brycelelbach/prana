@@ -71,4 +71,13 @@ phxpr.run-phxi procedures_as_arguments_lambda_to_lambda : procedures_as_argument
 phxpr.run-phxi procedures_as_arguments_lambda_with_upvals : procedures_as_arguments/lambda_with_upvals ;
 phxpr.run-phxi procedures_as_arguments_nested_lambda_to_intrinsics : procedures_as_arguments/nested_lambda_to_intrinsics ;
 phxpr.run-phxi procedures_as_arguments_nested_lambda_to_lambda : procedures_as_arguments/nested_lambda_to_lambda ;
+phxpr.run-phxi procedures_as_arguments_return_procedure : procedures_as_arguments/return_procedure ;
+
+phxpr.run-phxi internal_variables_alias_procedure : internal_variables/alias_procedure ;
+phxpr.run-phxi internal_variables_boolean_literal : internal_variables/boolean_literal ;
+phxpr.run-phxi internal_variables_double_literal : internal_variables/double_literal ;
+phxpr.run-phxi internal_variables_integer_literal : internal_variables/integer_literal ;
+phxpr.run-phxi internal_variables_nil_literal : internal_variables/nil_literal ;
+phxpr.run-phxi internal_variables_return_procedure : internal_variables/return_procedure ;
+phxpr.run-phxi internal_variables_string_literal : internal_variables/string_literal ;
 
