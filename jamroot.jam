@@ -39,9 +39,10 @@ project
     <toolset>gcc:<cxxflags>-fdiagnostics-show-option
     <toolset>gcc:<cxxflags>-Wno-multichar
     <toolset>gcc:<cxxflags>-Wattributes
+    <toolset>gcc:<cxxflags>-Wextra
     <toolset>clang:<cxxflags>-fdiagnostics-show-option
     <toolset>clang:<cxxflags>-Wno-multichar
-    <warnings>on
+    <warnings>all
     <include>$(PRANA_ROOT)
     <include>$(SHEOL_ROOT)
     <include>$(BOOST_ROOT)

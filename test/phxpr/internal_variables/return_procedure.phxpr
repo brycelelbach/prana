@@ -8,8 +8,8 @@
 (variable times-factory
   (lambda (x)
     (variable f
-      (lambda (y) (* x y))
-    f)))
+      (lambda (y) (* x y)))
+    f))
 
 (variable times2 (times-factory 2))
 

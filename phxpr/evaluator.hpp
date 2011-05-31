@@ -81,7 +81,7 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   template <typename F>
   void define_intrinsic (std::string const& name, F const& f) {
     boost::shared_ptr<function_body> body
-      = boost::make_shared<function_body>(f);
+      = boost::make_shared<function_body>(f, global_procedure_table);
 
     // create a new lambda expression
     lambda l(body, global_procedure_table, f.sig);

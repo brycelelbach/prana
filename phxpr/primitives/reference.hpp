@@ -48,9 +48,12 @@ struct variable_reference: actor<variable_reference> {
       // Load the argument's signature from the gpt.
       signature const& sig = (*global_procedure_table)[value->tag()];
 
-      if ((at_c<3>(sig) == function_type::placeholder) ||
+//      std::cout << at_c<3>(sig) << std::endl;
+
+      if ((at_c<3>(sig) == function_type::placeholder)||
           (at_c<3>(sig) == function_type::thunk))
-        return env.invoke(*value);
+        return utree(new variable_reference
+          (env.invoke(value), global_procedure_table));
     }
 #endif
 

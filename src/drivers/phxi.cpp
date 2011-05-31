@@ -258,8 +258,10 @@ int main (int argc, char** argv) {
       asts.back().reset(new parse_tree<sexpr>(ifs));
 
       // eval
-      if (!ifs.good())
+      if (!ifs.good()) {
+        evaluate(*asts.back(), e);
         break;
+      }
 
       // invoke for side effects
       else 

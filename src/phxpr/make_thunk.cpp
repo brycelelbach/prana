@@ -70,7 +70,8 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
         if (prana::is_utree_container(element))
           lazy_call->push_back(make_thunk(element, sig));
         else
-          lazy_call->push_back(make_variable_reference_thunk(element));
+//          lazy_call->push_back(make_variable_reference_thunk(element));
+          lazy_call->push_back(evaluate(element, *this));
       }
     }
   }
@@ -139,16 +140,22 @@ evaluator::make_internal_variable_thunk (utree const& value, displacement n,
 evaluator::result_type
 evaluator::make_variable_reference_thunk (utree const& datum) {
   // {{{
-  const signature sig(0, arity_type::fixed, evaluation_strategy::call_by_value, 
-                      function_type::reference, 0);
+  utree value = evaluate(datum, *this);
+  
+  signature sig(0, arity_type::fixed, evaluation_strategy::call_by_value, 
+                function_type::reference, 0);
 
-  utree ut = new variable_reference
-    (evaluate(datum, *this), global_procedure_table);
+  if (prana::recursive_which(value) == utree_type::function_type) {
+    BOOST_ASSERT(unsigned(value.tag()) <= global_procedure_table->size());
+    sig = (*global_procedure_table)[value.tag()];
+    at_c<3>(sig) = function_type::reference; 
+  }
 
+  utree r = new variable_reference(value, global_procedure_table);
   global_procedure_table->push_back(sig);
-  ut.tag(global_procedure_table->size() - 1);
+  r.tag(global_procedure_table->size() - 1);
 
-  return ut;
+  return r;
 } // }}}
 
 } // phxpr

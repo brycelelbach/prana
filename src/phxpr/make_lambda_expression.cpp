@@ -67,7 +67,7 @@ evaluator::make_lambda_expression (utree const& formals,
 
   boost::shared_ptr<function_body> fbody
     = boost::make_shared<function_body>
-      (boost::make_shared<function_body::code_type>());
+      (boost::make_shared<function_body::code_type>(), global_procedure_table);
 
   typedef range_type::const_iterator iterator;
 
@@ -81,10 +81,10 @@ evaluator::make_lambda_expression (utree const& formals,
     fbody->code->push_back(f);
   }
 
-  utree ut = new lambda(fbody, local_env.global_procedure_table, local_env.sig);
+  utree ut = new lambda(fbody, global_procedure_table, local_env.sig);
 
-  local_env.global_procedure_table->push_back(local_env.sig);
-  ut.tag(local_env.global_procedure_table->size() - 1);
+  global_procedure_table->push_back(local_env.sig);
+  ut.tag(global_procedure_table->size() - 1);
 
   return ut; 
 } // }}}

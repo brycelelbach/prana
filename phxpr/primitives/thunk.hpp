@@ -14,12 +14,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 
+#include <sheol/adt/dynamic_array.hpp>
+
 #include <prana/utree/predicates.hpp>
 
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
-#include <phxpr/primitives/function_body.hpp>
 
 namespace phxpr {
 
@@ -40,7 +41,7 @@ struct thunk: actor<thunk> {
   }
 
   // TODO: Refactor this code with the code in procedure
-  utree execute_lazy (utree& lazy, runtime_environment& env) const { 
+  utree execute_lazy (utree const& lazy, runtime_environment& env) const { 
     using boost::fusion::at_c;
 
     if (prana::recursive_which(lazy) == utree_type::function_type) {
@@ -52,7 +53,7 @@ struct thunk: actor<thunk> {
       if ((at_c<3>(sig) == function_type::placeholder) ||
           (at_c<3>(sig) == function_type::thunk) ||
           (at_c<3>(sig) == function_type::reference))
-        return env.invoke(lazy);
+        return execute_lazy(env.invoke(lazy), env);
     }
 
     return lazy;
@@ -65,6 +66,9 @@ struct thunk: actor<thunk> {
     runtime_environment& env = *ut.get<runtime_environment*>();
 
     utree const& lazy_f = execute_lazy((*lazy_call)[0], env);
+    
+    if (prana::recursive_which(lazy_f) != utree_type::function_type) 
+      return lazy_f;
 
     // IMPLEMENT: Allocate space for locals here (actually maybe not).
     const displacement lazy_env_size = lazy_call->size() - 1;
@@ -72,9 +76,6 @@ struct thunk: actor<thunk> {
 
     for (std::size_t i = 0, end = lazy_env_size; i != end; ++i)
       lazy_env[i] = execute_lazy((*lazy_call)[i + 1], env);
-
-    if (prana::recursive_which(lazy_f) != utree_type::function_type) 
-      return lazy_f;
 
     boost::shared_ptr<runtime_environment> new_env
       = boost::make_shared<runtime_environment>

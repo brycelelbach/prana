@@ -52,7 +52,10 @@ struct procedure: actor<procedure> {
       // Load the argument's signature from the gpt.
       signature const& sig = (*global_procedure_table)[arg.tag()];
 
-      if (at_c<3>(sig) == function_type::placeholder)
+//      std::cout << at_c<3>(sig) << std::endl;
+
+      if ((at_c<3>(sig) == function_type::placeholder)/*||
+          (at_c<3>(sig) == function_type::reference)*/)
         return env.invoke(arg);
     }
 
