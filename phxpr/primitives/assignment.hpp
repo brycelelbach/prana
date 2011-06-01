@@ -53,7 +53,7 @@ struct local_assignment: actor<local_assignment> {
         (invalid_local_assignment(n, frame, eptr, arity_type::fixed));
     }
 
-    (*eptr)[n] = value->eval(ut);
+    (*eptr)[n] = eptr->invoke(value);
 
     // assignment returns unspecified
     return utree(); 
