@@ -22,6 +22,7 @@
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/lambda.hpp>
 #include <phxpr/primitives/placeholder.hpp>
+#include <phxpr/primitives/reference.hpp>
 
 namespace phxpr {
 
@@ -135,21 +136,36 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   result_type
   make_variable_reference_thunk (utree const& datum);
 
+  // TODO: optimize for value != function case
   result_type
   make_module_level_variable (utree const& identifier, utree const& value) {
     boost::shared_ptr<utree> p(variables->declare(identifier));
-    *p = evaluate(value, *this);
+
+    // for recursion, we install a reference while evaluating the variable's
+    // value (as noted above, this can be optimized).
+    *p = utree(new variable_reference(p, global_procedure_table));
+ 
+    //  
+    const signature sig(0, arity_type::fixed,
+                        evaluation_strategy::call_by_value, 
+                        function_type::reference, 0);
+
+    global_procedure_table->push_back(sig);
+    p->tag(global_procedure_table->size() - 1);
+
+    utree const& r = evaluate(value, *this);
+    *p = r;
+
     // return value of a definition is unspecified (aka invalid utree)
     return utree();
   }
 
   result_type
   make_internal_variable (utree const& identifier, utree const& value) {
-    // IMPLEMENT: Don't use placeholder, use some sort of thunk that will
-    // set value when invoked.
     using boost::fusion::at_c;
     const displacement n = at_c<4>(sig)++ + at_c<0>(sig);
     variables->define(identifier, utree(new placeholder(n, frame))); 
+    // REVIEW: does this always return unspecified? (it should).
     return make_internal_variable_thunk(value, n, frame);
   }
 };

@@ -12,7 +12,7 @@
       (lambda (a b n)
         (if (<= n 1) b
           (f b (+ a b) (- n 1)))))
-    (if (=? n 0)
+    (if (= n 0)
       0
       (f 0 1 n))))
 
