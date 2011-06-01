@@ -29,6 +29,7 @@
 #include <phxpr/intrinsics/assert.hpp>
 #include <phxpr/intrinsics/basic_arithmetic.hpp>
 #include <phxpr/intrinsics/basic_io.hpp>
+#include <phxpr/intrinsics/comparison_predicates.hpp>
 #include <phxpr/intrinsics/equivalence_predicates.hpp>
 #include <phxpr/intrinsics/type_predicates.hpp>
 #include <phxpr/evaluator.hpp>
@@ -64,6 +65,11 @@ using phxpr::addition;
 using phxpr::subtraction;
 using phxpr::multiplication;
 using phxpr::division;
+
+using phxpr::less_predicate;
+using phxpr::less_equal_predicate;
+using phxpr::greater_predicate;
+using phxpr::greater_equal_predicate;
 
 using phxpr::equal_predicate;
 
@@ -185,9 +191,15 @@ int main (int argc, char** argv) {
   e.define_intrinsic("-", subtraction());
   e.define_intrinsic("*", multiplication());
   e.define_intrinsic("/", division());
+
+  // comparison predicates
+  e.define_intrinsic("<", less_predicate());
+  e.define_intrinsic("<=", less_equal_predicate());
+  e.define_intrinsic(">", greater_predicate());
+  e.define_intrinsic(">=", greater_equal_predicate());
  
   // equivalence predicates 
-  e.define_intrinsic("=?", equal_predicate());
+  e.define_intrinsic("=", equal_predicate());
 
   // type predicates
   e.define_intrinsic("boolean?", boolean_predicate());
