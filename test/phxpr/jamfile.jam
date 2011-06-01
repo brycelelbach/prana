@@ -79,5 +79,6 @@ phxpr.run-phxi internal_variables_double_literal : internal_variables/double_lit
 phxpr.run-phxi internal_variables_integer_literal : internal_variables/integer_literal ;
 phxpr.run-phxi internal_variables_nil_literal : internal_variables/nil_literal ;
 phxpr.run-phxi internal_variables_return_procedure : internal_variables/return_procedure ;
+phxpr.run-phxi internal_variables_nested_return_procedure : internal_variables/nested_return_procedure ;
 phxpr.run-phxi internal_variables_string_literal : internal_variables/string_literal ;
 

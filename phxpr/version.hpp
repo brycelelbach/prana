@@ -16,11 +16,11 @@
 //  PHXPR_VERSION_FULL & 0x00FF00 is the minor version
 //  PHXPR_VERSION_FULL & 0xFF0000 is the major version
 
-#define PHXPR_VERSION_FULL         0x000300
+#define PHXPR_VERSION_FULL         0x000301
 
 #define PHXPR_VERSION_MAJOR        0
 #define PHXPR_VERSION_MINOR        3
-#define PHXPR_VERSION_PATCHLEVEL   0
+#define PHXPR_VERSION_PATCHLEVEL   1
 
 #define PHXPR_VERSION_STR        BOOST_PP_STRINGIZE(PHXPR_VERSION_MAJOR) "."  \
                                  BOOST_PP_STRINGIZE(PHXPR_VERSION_MINOR) "."  \

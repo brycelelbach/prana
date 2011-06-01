@@ -26,7 +26,7 @@
 
 namespace phxpr {
 
-template <typename T, typename Key = boost::iterator_range<char const*> >
+template <typename Key, typename T>
 struct compile_environment {
   // {{{ types
   typedef boost::unordered_map<Key, boost::shared_ptr<T> > map_type;

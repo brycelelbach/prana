@@ -20,54 +20,26 @@
 #include <prana/utree/predicates.hpp> 
 
 #include <phxpr/signature.hpp>
-#include <phxpr/primitives/actor.hpp>
 
 namespace phxpr {
 
 struct function_body: actor<function_body> {
   typedef sheol::adt::dynamic_array<utree> code_type;
-  typedef sheol::adt::dynamic_array<signature> gpt_type;
 
   boost::shared_ptr<code_type> code;
-  boost::shared_ptr<gpt_type> global_procedure_table;
 
-  // {{{ REVIEW: How many of these constructors do we actually need?
-  function_body (utree const& code_, boost::shared_ptr<gpt_type> const& gpt):
-    code(boost::make_shared<code_type>()), global_procedure_table(gpt)
+  function_body (utree const& code_): code(boost::make_shared<code_type>())
   { code->push_back(code_); }
   
-  function_body (boost::shared_ptr<code_type> const& code_,
-                 boost::shared_ptr<gpt_type> const& gpt):
-    code(code_), global_procedure_table(gpt)
-  { }
-
-  function_body (function_body const& other):
-    code(other.code), global_procedure_table(other.global_procedure_table)
-  { }
-
-//  template <typename F>
-//  function_body (F const& code_): code(boost::make_shared<code_type>())
-//  { code->push_back(utree(stored_function<F>(code_))); }
-  // }}}
-  
-  // TODO: Refactor this code with the code in procedure, thunk and others
+  function_body (boost::shared_ptr<code_type> const& code_): code(code_) { }
+ 
+//  function_body (function_body const& other): code(other.code) { }
+ 
   utree execute (utree const& element, runtime_environment& env) const { 
     using boost::fusion::at_c;
 
-    if (prana::recursive_which(element) == utree_type::function_type) {
-      BOOST_ASSERT(element.tag() <= global_procedure_table->size());
-
-      // Load the element argument's signature from the gpt.
-      signature const& sig = (*global_procedure_table)[element.tag()];
-
-//      std::cout << at_c<3>(sig) << std::endl;
-
-//      if (at_c<3>(sig) == function_type::thunk)
-//        return execute(env.invoke(element), env);
-//        return env;
-//      else
+    if (prana::recursive_which(element) == utree_type::function_type)
       return env.invoke(element); 
-    }
 
     return utree(boost::ref(element));
   }
@@ -89,7 +61,7 @@ struct function_body: actor<function_body> {
   // REVIEW: Will passing shallow references via smart pointers screw with
   // assignment once it's implemented?
   function_base* copy (void) const
-  { return new function_body(code, global_procedure_table); }
+  { return new function_body(code); }
 };
 
 } // phxpr

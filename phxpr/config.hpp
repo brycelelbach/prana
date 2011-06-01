@@ -16,6 +16,8 @@
   #define PHXPR_EXPORT SHEOL_SYMBOL_IMPORT
 #endif
 
+#define PHXPR_INTERNAL SHEOL_SYMBOL_INTERNAL
+
 #include <phxpr/config/using.hpp>
 
 #endif // PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753

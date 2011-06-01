@@ -67,7 +67,7 @@ evaluator::make_lambda_expression (utree const& formals,
 
   boost::shared_ptr<function_body> fbody
     = boost::make_shared<function_body>
-      (boost::make_shared<function_body::code_type>(), global_procedure_table);
+      (boost::make_shared<function_body::code_type>());
 
   typedef range_type::const_iterator iterator;
 
