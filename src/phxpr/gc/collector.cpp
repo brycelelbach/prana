@@ -28,12 +28,12 @@ struct sweep_tag;
 struct count_layout
 {
     phxpr::detail::sp_counted_base * pi;
-    int id;
+    std::size_t id;
 };
 
 struct shared_ptr_layout
 {
-    sweep_tag* px;
+    sweep_tag * px;
     count_layout pn;
 };
 
@@ -48,7 +48,6 @@ arena_type & get_map()
     static arena_type m;
     return m;
 }
-
 
 mutex_type & get_mutex()
 {
@@ -68,10 +67,9 @@ void scan_and_count(void const * area, std::size_t size, arena_type const & m,
     for(std::size_t n = 0; n + sizeof(shared_ptr_layout) <= size;
         p += pointer_align, n += pointer_align)
     {
-        shared_ptr_layout const * q
-            = reinterpret_cast<shared_ptr_layout const *>(p);
+        shared_ptr_layout const * q = reinterpret_cast<shared_ptr_layout const *>(p);
 
-        if(q->pn.id == phxpr::detail::shared_count_id && q->pn.pi != 0 &&
+        if(q && q->pn.id == phxpr::detail::shared_count_id && q->pn.pi != 0 &&
            m.count(q->pn.pi) != 0)
         {
             ++m2[q->pn.pi];
@@ -87,10 +85,9 @@ void scan_and_mark(void const * area, std::size_t size,
     for(size_t n = 0; n + sizeof(shared_ptr_layout) <= size;
         p += pointer_align, n += pointer_align)
     {
-        shared_ptr_layout const * q
-            = reinterpret_cast<shared_ptr_layout const *>(p);
+        shared_ptr_layout const * q = reinterpret_cast<shared_ptr_layout const *>(p);
 
-        if(q->pn.id == phxpr::detail::shared_count_id && q->pn.pi != 0 &&
+        if(q && q->pn.id == phxpr::detail::shared_count_id && q->pn.pi != 0 &&
            m2.count(q->pn.pi) != 0)
         {
             open.push_back(q->pn.pi);
@@ -106,11 +103,11 @@ void find_unreachable_objects_impl(arena_type const & m,
 
     {
         if (report)
-            std::cout << "... " << m.size() << " objects in m.\n";
+            std::cout << "... " << m.size() << " objects in the world\n";
 
         for(arena_type::const_iterator i = m.begin(); i != m.end(); ++i)
         {
-            phxpr::detail::sp_counted_base const * p(0);
+            phxpr::detail::sp_counted_base const * p = 0;
 
             p = static_cast<phxpr::detail::sp_counted_base const *>(i->first);
 
@@ -122,9 +119,6 @@ void find_unreachable_objects_impl(arena_type const & m,
             if (i->second.first)
                 scan_and_count(i->second.first, i->second.second, m, m2);
         }
-
-        if (report)
-            std::cout << "... " << m2.size() << " objects in m2.\n";
     }
 
     // mark reachable objects
@@ -140,7 +134,7 @@ void find_unreachable_objects_impl(arena_type const & m,
         }
 
         if (report)
-            std::cout << "... " << open.size() << " objects in open.\n";
+            std::cout << "... " << open.size() << " objects are directly reachable\n";
 
         for(open_type::iterator j = open.begin(); j != open.end(); ++j)
         {
@@ -161,6 +155,9 @@ void find_unreachable_objects_impl(arena_type const & m,
     }
 
     // m2 now contains the unreachable objects
+
+    if (report)
+        std::cout << "... " << m2.size() << " objects are unreachable\n";
 }
 
 std::size_t find_unreachable_objects(bool report)

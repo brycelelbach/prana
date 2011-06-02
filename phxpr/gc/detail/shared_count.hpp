@@ -44,8 +44,8 @@ namespace detail
 
 #if defined(PHXPR_SP_ENABLE_DEBUG_HOOKS)
 
-int const shared_count_id = 0x2C35F101;
-int const   weak_count_id = 0x298C38A4;
+std::size_t const shared_count_id = 0x530ee973U;
+std::size_t const   weak_count_id = 0xea36474dU;
 
 #endif
 

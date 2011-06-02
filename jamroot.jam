@@ -9,6 +9,7 @@
 
 import os ;
 import path ;
+import string ;
 
 constant BOOST_ROOT : [ os.environ BOOST_ROOT ] ;
 constant SHEOL_ROOT : [ os.environ SHEOL_ROOT ] ;
@@ -20,15 +21,18 @@ constant BOOST_PROGRAM_OPTIONS
 constant BOOST_FILESYSTEM
   : $(BOOST_ROOT)/libs/filesystem/build//boost_filesystem ;
 
-constant VG_SUPPS : "--suppressions=$(PRANA_ROOT)/prana.supp" ;
+constant VALGRIND : [ string.join "valgrind"
+                                  "--suppressions=$(PRANA_ROOT)/prana.supp"
+                                  "--gen-suppressions=all" 
+                                  "--memcheck:leak-check=full"
+                                  "--memcheck:undef-value-errors=no"
+                                  "--error-exitcode=1"
+                                : " " ] ;
 
-constant VG_OPTIONS : "--memcheck:leak-check=yes --error-exitcode=1" ;
 
-variant release_with_valgrind : release :
-  <testing.launcher>"valgrind $(VG_SUPPS) $(VG_OPTIONS)" ;
+variant release_with_valgrind : release : <testing.launcher>"$(VALGRIND)" ;
 
-variant debug_with_valgrind : debug :
-  <testing.launcher>"valgrind $(VG_SUPPS) $(VG_OPTIONS)" ;
+variant debug_with_valgrind : debug : <testing.launcher>"$(VALGRIND)" ;
 
 use-project /prana : $(PRANA_ROOT)/build ; 
 

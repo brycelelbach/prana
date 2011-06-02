@@ -336,8 +336,11 @@ int main (int argc, char** argv) {
   }
 
   // do a GC sweep
-  if (vm.count("print-gc-sweeps"))
+  if (vm.count("print-gc-sweeps")) {
+    std::cout << "GC SHUTDOWN SWEEP" << std::endl;
     ::phxpr::free_unreachable_objects(true);
+  }
+
   else
     ::phxpr::free_unreachable_objects();
 

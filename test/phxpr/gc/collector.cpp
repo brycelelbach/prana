@@ -51,7 +51,7 @@ int main()
 {
     std::vector< phxpr::shared_ptr<X> > v1, v2;
 
-    int const n = 256 * 1024;
+    int const n = 256;
 
     std::cout << "Filling v1 and v2\n";
 
