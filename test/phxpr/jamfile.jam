@@ -9,6 +9,11 @@
 
 import phxpr ;
 
+run gc/collector.cpp : :
+  : <library>/prana//phxpr
+    <define>PHXPR_SP_ENABLE_DEBUG_HOOKS
+  : gc_collector ; 
+
 phxpr.run-phxi conditionals_boolean_literal_if_else : conditionals/boolean_literal_if_else ;
 phxpr.run-phxi conditionals_boolean_literal_if : conditionals/boolean_literal_if ;
 phxpr.run-phxi conditionals_lambda_if_delayed_evaluation : conditionals/lambda_if_delayed_evaluation ;
