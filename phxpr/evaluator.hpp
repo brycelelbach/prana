@@ -137,15 +137,18 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   make_variable_reference_thunk (utree const& datum);
 
   // TODO: optimize for value != function case
+  // FIXME: this leaks memory
   result_type
   make_module_level_variable (utree const& identifier, utree const& value) {
     phxpr::shared_ptr<utree> p(variables->declare(identifier));
 
+    // FIXME: this is leaked.
+    variable_reference* v = new variable_reference(p, global_procedure_table);
+
     // for recursion, we install a reference while evaluating the variable's
     // value (as noted above, this can be optimized).
-    *p = utree(new variable_reference(p, global_procedure_table));
+    *p = utree(v);
  
-    //  
     const signature sig(0, arity_type::fixed,
                         evaluation_strategy::call_by_value, 
                         function_type::reference, 0);
