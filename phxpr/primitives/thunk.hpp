@@ -11,13 +11,13 @@
 #include <phxpr/config.hpp>
 
 #include <boost/ref.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/shared_array.hpp>
 
 #include <sheol/adt/dynamic_array.hpp>
 
 #include <prana/utree/predicates.hpp>
 
+#include <phxpr/gc/shared_ptr.hpp>
+#include <phxpr/gc/shared_array.hpp>
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
@@ -28,11 +28,11 @@ struct thunk: actor<thunk> {
   typedef sheol::adt::dynamic_array<utree> lazy_call_type;
   typedef sheol::adt::dynamic_array<signature> gpt_type;
 
-  boost::shared_ptr<lazy_call_type> lazy_call;
-  boost::shared_ptr<gpt_type> global_procedure_table;
+  phxpr::shared_ptr<lazy_call_type> lazy_call;
+  phxpr::shared_ptr<gpt_type> global_procedure_table;
 
-  thunk (boost::shared_ptr<lazy_call_type> const& lazy_call_,
-         boost::shared_ptr<gpt_type> const& gpt):   
+  thunk (phxpr::shared_ptr<lazy_call_type> const& lazy_call_,
+         phxpr::shared_ptr<gpt_type> const& gpt):   
     lazy_call(lazy_call_), global_procedure_table(gpt)
   {
     BOOST_ASSERT(gpt);
@@ -72,13 +72,13 @@ struct thunk: actor<thunk> {
 
     // IMPLEMENT: Allocate space for locals here (actually maybe not).
     const displacement lazy_env_size = lazy_call->size() - 1;
-    boost::shared_array<utree> lazy_env(new utree[lazy_env_size]);
+    phxpr::shared_array<utree> lazy_env(new utree[lazy_env_size]);
 
     for (std::size_t i = 0, end = lazy_env_size; i != end; ++i)
       lazy_env[i] = execute_lazy((*lazy_call)[i + 1], env);
 
-    boost::shared_ptr<runtime_environment> new_env
-      = boost::make_shared<runtime_environment>
+    phxpr::shared_ptr<runtime_environment> new_env
+      = phxpr::make_shared<runtime_environment>
         (lazy_env, lazy_env_size, env.checkout());
 
     return new_env->invoke(lazy_f);

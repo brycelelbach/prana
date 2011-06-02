@@ -48,8 +48,8 @@ evaluator::execute (evaluator::range_type const& range) {
       iterator formals = ++it; 
       iterator body = ++it; 
       f = make_lambda_expression(*formals, range_type(body, end)); 
-      boost::shared_ptr<runtime_environment> new_env
-        = boost::make_shared<runtime_environment>();
+      phxpr::shared_ptr<runtime_environment> new_env
+        = phxpr::make_shared<runtime_environment>();
       return new_env->invoke(f);
     }
     
@@ -85,7 +85,7 @@ evaluator::execute (evaluator::range_type const& range) {
     }
     
     else {
-      boost::shared_ptr<utree> pf = variables->lookup(*it);
+      phxpr::shared_ptr<utree> pf = variables->lookup(*it);
 
       if (!pf)
         BOOST_THROW_EXCEPTION(identifier_not_found(*it));
@@ -105,28 +105,28 @@ evaluator::execute (evaluator::range_type const& range) {
   if ((at_c<3>(sig) == function_type::thunk) ||
       (at_c<3>(sig) == function_type::lambda))
   {
-    boost::shared_ptr<runtime_environment> new_env
-      = boost::make_shared<runtime_environment>();
+    phxpr::shared_ptr<runtime_environment> new_env
+      = phxpr::make_shared<runtime_environment>();
     f = new_env->invoke(f);
   }
 
   // Invoke nullary procedures.
   if (++it == end) {
-    boost::shared_ptr<runtime_environment> new_env
-      = boost::make_shared<runtime_environment>();
+    phxpr::shared_ptr<runtime_environment> new_env
+      = phxpr::make_shared<runtime_environment>();
     return new_env->invoke(f);
   }
 
   // Invoke non-nullary procedures.
   const displacement env_size = at_c<4>(sig) + std::distance(it, end);  
-  boost::shared_array<utree> env(new utree[env_size]);
+  phxpr::shared_array<utree> env(new utree[env_size]);
 
   // Evaluate the arguments.
   for (std::size_t i = 0; it != end; ++it)
     env[i++] = evaluate(*it, *this);
 
-  boost::shared_ptr<runtime_environment> new_env
-    = boost::make_shared<runtime_environment>(env, env_size);
+  phxpr::shared_ptr<runtime_environment> new_env
+    = phxpr::make_shared<runtime_environment>(env, env_size);
   return new_env->invoke(f);
 } // }}}
 

@@ -7,7 +7,7 @@
 
 (variable matches?
   (lambda (x y z)
-    (if (nil? x)
+    (if (null? x)
       (if (boolean? y)
         (if (string? z)
             #t

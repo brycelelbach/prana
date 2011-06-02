@@ -12,13 +12,13 @@
 
 #include <phxpr/config.hpp>
 
-#include <boost/make_shared.hpp>
 #include <boost/ref.hpp>
 
 #include <sheol/adt/dynamic_array.hpp>
 
 #include <prana/utree/predicates.hpp> 
 
+#include <phxpr/gc/make_shared.hpp>
 #include <phxpr/signature.hpp>
 
 namespace phxpr {
@@ -26,12 +26,12 @@ namespace phxpr {
 struct function_body: actor<function_body> {
   typedef sheol::adt::dynamic_array<utree> code_type;
 
-  boost::shared_ptr<code_type> code;
+  phxpr::shared_ptr<code_type> code;
 
-  function_body (utree const& code_): code(boost::make_shared<code_type>())
+  function_body (utree const& code_): code(phxpr::make_shared<code_type>())
   { code->push_back(code_); }
   
-  function_body (boost::shared_ptr<code_type> const& code_): code(code_) { }
+  function_body (phxpr::shared_ptr<code_type> const& code_): code(code_) { }
  
 //  function_body (function_body const& other): code(other.code) { }
  

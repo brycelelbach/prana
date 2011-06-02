@@ -12,8 +12,7 @@
 
 #include <phxpr/config.hpp>
 
-#include <boost/make_shared.hpp>
-
+#include <phxpr/gc/make_shared.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/procedure.hpp>
 
@@ -22,21 +21,21 @@ namespace phxpr {
 struct lambda: actor<lambda> {
   typedef sheol::adt::dynamic_array<signature> gpt_type;
 
-  boost::shared_ptr<function_body> body;
-  boost::shared_ptr<gpt_type> global_procedure_table;
+  phxpr::shared_ptr<function_body> body;
+  phxpr::shared_ptr<gpt_type> global_procedure_table;
   const signature sig;
   
-  lambda (function_body const& body_, boost::shared_ptr<gpt_type> const& gpt,
+  lambda (function_body const& body_, phxpr::shared_ptr<gpt_type> const& gpt,
           signature const& sig_):
-    body(boost::make_shared<function_body>(body_)), global_procedure_table(gpt),
+    body(phxpr::make_shared<function_body>(body_)), global_procedure_table(gpt),
     sig(sig_)
   {
     BOOST_ASSERT(gpt);
     BOOST_ASSERT(body);
   }
 
-  lambda (boost::shared_ptr<function_body> const& body_, 
-          boost::shared_ptr<gpt_type> const& gpt, signature const& sig_):
+  lambda (phxpr::shared_ptr<function_body> const& body_, 
+          phxpr::shared_ptr<gpt_type> const& gpt, signature const& sig_):
     body(body_), global_procedure_table(gpt), sig(sig_) 
   {
     BOOST_ASSERT(gpt);
@@ -50,7 +49,7 @@ struct lambda: actor<lambda> {
     
     runtime_environment& env = *ut.get<runtime_environment*>();
 
-    boost::shared_ptr<runtime_environment> saved_env;
+    phxpr::shared_ptr<runtime_environment> saved_env;
 
     if (env.level() == 0)
       saved_env = env.checkout();
@@ -67,7 +66,7 @@ struct lambda: actor<lambda> {
   }
 
   function_base* copy (void) const
-  { return new lambda(*body, global_procedure_table, sig); }
+  { return new lambda(body, global_procedure_table, sig); }
 };
 
 } // phxpr

@@ -1,0 +1,56 @@
+//  Copyright (c) 2001, 2002, 2003 Peter Dimov and Multi Media Ltd.
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef PHXPR_CF180E38_E2F1_4661_A71F_24B8D4083064
+#define PHXPR_CF180E38_E2F1_4661_A71F_24B8D4083064
+
+// MS compatible compilers support #pragma once
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
+#include <exception>
+
+#ifdef __BORLANDC__
+# pragma warn -8026     // Functions with excep. spec. are not expanded inline
+#endif
+
+namespace phxpr
+{
+
+// The standard library that comes with Borland C++ 5.5.1, 5.6.4
+// defines std::exception and its members as having C calling
+// convention (-pc). When the definition of bad_weak_ptr
+// is compiled with -ps, the compiler issues an error.
+// Hence, the temporary #pragma option -pc below.
+
+#if defined(__BORLANDC__) && __BORLANDC__ <= 0x564
+# pragma option push -pc
+#endif
+
+class bad_weak_ptr: public std::exception
+{
+public:
+
+    virtual char const * what() const throw()
+    {
+        return "phxpr::bad_weak_ptr";
+    }
+};
+
+#if defined(__BORLANDC__) && __BORLANDC__ <= 0x564
+# pragma option pop
+#endif
+
+} // phxpr
+
+#ifdef __BORLANDC__
+# pragma warn .8026     // Functions with excep. spec. are not expanded inline
+#endif
+
+#endif  // #ifndef PHXPR_CF180E38_E2F1_4661_A71F_24B8D4083064
+

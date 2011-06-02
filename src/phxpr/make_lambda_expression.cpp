@@ -24,7 +24,7 @@ void evaluator::make_placeholders (utree const& formals, signature const& sig) {
     if (prana::recursive_which(*it) != utree_type::symbol_type)
       BOOST_THROW_EXCEPTION(expected_identifier(*it)); 
 
-    boost::shared_ptr<utree> p = variables->define(*it, utree
+    phxpr::shared_ptr<utree> p = variables->define(*it, utree
       (new placeholder(i, frame))); 
 
     const signature ph_sig(i, ((end - 1) == i)
@@ -65,9 +65,9 @@ evaluator::make_lambda_expression (utree const& formals,
   else
     local_env.make_placeholders(formals, local_env.sig);
 
-  boost::shared_ptr<function_body> fbody
-    = boost::make_shared<function_body>
-      (boost::make_shared<function_body::code_type>());
+  phxpr::shared_ptr<function_body> fbody
+    = phxpr::make_shared<function_body>
+      (phxpr::make_shared<function_body::code_type>());
 
   typedef range_type::const_iterator iterator;
 

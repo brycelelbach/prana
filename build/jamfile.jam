@@ -5,6 +5,8 @@
 #   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
+import path ;
+
 lib phxpr 
   : $(PRANA_ROOT)/src/phxpr/evaluate.cpp
     $(PRANA_ROOT)/src/phxpr/execute.cpp
@@ -12,7 +14,11 @@ lib phxpr
     $(PRANA_ROOT)/src/phxpr/make_thunk.cpp
     $(PRANA_ROOT)/src/phxpr/predicate.cpp
     $(PRANA_ROOT)/src/phxpr/signature.cpp
+    $(PRANA_ROOT)/src/phxpr/gc/collector.cpp
   : <define>PHXPR_SOURCE
+    <define>PHXPR_SP_ENABLE_DEBUG_HOOKS
+    <variant>release:<linkflags>"-Wl,-rpath=$(PRANA_ROOT)/install/release/lib"
+    <variant>debug:<linkflags>"-Wl,-rpath=$(PRANA_ROOT)/install/debug/lib"
   ;
 
 exe phxi 
@@ -20,5 +26,44 @@ exe phxi
   : <library>$(BOOST_PROGRAM_OPTIONS)
     <library>$(BOOST_FILESYSTEM)
     <library>/prana//phxpr
+    <define>PHXPR_SP_ENABLE_DEBUG_HOOKS
+    <variant>release:<linkflags>"-Wl,-rpath=$(PRANA_ROOT)/install/release/lib"
+    <variant>debug:<linkflags>"-Wl,-rpath=$(PRANA_ROOT)/install/debug/lib"
   ;
 
+install phxpr-install
+  : phxpr $(BOOST_PROGRAM_OPTIONS) $(BOOST_FILESYSTEM)
+  : <install-type>LIB <install-dependencies>on
+    <variant>release:<location>$(PRANA_ROOT)/install/release/lib
+    <variant>debug:<location>$(PRANA_ROOT)/install/debug/lib 
+  : release debug ;
+
+install phxi-install
+  : phxi
+  : <install-type>EXE
+    <variant>release:<location>$(PRANA_ROOT)/install/release/bin
+    <variant>debug:<location>$(PRANA_ROOT)/install/debug/bin 
+  : release debug ;
+
+install prana-headers
+  : [ path.glob-tree $(PRANA_ROOT)/prana : *.hpp ] 
+  : <install-source-root>$(PRANA_ROOT)/prana
+    <variant>release:<location>$(PRANA_ROOT)/install/release/include/prana
+    <variant>debug:<location>$(PRANA_ROOT)/install/debug/include/prana
+  ;
+
+install phxpr-headers
+  : [ path.glob-tree $(PRANA_ROOT)/phxpr : *.hpp ] 
+  : <install-source-root>$(PRANA_ROOT)/phxpr
+    <variant>release:<location>$(PRANA_ROOT)/install/release/include/phxpr
+    <variant>debug:<location>$(PRANA_ROOT)/install/debug/include/phxpr
+  ;
+
+install sheol-headers
+  : [ path.glob-tree $(SHEOL_ROOT)/sheol : *.hpp ] 
+  : <install-source-root>$(SHEOL_ROOT)/sheol
+    <variant>release:<location>$(PRANA_ROOT)/install/release/include/sheol
+    <variant>debug:<location>$(PRANA_ROOT)/install/debug/include/sheol
+  ;
+
+ 

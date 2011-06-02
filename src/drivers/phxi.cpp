@@ -12,6 +12,9 @@
 #include <sstream>
 #include <fstream>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/fusion/include/at_c.hpp>
@@ -33,6 +36,7 @@
 #include <phxpr/intrinsics/equivalence_predicates.hpp>
 #include <phxpr/intrinsics/type_predicates.hpp>
 #include <phxpr/evaluator.hpp>
+#include <phxpr/gc/collector.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -99,6 +103,10 @@ int main (int argc, char** argv) {
     ("print-return", "print return value after evaluation")
     ("hide-pointers",
      "do not show C++ pointer values when displaying objects and procedures")
+    ("print-gc-sweeps",
+     "print unreachable references during garbage collection sweeps")
+    ("gc-scans",
+     "check for unreachable references after every top-level evaluation")
     ("phex,p", value<std::string>(&phex_input),
      "run in expectation mode, comparing evaluator stdout to expectation file")
     ("version,v", "display the version and copyright information")
@@ -208,7 +216,7 @@ int main (int argc, char** argv) {
   e.define_intrinsic("list?", list_predicate());
   e.define_intrinsic("number?", number_predicate());
   e.define_intrinsic("string?", string_predicate());
-  e.define_intrinsic("nil?", nil_predicate());
+  e.define_intrinsic("null?", nil_predicate());
   e.define_intrinsic("unspecified?", invalid_predicate());
 
   // basic io
@@ -229,12 +237,12 @@ int main (int argc, char** argv) {
 
   if (vm.count("print-return")) {
     utree r;
-
+    
     // interpreter file REL
-    while (ifs.good()) {
+    for (std::size_t i = 0; ifs.good(); ++i) {
       asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
 
-      // read
+      // read (TODO: make_shared?)
       asts.back().reset(new parse_tree<sexpr>(ifs));
 
       // eval
@@ -246,6 +254,11 @@ int main (int argc, char** argv) {
       // invoke for side effects
       else 
         evaluate(*asts.back(), e);
+      
+      if (vm.count("gc-scans")) {
+        std::cout << "GC SCAN " << i << std::endl;
+        ::phxpr::find_unreachable_objects(true);
+      }
     }
 
     if (vm.count("phex")) {
@@ -263,7 +276,7 @@ int main (int argc, char** argv) {
 
   else {
     // interpreter file REL
-    while (ifs.good()) {
+    for (std::size_t i = 0; ifs.good(); ++i) {
       asts.push_back(boost::shared_ptr<parse_tree<sexpr> >());
 
       // read
@@ -278,6 +291,11 @@ int main (int argc, char** argv) {
       // invoke for side effects
       else 
         evaluate(*asts.back(), e);
+
+      if (vm.count("gc-scans")) {
+        std::cout << "GC SCAN " << i << std::endl;
+        ::phxpr::find_unreachable_objects(true);
+      }
     }
   }
 
@@ -316,6 +334,12 @@ int main (int argc, char** argv) {
 
     delete[] buffer;
   }
+
+  // do a GC sweep
+  if (vm.count("print-gc-sweeps"))
+    ::phxpr::free_unreachable_objects(true);
+  else
+    ::phxpr::free_unreachable_objects();
 
   return 0; 
 }

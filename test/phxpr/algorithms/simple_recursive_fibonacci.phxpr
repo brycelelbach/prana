@@ -20,5 +20,17 @@
     (display (fibonacci n))
     (newline)))
 
-(for-each test-fibonacci (quote (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)))
+;(for-each test-fibonacci (quote (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)))
+
+(test-fibonacci 0)
+(test-fibonacci 1)
+(test-fibonacci 2)
+(test-fibonacci 3)
+(test-fibonacci 4)
+(test-fibonacci 5)
+(test-fibonacci 6)
+(test-fibonacci 7)
+(test-fibonacci 8)
+(test-fibonacci 9)
+(test-fibonacci 10)
 

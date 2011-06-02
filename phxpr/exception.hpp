@@ -14,6 +14,7 @@
 
 #include <prana/include/utree.hpp>
 
+#include <phxpr/gc/shared_ptr.hpp>
 #include <phxpr/signature.hpp>
 
 namespace phxpr {
@@ -39,11 +40,11 @@ struct invalid_arity: virtual exception {
 struct invalid_placeholder: virtual exception {
   displacement expected_n;
   displacement expected_frame;
-  boost::shared_ptr<runtime_environment> environment;
+  phxpr::shared_ptr<runtime_environment> environment;
   arity_type::info type;
 
   invalid_placeholder (displacement expected_n_, displacement expected_frame_,
-                       boost::shared_ptr<runtime_environment> const& e,
+                       phxpr::shared_ptr<runtime_environment> const& e,
                        arity_type::info type_):
     expected_n(expected_n_), expected_frame(expected_frame_),
     environment(e), type(type_) { }
@@ -54,12 +55,13 @@ struct invalid_placeholder: virtual exception {
 struct invalid_local_assignment: virtual exception {
   displacement expected_n;
   displacement expected_frame;
-  boost::shared_ptr<runtime_environment> environment;
+  phxpr::shared_ptr<runtime_environment> environment;
   arity_type::info type;
 
-  invalid_local_assignment (displacement expected_n_, displacement expected_frame_,
-                      boost::shared_ptr<runtime_environment> const& e,
-                      arity_type::info type_):
+  invalid_local_assignment (displacement expected_n_,
+                            displacement expected_frame_,
+                            phxpr::shared_ptr<runtime_environment> const& e,
+                            arity_type::info type_):
     expected_n(expected_n_), expected_frame(expected_frame_),
     environment(e), type(type_) { }
 
@@ -127,10 +129,10 @@ struct expected_identifier: virtual exception {
 
 struct expected_variable_argument: virtual exception {
   displacement n;
-  boost::shared_ptr<runtime_environment> environment;
+  phxpr::shared_ptr<runtime_environment> environment;
  
   expected_variable_argument (displacement n_, 
-                              boost::shared_ptr<runtime_environment> const& e_):
+                              phxpr::shared_ptr<runtime_environment> const& e_):
     n(n_), environment(e_) { }
   
   virtual ~expected_variable_argument (void) throw() { }

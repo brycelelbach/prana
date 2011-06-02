@@ -20,5 +20,9 @@
 
 #include <phxpr/config/using.hpp>
 
+#if defined(BOOST_SP_NO_SP_CONVERTIBLE)
+  #define PHXPR_SP_NO_SP_CONVERTIBLE
+#endif
+
 #endif // PHXPR_DAB661CA_B39E_4939_9CD2_6F85DA18D753
 

@@ -20,16 +20,16 @@ namespace phxpr {
 struct variable_reference: actor<variable_reference> {
   typedef sheol::adt::dynamic_array<signature> gpt_type;
 
-  boost::shared_ptr<utree> value;
-  boost::shared_ptr<gpt_type> global_procedure_table;
+  phxpr::shared_ptr<utree> value;
+  phxpr::shared_ptr<gpt_type> global_procedure_table;
 
   variable_reference (utree const& value_,
-                      boost::shared_ptr<gpt_type> const& gpt):
-    value(boost::make_shared<utree>(value_)), global_procedure_table(gpt)
+                      phxpr::shared_ptr<gpt_type> const& gpt):
+    value(phxpr::make_shared<utree>(value_)), global_procedure_table(gpt)
   { }
  
-  variable_reference (boost::shared_ptr<utree> const& value_,
-                      boost::shared_ptr<gpt_type> const& gpt):
+  variable_reference (phxpr::shared_ptr<utree> const& value_,
+                      phxpr::shared_ptr<gpt_type> const& gpt):
     value(value_), global_procedure_table(gpt)
   { }
   

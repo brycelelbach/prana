@@ -12,7 +12,7 @@
 
 #include <phxpr/config.hpp>
 
-#include <boost/make_shared.hpp>
+#include <phxpr/gc/make_shared.hpp>
 
 #include <prana/include/utree.hpp>
 

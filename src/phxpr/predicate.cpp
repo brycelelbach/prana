@@ -40,10 +40,10 @@ struct boolean_visitor {
   result_type operator() (boost::iterator_range<Iterator> const& range) const
   { return !range.empty(); }
 
-  result_type operator() (spirit::any_ptr const& p) const
+  result_type operator() (spirit::any_ptr const&) const
   { return true; } 
 
-  result_type operator() (spirit::function_base const& pf) const
+  result_type operator() (spirit::function_base const&) const
   { return true; }
 };
 

@@ -13,11 +13,11 @@
 #include <phxpr/config.hpp>
 
 #include <boost/ref.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/shared_array.hpp>
 
 #include <prana/utree/predicates.hpp>
 
+#include <phxpr/gc/shared_ptr.hpp>
+#include <phxpr/gc/shared_array.hpp>
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
@@ -28,14 +28,14 @@ namespace phxpr {
 struct procedure: actor<procedure> {
   typedef sheol::adt::dynamic_array<signature> gpt_type;
 
-  boost::shared_ptr<function_body> body;
-  boost::shared_ptr<runtime_environment> parent_env;
-  boost::shared_ptr<gpt_type> global_procedure_table;
+  phxpr::shared_ptr<function_body> body;
+  phxpr::shared_ptr<runtime_environment> parent_env;
+  phxpr::shared_ptr<gpt_type> global_procedure_table;
   const signature sig;
 
-  procedure (boost::shared_ptr<function_body> const& body_,
-             boost::shared_ptr<runtime_environment> const& parent_env_,
-             boost::shared_ptr<gpt_type> const& gpt, signature const& sig_):
+  procedure (phxpr::shared_ptr<function_body> const& body_,
+             phxpr::shared_ptr<runtime_environment> const& parent_env_,
+             phxpr::shared_ptr<gpt_type> const& gpt, signature const& sig_):
     body(body_), parent_env(parent_env_), global_procedure_table(gpt), sig(sig_)
   {
     BOOST_ASSERT(gpt);
@@ -86,26 +86,26 @@ struct procedure: actor<procedure> {
         const displacement ext_env_size = env.size() + at_c<4>(sig);
 
         // TODO: Implement make_shared_array<>.
-        boost::shared_array<utree> ext_env(new utree[ext_env_size]);
+        phxpr::shared_array<utree> ext_env(new utree[ext_env_size]);
 
         // Extend the environment.
         for (std::size_t i = 0, end = env.size(); i != end; ++i)
           ext_env[i] = env[i];
         
-        boost::shared_ptr<runtime_environment> new_env
-          = boost::make_shared<runtime_environment>
+        phxpr::shared_ptr<runtime_environment> new_env
+          = phxpr::make_shared<runtime_environment>
             (ext_env, ext_env_size, parent_env);
         return new_env->invoke(body);
       } // }}}
 
-      boost::shared_array<utree> storage(new utree[env.size()]);
+      phxpr::shared_array<utree> storage(new utree[env.size()]);
 
       for (std::size_t i = 0, end = env.size(); i != end; ++i) {
         storage[i] = expand(env[i], env);
       }
 
-      boost::shared_ptr<runtime_environment> new_env
-        = boost::make_shared<runtime_environment>
+      phxpr::shared_ptr<runtime_environment> new_env
+        = phxpr::make_shared<runtime_environment>
           (storage, env.size(), parent_env);
       return new_env->invoke(body);
     }
@@ -114,20 +114,20 @@ struct procedure: actor<procedure> {
     else { 
       if (at_c<4>(sig) != 0) {
         // TODO: Implement make_shared_array<>.
-        boost::shared_array<utree> ext_env(new utree[at_c<4>(sig)]);
+        phxpr::shared_array<utree> ext_env(new utree[at_c<4>(sig)]);
 
         // Extend the environment.
         for (std::size_t i = 0, end = env.size(); i != end; ++i)
           ext_env[i] = env[i];
         
-        boost::shared_ptr<runtime_environment> new_env
-          = boost::make_shared<runtime_environment>
+        phxpr::shared_ptr<runtime_environment> new_env
+          = phxpr::make_shared<runtime_environment>
             (ext_env, at_c<4>(sig), parent_env);
         return new_env->invoke(body);
       } // }}}
 
-      boost::shared_ptr<runtime_environment> new_env
-        = boost::make_shared<runtime_environment>(parent_env);
+      phxpr::shared_ptr<runtime_environment> new_env
+        = phxpr::make_shared<runtime_environment>(parent_env);
       return new_env->invoke(body);
     }
   }

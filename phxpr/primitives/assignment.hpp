@@ -17,21 +17,21 @@
 namespace phxpr {
 
 struct local_assignment: actor<local_assignment> {
-  boost::shared_ptr<utree> value;
+  phxpr::shared_ptr<utree> value;
   displacement n;
   displacement frame;
 
   local_assignment (utree const& value_, displacement n_, displacement frame_):
-    value(boost::make_shared<utree>(value_)), n(n_), frame(frame_)
+    value(phxpr::make_shared<utree>(value_)), n(n_), frame(frame_)
   { }
  
-  local_assignment (boost::shared_ptr<utree> const& value_, displacement n_,
+  local_assignment (phxpr::shared_ptr<utree> const& value_, displacement n_,
                     displacement frame_):
     value(value_), n(n_), frame(frame_)
   { }
 
   utree eval (utree& ut) const {
-    boost::shared_ptr<runtime_environment> eptr
+    phxpr::shared_ptr<runtime_environment> eptr
       = ut.get<runtime_environment*>()->checkout();
 
     if (!eptr) {

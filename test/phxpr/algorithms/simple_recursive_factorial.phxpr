@@ -20,5 +20,17 @@
     (display (factorial n))
     (newline)))
 
-(for-each test-factorial (quote (0 1 2 3 4 5 6 7 8 9 10)))
+;(for-each test-factorial (quote (0 1 2 3 4 5 6 7 8 9 10)))
+
+(test-factorial 0)
+(test-factorial 1)
+(test-factorial 2)
+(test-factorial 3)
+(test-factorial 4)
+(test-factorial 5)
+(test-factorial 6)
+(test-factorial 7)
+(test-factorial 8)
+(test-factorial 9)
+(test-factorial 10)
 

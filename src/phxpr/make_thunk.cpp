@@ -26,8 +26,8 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
   const signature body_sig(at_c<0>(sig), at_c<1>(sig), at_c<2>(sig), 
                            function_type::thunk, at_c<4>(sig));
 
-  boost::shared_ptr<thunk::lazy_call_type> lazy_call
-    = boost::make_shared<thunk::lazy_call_type>();
+  phxpr::shared_ptr<thunk::lazy_call_type> lazy_call
+    = phxpr::make_shared<thunk::lazy_call_type>();
 
   if (prana::is_utree_container(elements)) {
     typedef utree::const_iterator iterator;

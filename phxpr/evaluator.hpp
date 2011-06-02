@@ -49,22 +49,22 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   typedef sheol::adt::dynamic_array<signature> gpt_type;
   // }}}
 
-  boost::shared_ptr<variables_type> variables;
-  boost::shared_ptr<gpt_type> global_procedure_table;
+  phxpr::shared_ptr<variables_type> variables;
+  phxpr::shared_ptr<gpt_type> global_procedure_table;
   const displacement frame;
   signature sig;
 
   evaluator (void):
-    variables(boost::make_shared<variables_type>()),
-    global_procedure_table(boost::make_shared<gpt_type>()),
+    variables(phxpr::make_shared<variables_type>()),
+    global_procedure_table(phxpr::make_shared<gpt_type>()),
     frame(0), sig(0, arity_type::fixed, evaluation_strategy::call_by_value,
                   function_type::module, 0) 
   { }
 
-  evaluator (boost::shared_ptr<variables_type> const& parent_,
-             boost::shared_ptr<gpt_type> const& gpt,
+  evaluator (phxpr::shared_ptr<variables_type> const& parent_,
+             phxpr::shared_ptr<gpt_type> const& gpt,
              displacement frame_, signature const& sig_):
-    variables(boost::make_shared<variables_type>(parent_)),
+    variables(phxpr::make_shared<variables_type>(parent_)),
     global_procedure_table(gpt), frame(frame_), sig(sig_)
   { BOOST_ASSERT(parent_); }
 
@@ -81,18 +81,18 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
 
   template <typename F>
   void define_intrinsic (std::string const& name, F const& f) {
-    boost::shared_ptr<function_body> body
-      = boost::make_shared<function_body>(f);
+    phxpr::shared_ptr<function_body> body
+      = phxpr::make_shared<function_body>(f);
 
     // create a new lambda expression
     lambda l(body, global_procedure_table, f.sig);
 
     // evaluate the lambda expression, returning a procedure
-    boost::shared_ptr<runtime_environment> new_env
-      = boost::make_shared<runtime_environment>(); 
+    phxpr::shared_ptr<runtime_environment> new_env
+      = phxpr::make_shared<runtime_environment>(); 
     utree proc = new_env->invoke(l);
 
-    boost::shared_ptr<utree> p = variables->define
+    phxpr::shared_ptr<utree> p = variables->define
       (utree(spirit::utf8_symbol_type(name)), proc); 
 
     global_procedure_table->push_back(f.sig);
@@ -107,7 +107,7 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
 
   // FIXME: This requires a string copy because utree can't hold symbol ranges. 
   result_type make_variable_reference (symbol_type const& str) {
-    boost::shared_ptr<utree> p = variables->lookup(utree(str));
+    phxpr::shared_ptr<utree> p = variables->lookup(utree(str));
 
     if (!p)
       BOOST_THROW_EXCEPTION(identifier_not_found(utree(str)));
@@ -139,7 +139,7 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   // TODO: optimize for value != function case
   result_type
   make_module_level_variable (utree const& identifier, utree const& value) {
-    boost::shared_ptr<utree> p(variables->declare(identifier));
+    phxpr::shared_ptr<utree> p(variables->declare(identifier));
 
     // for recursion, we install a reference while evaluating the variable's
     // value (as noted above, this can be optimized).
