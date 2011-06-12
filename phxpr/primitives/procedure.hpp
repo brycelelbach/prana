@@ -17,7 +17,6 @@
 #include <prana/utree/predicates.hpp>
 
 #include <phxpr/gc/shared_ptr.hpp>
-#include <phxpr/gc/shared_array.hpp>
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
@@ -85,44 +84,44 @@ struct procedure: actor<procedure> {
         // {{{ environment extension for local variables
         const displacement ext_env_size = env.size() + at_c<4>(sig);
 
-        // TODO: Implement make_shared_array<>.
-        phxpr::shared_array<utree> ext_env(new utree[ext_env_size]);
+        phxpr::shared_ptr<runtime_environment::upvalue_type> storage
+          = phxpr::make_shared<runtime_environment::upvalue_type>
+            (ext_env_size, sheol::fill);
 
         // Extend the environment.
         for (std::size_t i = 0, end = env.size(); i != end; ++i)
-          ext_env[i] = env[i];
+          (*storage)[i] = env[i];
         
         phxpr::shared_ptr<runtime_environment> new_env
-          = phxpr::make_shared<runtime_environment>
-            (ext_env, ext_env_size, parent_env);
+          = phxpr::make_shared<runtime_environment>(storage, parent_env);
         return new_env->invoke(body);
       } // }}}
 
-      phxpr::shared_array<utree> storage(new utree[env.size()]);
+      phxpr::shared_ptr<runtime_environment::upvalue_type> storage
+        = phxpr::make_shared<runtime_environment::upvalue_type>
+          (env.size(), sheol::fill);
 
-      for (std::size_t i = 0, end = env.size(); i != end; ++i) {
-        storage[i] = expand(env[i], env);
-      }
+      for (std::size_t i = 0, end = env.size(); i != end; ++i)
+        (*storage)[i] = expand(env[i], env);
 
       phxpr::shared_ptr<runtime_environment> new_env
-        = phxpr::make_shared<runtime_environment>
-          (storage, env.size(), parent_env);
+        = phxpr::make_shared<runtime_environment>(storage, parent_env);
       return new_env->invoke(body);
     }
   
     // nullary  
     else { 
       if (at_c<4>(sig) != 0) {
-        // TODO: Implement make_shared_array<>.
-        phxpr::shared_array<utree> ext_env(new utree[at_c<4>(sig)]);
+        phxpr::shared_ptr<runtime_environment::upvalue_type> storage
+          = phxpr::make_shared<runtime_environment::upvalue_type>
+            (at_c<4>(sig), sheol::fill);
 
         // Extend the environment.
         for (std::size_t i = 0, end = env.size(); i != end; ++i)
-          ext_env[i] = env[i];
+          (*storage)[i] = env[i];
         
         phxpr::shared_ptr<runtime_environment> new_env
-          = phxpr::make_shared<runtime_environment>
-            (ext_env, at_c<4>(sig), parent_env);
+          = phxpr::make_shared<runtime_environment>(storage, parent_env);
         return new_env->invoke(body);
       } // }}}
 

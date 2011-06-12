@@ -17,7 +17,6 @@
 #include <prana/utree/predicates.hpp>
 
 #include <phxpr/gc/shared_ptr.hpp>
-#include <phxpr/gc/shared_array.hpp>
 #include <phxpr/exception.hpp>
 #include <phxpr/signature.hpp>
 #include <phxpr/primitives/actor.hpp>
@@ -72,14 +71,15 @@ struct thunk: actor<thunk> {
 
     // IMPLEMENT: Allocate space for locals here (actually maybe not).
     const displacement lazy_env_size = lazy_call->size() - 1;
-    phxpr::shared_array<utree> lazy_env(new utree[lazy_env_size]);
+    phxpr::shared_ptr<runtime_environment::upvalue_type> storage
+      = phxpr::make_shared<runtime_environment::upvalue_type>
+        (lazy_env_size, sheol::fill);
 
     for (std::size_t i = 0, end = lazy_env_size; i != end; ++i)
-      lazy_env[i] = execute_lazy((*lazy_call)[i + 1], env);
+      (*storage)[i] = execute_lazy((*lazy_call)[i + 1], env);
 
     phxpr::shared_ptr<runtime_environment> new_env
-      = phxpr::make_shared<runtime_environment>
-        (lazy_env, lazy_env_size, env.checkout());
+      = phxpr::make_shared<runtime_environment>(storage, env.checkout());
 
     return new_env->invoke(lazy_f);
   }
