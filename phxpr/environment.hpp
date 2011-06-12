@@ -18,8 +18,9 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/spirit/include/support_utree.hpp>
 
+#include <sheol/adt/dynamic_array.hpp>
+
 #include <phxpr/gc/shared_ptr.hpp>
-#include <phxpr/gc/shared_array.hpp>
 #include <phxpr/gc/enable_shared_from_this.hpp>
 #include <phxpr/gc/make_shared.hpp>
 #include <phxpr/exception.hpp>
@@ -56,15 +57,19 @@ struct compile_environment {
     return it->second; 
   } // }}}
   
-  mapped_type declare (key_type const& name) {
+  mapped_type& declare (key_type const& name) {
     if (definitions.count(name))
     { BOOST_THROW_EXCEPTION(multiple_definitions<Key>(name)); }
-    return (definitions[name] = phxpr::make_shared<T>());
+    return (definitions[name] = phxpr::shared_ptr<T>());
   }
 
-  mapped_type define (key_type const& name, T const& val) {
+  mapped_type& define (key_type const& name, T const& val) {
     if (definitions.count(name))
     { BOOST_THROW_EXCEPTION(multiple_definitions<Key>(name)); }
+    return (definitions[name] = phxpr::make_shared<T>(val));
+  }
+
+  mapped_type& redefine (key_type const& name, T const& val) {
     return (definitions[name] = phxpr::make_shared<T>(val));
   }
 
@@ -90,30 +95,40 @@ struct compile_environment {
 };
     
 struct runtime_environment:
-  boost::iterator_range<utree*>,
+  boost::iterator_range<sheol::adt::dynamic_array<utree>::iterator>,
   phxpr::enable_shared_from_this<runtime_environment>
 {
  public:
-  runtime_environment (void): depth(0), parent(), upval(0) { }
+  typedef sheol::adt::dynamic_array<utree> upvalue_type;
+  typedef boost::iterator_range<upvalue_type::iterator> base_type;
+//  typedef boost::iterator_range<upvalue_type>::iterator iterator;
+
+  runtime_environment (void): depth(0), parent(), upval() { }
 
   runtime_environment (phxpr::shared_ptr<runtime_environment> const& parent_):
-    depth(parent_ ? (parent_->depth + 1) : 0), parent(parent_), upval(0) { }
+    depth(parent_ ? (parent_->depth + 1) : 0), parent(parent_), upval() { }
   
-  runtime_environment (phxpr::shared_array<utree> const& upval_,
-                       runtime_environment::size_type size_):
-    boost::iterator_range<utree*>(upval_.get(), upval_.get() + size_), depth(0),
+  runtime_environment (phxpr::shared_ptr<upvalue_type> const& upval_):
+    base_type(upval_->begin(), upval_->end()), depth(0),
     parent(), upval(upval_) { }
   
-  runtime_environment (phxpr::shared_array<utree> const& upval_,
-                       runtime_environment::size_type size_,
+  runtime_environment (phxpr::shared_ptr<upvalue_type> const& upval_,
                        phxpr::shared_ptr<runtime_environment> const& parent_):
-    boost::iterator_range<utree*>(upval_.get(), upval_.get() + size_),
+    base_type(upval_->begin(), upval_->end()),
     depth(parent_ ? (parent_->depth + 1) : 0), parent(parent_),
     upval(upval_) { }
   
   runtime_environment (runtime_environment const& other):
-    boost::iterator_range<utree*>(other.begin(), other.end()),
+    base_type(other.begin(), other.end()),
     depth(other.depth), parent(other.parent), upval(other.upval) { }
+
+/*
+  ~runtime_environment (void) {
+    if (upval.unique())
+      for (iterator it = begin(), end_ = end(); it != end_; ++it) 
+      { it->clear(); }
+  }
+*/
 
   phxpr::shared_ptr<runtime_environment> const& outer (void) const
   { return parent; }
@@ -121,7 +136,7 @@ struct runtime_environment:
   runtime_environment::size_type level (void) const 
   { return depth; }
 
-  phxpr::shared_array<utree> const& get() const
+  phxpr::shared_ptr<upvalue_type> const& get() const
   { return upval; }
 
   phxpr::shared_ptr<runtime_environment> checkout() const
@@ -142,7 +157,7 @@ struct runtime_environment:
  private:
   const runtime_environment::size_type depth;
   phxpr::shared_ptr<runtime_environment> parent;
-  phxpr::shared_array<utree> upval;
+  phxpr::shared_ptr<upvalue_type> upval;
 };
 
 } // phxpr
