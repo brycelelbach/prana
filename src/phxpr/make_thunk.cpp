@@ -48,6 +48,7 @@ evaluator::make_thunk (utree const& elements, signature const& sig) {
     }
 
     // TODO: syntax checks
+    // TODO: bad define placement checks
     else if (*it == utree(spirit::utf8_symbol_type("variable"))) {
       iterator identifier = ++it; 
       iterator value = ++it; 

@@ -119,14 +119,16 @@ evaluator::execute (evaluator::range_type const& range) {
 
   // Invoke non-nullary procedures.
   const displacement env_size = at_c<4>(sig) + std::distance(it, end);  
-  phxpr::shared_array<utree> env(new utree[env_size]);
+  phxpr::shared_ptr<runtime_environment::upvalue_type> storage
+    = phxpr::make_shared<runtime_environment::upvalue_type>
+      (env_size, sheol::fill);
 
   // Evaluate the arguments.
   for (std::size_t i = 0; it != end; ++it)
-    env[i++] = evaluate(*it, *this);
+    (*storage)[i++] = evaluate(*it, *this);
 
   phxpr::shared_ptr<runtime_environment> new_env
-    = phxpr::make_shared<runtime_environment>(env, env_size);
+    = phxpr::make_shared<runtime_environment>(storage);
   return new_env->invoke(f);
 } // }}}
 
