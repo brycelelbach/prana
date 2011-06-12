@@ -140,14 +140,19 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
   // FIXME: this leaks memory
   result_type
   make_module_level_variable (utree const& identifier, utree const& value) {
-    phxpr::shared_ptr<utree> p(variables->declare(identifier));
+    phxpr::shared_ptr<utree>& p = variables->declare(identifier);
+//    phxpr::shared_ptr<utree> p(variables->define
+//      (identifier, utree(new variable_reference(p, global_procedure_table))));
 
-    // FIXME: this is leaked.
-    variable_reference* v = new variable_reference(p, global_procedure_table);
+    p = phxpr::make_shared<utree>
+      (new recursive_reference(p, global_procedure_table));
+
+//    variable_reference* v = new variable_reference(p, global_procedure_table);
+//    variable_reference v(p, global_procedure_table);
 
     // for recursion, we install a reference while evaluating the variable's
     // value (as noted above, this can be optimized).
-    *p = utree(v);
+//    *p = utree(new variable_reference(p, global_procedure_table));
  
     const signature sig(0, arity_type::fixed,
                         evaluation_strategy::call_by_value, 
@@ -157,7 +162,11 @@ struct PHXPR_EXPORT evaluator: boost::noncopyable {
     p->tag(global_procedure_table->size() - 1);
 
     utree const& r = evaluate(value, *this);
+
+//    std::cout << "use_count = " << p.use_count() << std::endl;
+
     *p = r;
+//    variables->redefine(identifier, r); 
 
     // return value of a definition is unspecified (aka invalid utree)
     return utree();
